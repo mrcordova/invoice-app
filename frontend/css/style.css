@@ -121,6 +121,22 @@ header {
   }
 }
 
+.invoice-title-cont {
+  display: flex;
+  flex-direction: column;
+  color: light-dark(var(--papilio-argeotus), var(--stotic-white));
+  font-size: 0.813rem;
+  letter-spacing: -0.006rem;
+  line-height: 1.15;
+
+  & .invoice-title {
+    color: light-dark(var(--ruined-smores), white);
+    font-size: clamp(1.5rem, calc(0.784rem + 3.053vw), 2.25rem);
+    letter-spacing: clamp(-0.071rem, calc(-0.024rem + -0.097vw), -0.047rem);
+    line-height: 0.92;
+  }
+}
+
 @media (min-width: 48rem) {
   header {
     & .logo-cont {
