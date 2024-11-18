@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap");
 :root {
   --venetian-nights: #7c5dfa;
-  --forgotten-purpl: #9277ff;
+  --forgotten-purple: #9277ff;
   --kon: #1e2139;
   --royal-curtsy: #252945;
   --stotic-white: #dfe3fa;
@@ -12,6 +12,7 @@
   --american-pink: #ff9797;
   --zhēn-zhū-bái-pearl: #f8f8fb;
   --river-styx: #141625;
+  --carbon-blue: #373b53;
 }
 
 .league-spartan-medium {
@@ -25,4 +26,51 @@
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
+}
+
+header {
+  background-color: var(--carbon-blue);
+
+  & .logo-cont {
+    background-color: var(--venetian-nights);
+
+    position: relative;
+    width: max-content;
+    padding-inline: clamp(1.375rem, calc(1.256rem + 0.509vw), 1.5rem);
+    padding-block: clamp(1.438rem, calc(1.318rem + 0.509vw), 1.563rem);
+    border-top-right-radius: 1.25rem;
+    border-bottom-right-radius: 1.25rem;
+    overflow: hidden;
+    z-index: 0;
+
+    & .logo-bg {
+      position: absolute;
+      background-color: var(--forgotten-purple);
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      /* top: 0; */
+      left: 0;
+      right: 0;
+      bottom: -50%;
+
+      border-top-left-radius: 1.25rem;
+      border-bottom-left-radius: 1.25rem;
+    }
+  }
+
+  & input[type="checkbox"] {
+    display: none;
+  }
+}
+
+@media (min-width: 48rem) {
+  & .logo-cont {
+    padding-inline: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem);
+    padding-block: clamp(1.563rem, calc(1.063rem + 1.042vw), 2rem);
+
+    & .logo-bg {
+      /* height: clamp(5rem, calc(3.357rem + 3.423vw), 6.438rem); */
+    }
+  }
 }
