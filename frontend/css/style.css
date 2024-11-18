@@ -13,6 +13,7 @@
   --zhēn-zhū-bái-pearl: #f8f8fb;
   --river-styx: #141625;
   --carbon-blue: #373b53;
+  --independence: #494e6e;
 }
 
 .league-spartan-medium {
@@ -27,22 +28,39 @@
   font-weight: 700;
   font-style: normal;
 }
-
+html {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 90rem;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  transition: all 1s ease;
+}
 header {
   background-color: var(--carbon-blue);
+  display: flex;
 
   & .logo-cont {
     background-color: var(--venetian-nights);
 
+    margin-inline-end: auto;
     position: relative;
-    width: max-content;
+    /* width: max-content; */
+
     padding-inline: clamp(1.375rem, calc(1.256rem + 0.509vw), 1.5rem);
     padding-block: clamp(1.438rem, calc(1.318rem + 0.509vw), 1.563rem);
     border-top-right-radius: 1.25rem;
     border-bottom-right-radius: 1.25rem;
     overflow: hidden;
     z-index: 0;
+    /* height: 100%; */
 
+    & img {
+      width: clamp(2rem, calc(1.523rem + 2.036vw), 2.5rem);
+    }
     & .logo-bg {
       position: absolute;
       background-color: var(--forgotten-purple);
@@ -59,18 +77,66 @@ header {
     }
   }
 
+  & .theme-toggle {
+    align-self: center;
+    padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+  }
+
+  & .profile-pic-cont {
+    padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+    padding-block: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem);
+    border-left: 1px solid var(--independence);
+
+    /* min-width: clamp(2rem, calc(1.523rem + 2.036vw), 2.5rem); */
+    & img {
+      width: 2rem;
+      border-radius: 50%;
+    }
+  }
   & input[type="checkbox"] {
     display: none;
   }
 }
 
 @media (min-width: 48rem) {
-  & .logo-cont {
-    padding-inline: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem);
-    padding-block: clamp(1.563rem, calc(1.063rem + 1.042vw), 2rem);
+  header {
+    & .logo-cont {
+      padding-inline: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem);
+      padding-block: clamp(1.563rem, calc(1.063rem + 1.042vw), 2rem);
+      width: clamp(5rem, calc(3.357rem + 3.423vw), 6.438rem);
+    }
 
-    & .logo-bg {
-      /* height: clamp(5rem, calc(3.357rem + 3.423vw), 6.438rem); */
+    & .profile-pic-cont {
+      /* width: clamp(5rem, calc(3.357rem + 3.423vw), 6.438rem); */
+      & img {
+        width: clamp(2rem, calc(1.429rem + 1.19vw), 2.5rem);
+      }
+    }
+
+    & .theme-toggle {
+      padding-inline: 2rem;
+    }
+  }
+}
+
+@media (min-width: 90rem) {
+  body {
+    flex-direction: row;
+  }
+  header {
+    flex-direction: column;
+    border-top-right-radius: 1.25rem;
+    border-bottom-right-radius: 1.25rem;
+    & .profile-pic-cont {
+      border-top: 1px solid var(--independence);
+      border-left: 0;
+    }
+    & .logo-cont {
+      margin-block-end: auto;
+    }
+
+    & .theme-toggle {
+      padding-block: 2rem;
     }
   }
 }
