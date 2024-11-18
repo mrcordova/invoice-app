@@ -14,6 +14,7 @@
   --river-styx: #141625;
   --carbon-blue: #373b53;
   --independence: #494e6e;
+  color-scheme: light dark;
 }
 
 .league-spartan-medium {
@@ -38,6 +39,8 @@ body {
   flex-direction: column;
   min-height: 100%;
   transition: all 1s ease;
+
+  background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
 }
 header {
   background-color: var(--carbon-blue);
@@ -98,6 +101,26 @@ header {
   }
 }
 
+.hide-mobile {
+  display: none;
+}
+
+.invoices {
+  &:has(> *:not(.hide)) + .no-invoices-con {
+    display: none;
+  }
+
+  &:has(> .hide) {
+    display: none; /* Hide if all children have the .hide class */
+  }
+  &:has(> *:not(.hide)) {
+    display: flex; /* Show if any child does NOT have the .hide class */
+  }
+  & .hide {
+    display: none;
+  }
+}
+
 @media (min-width: 48rem) {
   header {
     & .logo-cont {
@@ -116,6 +139,9 @@ header {
     & .theme-toggle {
       padding-inline: 2rem;
     }
+  }
+  .hide-mobile {
+    display: inline;
   }
 }
 
