@@ -45,6 +45,54 @@ body {
 
   background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
 }
+
+.bill-from-section {
+  display: grid;
+  grid-template-areas:
+    "header ."
+    "addy addy"
+    "city post-code"
+    "country country";
+  row-gap: 1.563rem;
+  column-gap: clamp(1.438rem, calc(1.378rem + 0.254vw), 1.5rem);
+
+  & label {
+    display: grid;
+    color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+    font-size: 0.8125rem;
+    letter-spacing: -0.00625rem;
+    line-height: 1.15;
+    gap: 0.5625rem;
+  }
+  & input {
+    min-width: 0;
+    background-color: light-dark(white, var(--kon));
+    border: 1px solid light-dark(var(--stotic-white), var(--royal-curtsy));
+    color: light-dark(var(--ruined-smores), white);
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.015625rem;
+    text-indent: 1.25rem;
+    padding-block: 1.125rem 0.9375rem;
+  }
+  & .header {
+    grid-area: header;
+  }
+
+  & .addy {
+    grid-area: addy;
+  }
+  & .city {
+    grid-area: city;
+  }
+  & .postal-code {
+    grid-area: post-code;
+  }
+  & .country {
+    grid-area: country;
+  }
+}
 .filter-status-cont {
   position: relative;
   color: light-dark(var(--ruined-smores), white);
@@ -409,6 +457,7 @@ body {
   & .form-cont {
     background-color: light-dark(white, var(--river-styx));
     flex: 1;
+    padding-inline: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
   }
   &::backdrop {
     background-color: hsl(from black h s l / 0.5);
@@ -432,6 +481,12 @@ main {
     clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
 }
 @media (min-width: 48rem) {
+  .bill-from-section {
+    grid-template-areas:
+      "header . ."
+      "addy addy addy"
+      "city post-code country";
+  }
   .header {
     & .logo-cont {
       padding-inline: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem);
@@ -533,38 +588,13 @@ main {
 
   #new-invoice-dialog[open] {
     flex-direction: row;
-    /* width: 45rem; */
-    /* max-width: 90rem; */
     min-width: 90rem;
-    /* width: 4rem; */
-    /* justify-content: flex-start; */
 
-    /* max-width: 45rem; */
-    /* position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0; */
-
-    /* display: block; */
-    /* max-width: 45rem; */
     margin: 0 auto;
-    /* border-top-right-radius: 1.25rem;
-    border-bottom-right-radius: 1.25rem; */
 
-    & .header {
-      /* height: 100vh; */
-      /* height: 100svh; */
-
-      /* margin-inline-start: auto; */
-    }
     & .form-cont {
-      /* min-width: 50%; */
-      /* width: 100%; */
       flex: 0;
       min-width: 38.5rem;
-      /* margin: 0 auto; */
-      /* margin-inline-end: auto; */
     }
   }
 }

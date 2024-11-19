@@ -54,38 +54,50 @@
             <img src="./assets/image-avatar.jpg" alt="profile picture" />
           </div>
         </header>
-        <div class="form-cont">
+        <div class="form-cont league-spartan-bold">
           <button>
             <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
             Go back
           </button>
           <h3>New Invoice</h3>
           <form>
-            <section>
-              <h4>Bill From</h4>
-              <label>
+            <section class="bill-from-section">
+              <h4 class="section-header">Bill From</h4>
+              <label class="addy league-spartan-medium">
                 Street Address
                 <input
+                  class="league-spartan-bold"
                   type="text"
                   name="addy"
                   id="addy"
                   autocomplete="address-level1" />
               </label>
-              <label>
+              <label class="city league-spartan-medium">
                 City
                 <input
+                  class="league-spartan-bold"
                   type="text"
                   name="addy"
                   id="ciy"
                   autocomplete="address-level2" />
               </label>
-              <label>
+              <label class="postal-code league-spartan-medium">
                 Postal Code
                 <input
+                  class="league-spartan-bold"
                   type="text"
                   name="addy"
                   id="zipcode"
                   autocomplete="postal-code" />
+              </label>
+              <label class="country league-spartan-medium">
+                Country
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="addy"
+                  id="country"
+                  autocomplete="country" />
               </label>
             </section>
           </form>
