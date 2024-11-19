@@ -211,13 +211,19 @@ header {
   &:has(> *:not(.hide)) {
     display: grid; /* Show if any child does NOT have the .hide class */
     /* grid-template-columns: 1fr; */
+    gap: 1rem;
   }
   & .hide {
     display: none;
   }
 
   & .invoice {
-    /* grid-template-columns: subgrid; */
+    border-radius: 0.5rem;
+    padding-inline: 1.5rem;
+    padding-block: clamp(1rem, calc(2.099rem + -2.29vw), 1.563rem)
+      clamp(1rem, calc(1.733rem + -1.527vw), 1.375rem);
+    grid-template-columns: repeat(2, 1fr);
+    background-color: light-dark(white, var(--kon));
     display: grid;
     grid-template-areas:
       "id user"
@@ -229,7 +235,7 @@ header {
     }
     & .invoice-user {
       grid-area: user;
-      text-align: left;
+      text-align: right;
     }
     & .due-date {
       grid-area: due;
@@ -239,6 +245,7 @@ header {
     }
     & .status-token {
       grid-area: status;
+      margin: auto;
     }
   }
 }
@@ -314,10 +321,20 @@ main {
   }
 
   .invoices {
+    /* grid-template-columns: repeat(5, 1fr); */
     & .invoice {
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: repeat(5, 1fr);
 
       grid-template-areas: "id due user amount status";
+      & .amount {
+        text-align: end;
+      }
+      & .status-token {
+        text-align: center;
+      }
+      & .invoice-user {
+        text-align: left;
+      }
     }
   }
   main {
