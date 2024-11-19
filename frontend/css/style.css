@@ -46,7 +46,8 @@ body {
   background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
 }
 
-.bill-from-section {
+.bill-from-section,
+.bill-to-section {
   display: grid;
   grid-template-areas:
     "header ."
@@ -97,6 +98,23 @@ body {
   }
   & .country {
     grid-area: country;
+  }
+}
+.bill-to-section {
+  grid-template-areas:
+    "header ."
+    "name name"
+    "email email"
+    "addy addy"
+    "city post-code"
+    "country country";
+
+  & .client-name {
+    grid-area: name;
+  }
+
+  & .client-email {
+    grid-area: email;
   }
 }
 .filter-status-cont {
@@ -458,6 +476,8 @@ body {
 
   & .header {
     /* height: max-content; */
+    position: sticky;
+    top: 0;
   }
 
   & .form-cont {
@@ -503,6 +523,15 @@ main {
   .bill-from-section {
     grid-template-areas:
       "header . ."
+      "addy addy addy"
+      "city post-code country";
+  }
+
+  .bill-to-section {
+    grid-template-areas:
+      "header . ."
+      "name name name"
+      "email email email"
       "addy addy addy"
       "city post-code country";
   }
