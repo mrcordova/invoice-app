@@ -29,7 +29,7 @@
       </div>
     </header>
     <main>
-      <div>
+      <div class="options-cont">
         <div class="invoice-title-cont league-spartan-medium">
           <h1 class="league-spartan-bold invoice-title">Invoices</h1>
           <span class="hide-mobile">There are</span>
@@ -38,7 +38,34 @@
           invoices
         </div>
         <!-- Add number here -->
-        Filter by status Draft Pending Paid New Invoice
+        <div class="filter-status-cont league-spartan-bold">
+          <label class="filter-status-input-lab">
+            <input type="checkbox" name="filter" id="filter" />
+            Filter
+            <span class="hide-mobile">by status</span>
+          </label>
+          <menu class="filter-status-menu">
+            <li>
+              <label>
+                <input type="checkbox" name="status" id="draft" />
+                Draft
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" name="status" id="draft" />
+                Pending
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" name="status" id="draft" />
+                Paid
+              </label>
+            </li>
+          </menu>
+        </div>
+        New Invoice
       </div>
 
       <div class="invoices">
