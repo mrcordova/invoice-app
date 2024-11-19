@@ -294,6 +294,7 @@ header {
   align-items: center;
 }
 main {
+  flex: 1;
   padding-inline: clamp(1.5rem, calc(0.069rem + 6.107vw), 3rem);
   padding-block: clamp(2rem, calc(0.271rem + 7.379vw), 3.813rem)
     clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
@@ -323,7 +324,7 @@ main {
   .invoices {
     /* grid-template-columns: repeat(5, 1fr); */
     & .invoice {
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: max-content repeat(4, 1fr);
 
       grid-template-areas: "id due user amount status";
       & .amount {
@@ -334,6 +335,9 @@ main {
       }
       & .invoice-user {
         text-align: left;
+      }
+      & .due-date {
+        text-align: center;
       }
     }
   }
