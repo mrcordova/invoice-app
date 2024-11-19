@@ -181,6 +181,11 @@ header {
   & .theme-toggle {
     align-self: center;
     padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+    color: var(--true-lavender);
+    &:hover {
+      cursor: pointer;
+      color: var(--stotic-white);
+    }
   }
 
   & .profile-pic-cont {
@@ -235,6 +240,12 @@ header {
       "id user"
       "due status"
       "amount status";
+    border: 1px solid transparent;
+
+    &:hover {
+      cursor: pointer;
+      border: 1px solid var(--venetian-nights);
+    }
 
     & .invoice-id {
       margin-block-end: 1.5rem;
@@ -361,6 +372,11 @@ header {
     & img {
       min-width: 0.6875rem;
     }
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--forgotten-purple);
   }
 }
 .no-invoices-con {
