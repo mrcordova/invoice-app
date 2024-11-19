@@ -140,7 +140,7 @@ body {
     }
   }
 }
-header {
+.header {
   background-color: var(--carbon-blue);
   display: flex;
 
@@ -202,6 +202,10 @@ header {
   & input[type="checkbox"] {
     display: none;
   }
+}
+
+.header-cont {
+  background-color: light-dark(white, var(--river-styx));
 }
 
 .hide-mobile {
@@ -379,6 +383,37 @@ header {
     background-color: var(--forgotten-purple);
   }
 }
+#new-invoice-dialog[open] {
+  /* z-index: -1; */
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  /* width: 100%; */
+  height: 100%;
+  min-width: 100%;
+  max-height: 100vh;
+  max-height: 100svh;
+  background-color: transparent;
+  background: linear-gradient(
+    to right,
+    light-dark(white, var(--river-styx)) 15%,
+    transparent 15%
+  );
+
+  & .header {
+    /* height: max-content; */
+  }
+
+  & .form-cont {
+    background-color: light-dark(white, var(--river-styx));
+    flex: 1;
+  }
+  &::backdrop {
+    background-color: hsl(from black h s l / 0.5);
+  }
+}
 .no-invoices-con {
   display: flex;
   flex-direction: column;
@@ -397,7 +432,7 @@ main {
     clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
 }
 @media (min-width: 48rem) {
-  header {
+  .header {
     & .logo-cont {
       padding-inline: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem);
       padding-block: clamp(1.563rem, calc(1.063rem + 1.042vw), 2rem);
@@ -451,13 +486,33 @@ main {
     padding-block: clamp(3.813rem, calc(2.67rem + 2.381vw), 4.813rem)
       clamp(10.813rem, calc(4.027rem + 14.137vw), 16.75rem);
   }
+  #new-invoice-dialog[open] {
+    /* width: 100%; */
+    /* max-width: 100vh; */
+    /* max-width: 100svh; */
+    /* background-color: transparent; */
+    & .header {
+      /* flex-direction: column; */
+      /* min-height: max-content; */
+    }
+    & .form-cont {
+      border-top-right-radius: 1.25rem;
+      border-bottom-right-radius: 1.25rem;
+      /* background-color: transparent; */
+      width: 80%;
+      /* background-color: light-dark(white, var(--river-styx)); */
+      /* min-height: 100vh; */
+      /* min-height: 100svh; */
+      /* height: 100%; */
+    }
+  }
 }
 
 @media (min-width: 90rem) {
   body {
     flex-direction: row;
   }
-  header {
+  .header {
     flex-direction: column;
     border-top-right-radius: 1.25rem;
     border-bottom-right-radius: 1.25rem;
@@ -471,6 +526,21 @@ main {
 
     & .theme-toggle {
       padding-block: 2rem;
+    }
+  }
+
+  #new-invoice-dialog[open] {
+    flex-direction: row;
+    /* border-top-right-radius: 1.25rem;
+    border-bottom-right-radius: 1.25rem; */
+
+    & .header {
+      /* height: 100vh; */
+      /* height: 100svh; */
+    }
+    & .form-cont {
+      min-width: 50%;
+      flex: 0;
     }
   }
 }
