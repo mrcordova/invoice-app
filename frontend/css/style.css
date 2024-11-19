@@ -48,12 +48,16 @@ body {
   font-size: 0.938rem;
   line-height: 1;
   letter-spacing: -0.016rem;
-  padding-inline: 2.5rem;
+  /* padding-inline: 2.5rem; */
+  padding-inline: 2.5rem clamp(1.159rem, calc(-0.121rem + 5.461vw), 2.5rem);
   width: max-content;
 
   & .filter-status-input-lab {
     /* position: relative; */
 
+    &:hover {
+      cursor: pointer;
+    }
     & input[type="checkbox"] {
       display: none;
     }
@@ -229,11 +233,6 @@ header {
   }
 }
 
-.options-cont {
-  display: flex;
-  align-items: center;
-}
-
 .new-invoice-btn {
   display: flex;
   align-items: center;
@@ -253,7 +252,15 @@ header {
     background-color: white;
   }
 }
-
+.options-cont {
+  display: flex;
+  align-items: center;
+}
+main {
+  padding-inline: clamp(1.5rem, calc(0.069rem + 6.107vw), 3rem);
+  padding-block: clamp(2rem, calc(0.271rem + 7.379vw), 3.813rem)
+    clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
+}
 @media (min-width: 48rem) {
   header {
     & .logo-cont {
@@ -275,6 +282,12 @@ header {
   }
   .hide-mobile {
     display: inline;
+  }
+  main {
+    padding-inline: clamp(3rem, calc(-11.643rem + 30.506vw), 15.813rem)
+      clamp(3rem, calc(-18.929rem + 45.685vw), 22.188rem);
+    padding-block: clamp(3.813rem, calc(2.67rem + 2.381vw), 4.813rem)
+      clamp(10.813rem, calc(4.027rem + 14.137vw), 16.75rem);
   }
 }
 
