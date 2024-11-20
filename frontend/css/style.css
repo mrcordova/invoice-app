@@ -57,26 +57,6 @@ body {
   row-gap: 1.563rem;
   column-gap: clamp(1.438rem, calc(1.378rem + 0.254vw), 1.5rem);
 
-  & label {
-    display: grid;
-    color: light-dark(var(--true-lavender), var(--papilio-argeotus));
-    font-size: 0.8125rem;
-    letter-spacing: -0.00625rem;
-    line-height: 1.15;
-    gap: 0.5625rem;
-  }
-  & input {
-    min-width: 0;
-    background-color: light-dark(white, var(--kon));
-    border: 1px solid light-dark(var(--stotic-white), var(--royal-curtsy));
-    color: light-dark(var(--ruined-smores), white);
-    border-radius: 0.25rem;
-    font-size: 0.9375rem;
-    line-height: 1;
-    letter-spacing: -0.015625rem;
-    text-indent: 1.25rem;
-    padding-block: 1.125rem 0.9375rem;
-  }
   & .section-header {
     grid-area: header;
     font-size: 0.9375rem;
@@ -311,7 +291,6 @@ body {
     grid-template-columns: repeat(2, 1fr);
     background-color: light-dark(white, var(--kon));
     display: grid;
-    /* gap: 1.5rem; */
     grid-template-areas:
       "id user"
       "due status"
@@ -365,7 +344,6 @@ body {
       gap: 1.25rem;
     }
     & .status-token {
-      /* margin-block-start: 1.5rem; */
       display: flex;
       align-items: baseline;
       justify-content: center;
@@ -374,9 +352,7 @@ body {
       padding-block: 0.875rem 0.688rem;
       width: 6.5rem;
       text-transform: capitalize;
-      /* align-self: flex-end; */
       margin-inline-start: auto;
-      /* margin: auto; */
       & .status {
         width: 0.5rem;
         height: 0.5rem;
@@ -479,6 +455,26 @@ body {
     position: sticky;
     top: 0;
   }
+  & label {
+    display: grid;
+    color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+    font-size: 0.8125rem;
+    letter-spacing: -0.00625rem;
+    line-height: 1.15;
+    gap: 0.5625rem;
+  }
+  & input {
+    min-width: 0;
+    background-color: light-dark(white, var(--kon));
+    border: 1px solid light-dark(var(--stotic-white), var(--royal-curtsy));
+    color: light-dark(var(--ruined-smores), white);
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.015625rem;
+    text-indent: 1.25rem;
+    padding-block: 1.125rem 0.9375rem;
+  }
 
   & .form-cont {
     background-color: light-dark(white, var(--river-styx));
@@ -496,6 +492,52 @@ body {
       letter-spacing: -0.015625rem;
       color: light-dark(var(--ruined-smores), white);
       padding-block-end: 1.625rem;
+    }
+
+    .invoice-item {
+      display: grid;
+      grid-template-areas:
+        "name name name name"
+        "qty price total delete";
+      grid-template-columns: 4rem repeat(2, 1fr) max-content;
+
+      row-gap: 1.563rem;
+      column-gap: 1rem;
+      & .name {
+        grid-area: name;
+      }
+      & .qty {
+        grid-area: qty;
+      }
+
+      & .price {
+        grid-area: price;
+      }
+
+      & .total {
+        grid-area: total;
+        & input {
+          background-color: transparent;
+          border: 1px solid transparent;
+          text-indent: 0;
+
+          &::placeholder {
+            color: light-dark(var(--ruined-smores), white);
+          }
+        }
+      }
+      & .delete {
+        grid-area: delete;
+      }
+
+      & input[type="number"] {
+        &::-webkit-inner-spin-button,
+        ::-webkit-inner-spin-button {
+          /* display: none; */
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
     }
   }
   &::backdrop {
@@ -611,6 +653,12 @@ main {
 
       & .go-back-btn {
         display: none;
+      }
+
+      & .invoice-item {
+        display: grid;
+        grid-template-areas: "name name qty price total delete";
+        grid-template-columns: repeat(2, 1fr) 2.875rem repeat(2, 1fr) max-content;
       }
     }
   }

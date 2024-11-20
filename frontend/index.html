@@ -107,7 +107,7 @@
                 <input
                   class="league-spartan-bold"
                   type="text"
-                  name="addy"
+                  name="c-addy"
                   id="name"
                   autocomplete="name" />
               </label>
@@ -116,7 +116,7 @@
                 <input
                   class="league-spartan-bold"
                   type="email"
-                  name="addy"
+                  name="c-addy"
                   id="email"
                   autocomplete="email" />
               </label>
@@ -125,7 +125,7 @@
                 <input
                   class="league-spartan-bold"
                   type="text"
-                  name="addy"
+                  name="c-addy"
                   id="client-addy"
                   autocomplete="address-level1" />
               </label>
@@ -134,7 +134,7 @@
                 <input
                   class="league-spartan-bold"
                   type="text"
-                  name="addy"
+                  name="c-addy"
                   id="client-ciy"
                   autocomplete="address-level2" />
               </label>
@@ -143,7 +143,7 @@
                 <input
                   class="league-spartan-bold"
                   type="text"
-                  name="addy"
+                  name="c-addy"
                   id="client-zipcode"
                   autocomplete="postal-code" />
               </label>
@@ -152,10 +152,51 @@
                 <input
                   class="league-spartan-bold"
                   type="text"
-                  name="addy"
+                  name="c-addy"
                   id="client-country"
                   autocomplete="country" />
               </label>
+            </section>
+            <section>
+              <h4>Item List</h4>
+              <div class="invoice-item">
+                <label class="name">
+                  Item name
+                  <input
+                    type="text"
+                    name="items"
+                    id="item-name"
+                    autocomplete="name" />
+                </label>
+                <label class="qty">
+                  Qty.
+                  <input
+                    type="number"
+                    name="items"
+                    id="qty"
+                    inputmode="numeric" />
+                </label>
+                <label class="price">
+                  Price
+                  <input
+                    type="number"
+                    name="items"
+                    id="price"
+                    inputmode="numeric" />
+                </label>
+                <label class="total">
+                  Total
+                  <input
+                    type="number"
+                    name="items"
+                    id="total"
+                    disabled
+                    placeholder="400.00" />
+                </label>
+                <button class="delete">
+                  <img src="./assets/icon-delete.svg" alt="delete-icon" />
+                </button>
+              </div>
             </section>
           </form>
         </div>
