@@ -528,6 +528,7 @@ body {
       }
       & .delete {
         grid-area: delete;
+        width: 0.8125rem;
       }
 
       & input[type="number"] {
