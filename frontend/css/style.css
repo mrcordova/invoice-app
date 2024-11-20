@@ -503,6 +503,17 @@ body {
 
       row-gap: 1.563rem;
       column-gap: 1rem;
+      &.hide-mobile {
+        display: none;
+      }
+
+      & div {
+        color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+        font-size: 0.8125rem;
+        letter-spacing: -0.00625rem;
+        line-height: 1.15;
+        gap: 0.5625rem;
+      }
       & .name {
         grid-area: name;
       }
@@ -660,6 +671,9 @@ main {
         display: grid;
         grid-template-areas: "name name qty price total delete";
         grid-template-columns: repeat(2, 1fr) 2.875rem repeat(2, 1fr) max-content;
+        &.hide-mobile {
+          display: grid;
+        }
       }
     }
   }
