@@ -432,6 +432,36 @@ body {
 
   & .net {
     grid-area: net;
+    & input {
+      display: none;
+    }
+    & span {
+      display: flex;
+      background-color: light-dark(white, var(--kon));
+      border: 1px solid light-dark(var(--stotic-white), var(--royal-curtsy));
+      color: light-dark(var(--ruined-smores), white);
+      border-radius: 0.25rem;
+      font-size: 0.9375rem;
+      padding-block: 1.125rem 0.9375rem;
+      text-indent: 1.25rem;
+      align-items: center;
+      justify-content: space-between;
+      padding-inline-end: 1rem;
+
+      &::after {
+        content: "";
+        background-image: url(../assets/icon-arrow-down.svg);
+        top: 0;
+        bottom: 0;
+        right: 0;
+        /* margin-inline-start: 97%; */
+        background-repeat: no-repeat;
+        width: 0.65rem;
+        height: 0.65rem;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
   }
 
   & .desc {
