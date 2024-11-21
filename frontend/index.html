@@ -160,33 +160,55 @@
             <section class="invoice-date-section">
               <label class="date">
                 Invoice Date
-                <input type="date" name="date" id="date" />
+                <input
+                  type="date"
+                  name="date"
+                  id="date"
+                  onclick="this.showPicker()" />
               </label>
               <div class="net">
                 <label>
-                  <span class="label-error">Payment Terms</span>
+                  <span class="label-name">
+                    Payment Terms
+                    <span class=".error-text" aria-live="polite"></span>
+                  </span>
                   <span class="net-span">
                     Net 30 Days
                     <input type="checkbox" name="terms" id="terms" />
                   </span>
                 </label>
-                <menu class="net-menu">
+                <menu id="net-menu" class="net-menu">
                   <li>
                     <label>
-                      <input type="checkbox" name="status" id="draft" />
-                      Draft
+                      <input type="radio" name="net-term-days" id="net-one" />
+                      Net 1 Day
                     </label>
                   </li>
                   <li>
                     <label>
-                      <input type="checkbox" name="status" id="pending" />
-                      Pending
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-seven" />
+                      Net 7 Days
                     </label>
                   </li>
                   <li>
                     <label>
-                      <input type="checkbox" name="status" id="paid" />
-                      Paid
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-fourteen" />
+                      Net 14 Days
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-thirty" />
+                      Net 30 Days
                     </label>
                   </li>
                 </menu>

@@ -415,9 +415,14 @@ body {
     padding-inline-start: 1.25rem;
     padding-inline-end: 1rem;
 
-    /* &::-webkit-datetime-edit {
+    &::-webkit-datetime-edit {
       text-indent: 0;
-    } */
+    }
+
+    &:hover {
+      cursor: pointer;
+      accent-color: green;
+    }
   }
 
   & input[type="text"] {
@@ -436,20 +441,17 @@ body {
     & input {
       display: none;
     }
-    & label:has(input:checked) + .net-menu {
+    & label:has(input:checked) + #net-menu {
       display: block;
     }
 
-    & label:hover {
+    & label {
       cursor: pointer;
 
-      & .label-error {
+      & .label-name {
         display: flex;
 
         justify-content: space-between;
-        &::after {
-          content: "dsfsd";
-        }
       }
     }
     & .net-span {
@@ -471,27 +473,45 @@ body {
         top: 0;
         bottom: 0;
         right: 0;
-        /* margin-inline-start: 97%; */
+
         background-repeat: no-repeat;
         width: 0.65rem;
         height: 0.65rem;
         display: inline-block;
         vertical-align: middle;
       }
+
+      &:has(input:checked)::after {
+        transform: rotate(180deg);
+      }
     }
 
-    & .net-menu {
+    & #net-menu {
       width: 100%;
       list-style: none;
       padding: 0;
       position: absolute;
-      bottom: -3.5rem;
+      bottom: -12.25rem;
       border-radius: 0.5rem;
       display: none;
       color: light-dark(var(--ruined-smores), white);
       background-color: light-dark(white, var(--royal-curtsy));
       box-shadow: 0px 10px 20px 0px
         light-dark(hsl(from #48549f h s l / 0.25), hsl(from black h s l / 0.25));
+
+      & label {
+        padding-inline: 1.5rem;
+        padding-block: 1rem 0.938rem;
+        font-size: 0.938rem;
+        line-height: 1;
+        letter-spacing: -0.016rem;
+        border-bottom: 1px solid var(--kon);
+
+        &:hover {
+          cursor: pointer;
+          color: var(--venetian-nights);
+        }
+      }
     }
   }
 
@@ -545,14 +565,12 @@ body {
   }
 }
 #new-invoice-dialog[open] {
-  /* z-index: -1; */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 0;
   border: 0;
   margin: 0;
-  /* width: 100%; */
   height: 100%;
   min-width: 100%;
   max-height: 100vh;
@@ -565,7 +583,6 @@ body {
   );
 
   & .header {
-    /* height: max-content; */
     position: sticky;
     top: 0;
   }
