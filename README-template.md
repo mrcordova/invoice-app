@@ -100,6 +100,7 @@ Use this section to outline areas that you want to continue focusing on in futur
 ### Useful resources
 
 https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/
+https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus
 
 - [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
 - [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.

@@ -612,6 +612,11 @@ body {
     letter-spacing: -0.015625rem;
     text-indent: 1.25rem;
     padding-block: 1.125rem 0.9375rem;
+
+    &:hover {
+      cursor: pointer;
+      outline: var(--venetian-nights) solid 1px;
+    }
   }
 
   & .form-cont {
@@ -746,6 +751,11 @@ body {
 
           &::placeholder {
             color: light-dark(var(--ruined-smores), white);
+          }
+
+          &:read-only {
+            pointer-events: none;
+            outline: none;
           }
         }
       }
