@@ -1,107 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/favicon-32x32.png" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/style.css" />
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32x32.png">
+    <title>Frontend Mentor | Invoice app</title>
+  </head>
 
-  <title>Frontend Mentor | Invoice app</title>
-</head>
+  <body>
+    <div class="header-cont">
+      <header class="header">
+        <div class="logo-cont">
+          <img src="./assets/logo.svg" alt="invoice logo" />
+          <div class="logo-bg"></div>
+        </div>
+        <label class="theme-toggle">
+          <input type="checkbox" name="theme" id="theme" />
+          <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19.502 11.342a.703.703 0 00-.588.128 7.499 7.499 0 01-2.275 1.33 7.123 7.123 0 01-2.581.46A7.516 7.516 0 018.74 11.06a7.516 7.516 0 01-2.198-5.316c0-.87.153-1.713.41-2.48.28-.817.69-1.559 1.226-2.197a.652.652 0 00-.102-.92.703.703 0 00-.588-.128C5.316.607 3.425 1.91 2.07 3.649A10.082 10.082 0 000 9.783C0 12.57 1.125 15.1 2.965 16.94a10.04 10.04 0 007.156 2.965c2.352 0 4.524-.818 6.262-2.173a10.078 10.078 0 003.579-5.597.62.62 0 00-.46-.793z"
+              fill="currentColor"
+              fill-rule="nonzero" />
+          </svg>
+        </label>
+        <div class="profile-pic-cont">
+          <img src="./assets/image-avatar.jpg" alt="profile picture" />
+        </div>
+      </header>
+      <dialog id="edit-invoice-dialog">
+        <header class="header">
+          <div class="logo-cont">
+            <img src="./assets/logo.svg" alt="invoice logo" />
+            <div class="logo-bg"></div>
+          </div>
+          <label class="theme-toggle">
+            <input type="checkbox" name="theme" id="dialog-theme" />
+            <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M19.502 11.342a.703.703 0 00-.588.128 7.499 7.499 0 01-2.275 1.33 7.123 7.123 0 01-2.581.46A7.516 7.516 0 018.74 11.06a7.516 7.516 0 01-2.198-5.316c0-.87.153-1.713.41-2.48.28-.817.69-1.559 1.226-2.197a.652.652 0 00-.102-.92.703.703 0 00-.588-.128C5.316.607 3.425 1.91 2.07 3.649A10.082 10.082 0 000 9.783C0 12.57 1.125 15.1 2.965 16.94a10.04 10.04 0 007.156 2.965c2.352 0 4.524-.818 6.262-2.173a10.078 10.078 0 003.579-5.597.62.62 0 00-.46-.793z"
+                fill="currentColor"
+                fill-rule="nonzero" />
+            </svg>
+          </label>
+          <div class="profile-pic-cont">
+            <img src="./assets/image-avatar.jpg" alt="profile picture" />
+          </div>
+        </header>
+        <div class="form-cont league-spartan-bold">
+          <button class="go-back-btn">
+            <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
+            Go back
+          </button>
+          <h3>New Invoice</h3>
+          <form class="invoice-form">
+            <section class="bill-from-section">
+              <h4 class="section-header">Bill From</h4>
+              <label class="addy league-spartan-medium">
+                <span class="label-name">
+                  Street Address
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="addy"
+                  id="addy"
+                  required
+                  autocomplete="address-level3" />
+              </label>
+              <label class="city league-spartan-medium">
+                <span class="label-name">
+                  City
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="addy"
+                  id="ciy"
+                  required
+                  autocomplete="address-level2" />
+              </label>
+              <label class="postal-code league-spartan-medium">
+                <span class="label-name">
+                  Postal Code
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="addy"
+                  id="zipcode"
+                  required
+                  autocomplete="postal-code" />
+              </label>
+              <label class="country league-spartan-medium">
+                <span class="label-name">
+                  Country
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="addy"
+                  id="country"
+                  required
+                  autocomplete="country" />
+              </label>
+            </section>
+            <section class="bill-to-section">
+              <h4 class="section-header">Bill To</h4>
+              <label class="client-name league-spartan-medium">
+                <span class="label-name">
+                  Client's Name
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="c-addy"
+                  id="name"
+                  required
+                  autocomplete="name" />
+              </label>
+              <label class="client-email league-spartan-medium">
+                <span class="label-name">
+                  Client's Email
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="email"
+                  name="c-addy"
+                  id="email"
+                  required
+                  autocomplete="email" />
+              </label>
+              <label class="addy league-spartan-medium">
+                <span class="label-name">
+                  Street Address
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="c-addy"
+                  id="client-addy"
+                  required
+                  autocomplete="street-address" />
+              </label>
+              <label class="city league-spartan-medium">
+                <span class="label-name">
+                  City
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="c-addy"
+                  id="client-ciy"
+                  required
+                  autocomplete="address-level2" />
+              </label>
+              <label class="postal-code league-spartan-medium">
+                <span class="label-name">
+                  Postal Code
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="c-addy"
+                  id="client-zipcode"
+                  required
+                  autocomplete="postal-code" />
+              </label>
+              <label class="country league-spartan-medium">
+                <span class="label-name">
+                  Country
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="c-addy"
+                  id="client-country"
+                  required
+                  autocomplete="country" />
+              </label>
+            </section>
+            <section class="invoice-date-section">
+              <label class="date">
+                <span class="label-name">
+                  Invoice Date
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  type="date"
+                  name="date"
+                  id="date"
+                  required
+                  onclick="this.showPicker()" />
+              </label>
+              <div class="net">
+                <label>
+                  <span class="label-name">
+                    Payment Terms
+                    <span class="error-text" aria-live="polite"></span>
+                  </span>
+                  <span class="net-span" tabindex="0">
+                    Net 30 Days
+                    <input type="checkbox" name="terms" id="terms" />
+                  </span>
+                </label>
+                <menu id="net-menu" class="net-menu">
+                  <li>
+                    <label>
+                      <input type="radio" name="net-term-days" id="net-one" />
+                      Net 1 Day
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-seven" />
+                      Net 7 Days
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-fourteen" />
+                      Net 14 Days
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-thirty" />
+                      Net 30 Days
+                    </label>
+                  </li>
+                </menu>
+              </div>
 
-<body>
-  Go back
+              <label class="desc">
+                <span class="label-name">
+                  Project Description
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
 
-  Status <!-- Add status -->
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  required
+                  placeholder="e.g. Graphic Design Service" />
+              </label>
+            </section>
+            <section class="invoice-items-section">
+              <h4>Item List</h4>
+              <div class="invoice-item hide-mobile item-header">
+                <div class="name">Item name</div>
+                <div class="qty">Qty.</div>
+                <div class="price">Price</div>
+                <div class="total">Total</div>
+                <div class="delete"></div>
+              </div>
+              <div class="invoice-items">
+                <div class="invoice-item">
+                  <label class="name">
+                    <span class="label-name">
+                      Item name
+                      <span class="error-text" aria-live="polite"></span>
+                    </span>
 
-  Edit
-  Delete
-  Mark as Paid
+                    <input
+                      type="text"
+                      name="items"
+                      id="item-name"
+                      required
+                      autocomplete="off" />
+                  </label>
+                  <label class="qty">
+                    <span class="label-name">Qty.</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="qty"
+                      required
+                      inputmode="numeric" />
+                  </label>
+                  <label class="price">
+                    <span class="label-name">Price</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="price"
+                      required
+                      inputmode="numeric" />
+                  </label>
+                  <label class="total">
+                    <span class="label-name">Total</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="total"
+                      required
+                      readonly
+                      placeholder="400.00" />
+                  </label>
+                  <button class="delete">
+                    <svg
+                      width="13"
+                      height="16"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
+                        fill="currentColor"
+                        fill-rule="nonzero" />
+                    </svg>
+                    <!-- <img src="./assets/icon-delete.svg" alt="delete-icon" /> -->
+                  </button>
+                </div>
+                <div class="invoice-item">
+                  <label class="name">
+                    <span class="label-name">Item name</span>
+                    <input
+                      type="text"
+                      name="items"
+                      id="item2-name"
+                      required
+                      autocomplete="off" />
+                  </label>
+                  <label class="qty">
+                    <span class="label-name">Qty.</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="qty2"
+                      required
+                      inputmode="numeric" />
+                  </label>
+                  <label class="price">
+                    <span class="label-name">Price</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="price2"
+                      required
+                      inputmode="numeric" />
+                  </label>
+                  <label class="total">
+                    <span class="label-name">Total</span>
+                    <input
+                      type="number"
+                      name="items"
+                      id="total2"
+                      required
+                      readonly
+                      placeholder="400.00" />
+                  </label>
+                  <button class="delete">
+                    <svg
+                      width="13"
+                      height="16"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
+                        fill="currentColor"
+                        fill-rule="nonzero" />
+                    </svg>
+                    <!-- <img src="./assets/icon-delete.svg" alt="delete-icon" /> -->
+                  </button>
+                </div>
 
-  #<!-- Add id -->
-  <!-- Add description -->
+                <button class="add-new-item-btn league-spartan-bold">
+                  + Add New Item
+                </button>
+              </div>
+            </section>
+            <span
+              class="error-text league-spartan-bold"
+              aria-live="polite"></span>
+          </form>
+          <div class="edit-btns league-spartan-bold">
+            <button>Discard</button>
+            <button>Save as Draft</button>
+            <button>Save & Send</button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+    <main>
+      <button class="go-back-btn league-spartan-bold">
+        <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
+        Go back
+      </button>
+      <div class="edit-btns league-spartan-bold">
+        <div class="status-cont">
+          <p>Status</p>
+          <div class="status-token" data-status="pending">
+            <div class="status"></div>
+            Pending
+          </div>
+        </div>
+        <button class="edit-btn" aria-label="discard edit">Edit</button>
+        <button class="delete-btn">Delete</button>
+        <button class="mark-btn">Mark as Paid</button>
+      </div>
+      Go back Status
+      <!-- Add status -->
 
-  <!-- Add senderAdress -->
+      Edit Delete Mark as Paid #
+      <!-- Add id -->
+      <!-- Add description -->
 
-  Invoice Date
-  <!-- Add createdAt -->
+      <!-- Add senderAdress -->
 
-  Payment Due
-  <!-- Add paymentDue -->
+      Invoice Date
+      <!-- Add createdAt -->
 
-  Bill To
-  <!-- Add clientName -->
-  <!-- Add clientAdress -->
+      Payment Due
+      <!-- Add paymentDue -->
 
-  Sent To
-  <!-- Add clientEmail -->
+      Bill To
+      <!-- Add clientName -->
+      <!-- Add clientAdress -->
 
-  Item Name
-  QTY.
-  Price
-  Total
+      Sent To
+      <!-- Add clientEmail -->
 
-  <!-- Add item.name -->
-  <!-- Add item.quanity -->
-  <!-- Add item.price -->
-  <!-- Add item.total -->
+      Item Name QTY. Price Total
 
-  Amount Due
-  £ <!-- Add total -->
+      <!-- Add item.name -->
+      <!-- Add item.quanity -->
+      <!-- Add item.price -->
+      <!-- Add item.total -->
 
-  <!-- Edit invoice form -->
-  Go back
+      Amount Due £
+      <!-- Add total -->
 
-  Edit #<!-- Add id -->
+      <!-- Edit invoice form -->
+      Go back Edit #
+      <!-- Add id -->
 
-  Bill From
-  
-  Street Address
-  City
-  Post Code
-  Country
-  
-  Bill To
-  
-  Client's Name
-  Client's Email
-  Street Address
-  City
-  Post Code
-  Country
-  
-  Invoice Date
-  
-  Payment Terms
-  Net 1 day
-  Net 7 days
-  Net 14 days
-  Net 30 days
-  
-  Project Description
-  
-  Item List
-  
-  Item Name
-  Qty.
-  Price
-  Total
-  
-  Add New Item
+      Bill From Street Address City Post Code Country Bill To Client's Name
+      Client's Email Street Address City Post Code Country Invoice Date Payment
+      Terms Net 1 day Net 7 days Net 14 days Net 30 days Project Description
+      Item List Item Name Qty. Price Total Add New Item Cancel Save Changes
+      <!-- Edit invoice end -->
 
-  Cancel
-  Save Changes
-  <!-- Edit invoice end -->
-
-  <!-- Delete Modal -->
-  Confirm Deletion
-  Are you sure you want to delete invoice #<!-- Add id -->? 
-  This action cannot be undone.
-
-  Cancel
-  Delete
-  <!-- Delete Modal end -->
-</body>
-
+      <!-- Delete Modal -->
+      Confirm Deletion Are you sure you want to delete invoice #
+      <!-- Add id -->
+      ? This action cannot be undone. Cancel Delete
+      <!-- Delete Modal end -->
+    </main>
+    <footer class="edit-btns league-spartan-bold">
+      <button class="edit-btn" aria-label="discard edit">Edit</button>
+      <button class="delete-btn">Delete</button>
+      <button class="mark-btn">Mark as Paid</button>
+    </footer>
+  </body>
 </html>
