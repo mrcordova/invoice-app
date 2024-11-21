@@ -402,6 +402,43 @@ body {
   }
 }
 
+.invoice-date-section {
+  display: grid;
+  grid-template-areas:
+    "date"
+    "net"
+    "desc";
+  row-gap: 1.563rem;
+  column-gap: clamp(1.438rem, calc(1.378rem + 0.254vw), 1.5rem);
+  padding-block-start: clamp(2.563rem, calc(2.085rem + 2.036vw), 3.063rem);
+  & input[type="date"] {
+    padding-inline-start: 1.25rem;
+    padding-inline-end: 1rem;
+
+    /* &::-webkit-datetime-edit {
+      text-indent: 0;
+    } */
+  }
+
+  & input[type="text"] {
+    &::placeholder {
+      color: light-dark(var(--ruined-smores), white);
+    }
+  }
+
+  & .date {
+    grid-area: date;
+  }
+
+  & .net {
+    grid-area: net;
+  }
+
+  & .desc {
+    grid-area: desc;
+  }
+}
+
 .invoice-title-cont {
   margin-inline-end: auto;
   /* display: flex;
@@ -657,9 +694,13 @@ body {
   & .form-btns {
     /* position: absolute;
     bottom: 0; */
-    padding-inline: clamp(1.5rem, calc(1.083rem + 1.781vw), 1.938rem);
-    padding-block: clamp(1.313rem, calc(-0.775rem + 8.906vw), 3.5rem)
-      clamp(1.375rem, calc(-0.653rem + 8.651vw), 3.5rem);
+    /* padding-inline: clamp(1.5rem, calc(1.083rem + 1.781vw), 1.938rem); */
+    /* padding-inline: 1.5rem; */
+    padding-inline-start: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
+    padding-inline-end: clamp(1.188rem, calc(-0.721rem + 8.142vw), 3.188rem);
+    padding-block: 1.313rem 1.375rem;
+    /* padding-block: clamp(1.313rem, calc(-0.775rem + 8.906vw), 3.5rem)
+      clamp(1.375rem, calc(-0.653rem + 8.651vw), 3.5rem); */
     background-color: light-dark(white, var(--river-styx));
     display: flex;
     gap: clamp(0.438rem, calc(0.378rem + 0.254vw), 0.5rem);
@@ -667,8 +708,8 @@ body {
     text-align: center;
     line-height: 1;
     letter-spacing: -0.016rem;
-    box-shadow: 0px -10px 10px 10px hsl(from var(--river-styx) h s l / 0.1);
-    box-shadow: 0px -10px 10px 10px hsl(from var(--animated-color) h s l / 0.1);
+    /* box-shadow: 0px -10px 10px 10px hsl(from var(--river-styx) h s l / 0.1); */
+    box-shadow: 0px -10px 50px 50px hsl(from var(--animated-color) h s l / 0.1);
 
     /* background-color: var(--scroll-color); */
     position: sticky;
@@ -802,6 +843,13 @@ main {
       }
     }
   }
+  .invoice-date-section {
+    display: grid;
+    grid-template-areas:
+      "date net"
+      "desc desc";
+    grid-template-columns: repeat(2, 1fr);
+  }
   main {
     padding-inline: clamp(3rem, calc(-11.643rem + 30.506vw), 15.813rem)
       clamp(3rem, calc(-18.929rem + 45.685vw), 22.188rem);
@@ -862,7 +910,7 @@ main {
     }
 
     & .form-btns {
-      padding-block: clamp(2rem, calc(5.214rem + -3.571vw), 3.5rem);
+      /* padding-block: clamp(2rem, calc(5.214rem + -3.571vw), 3.5rem); */
 
       border-top-right-radius: 1.25rem;
       border-bottom-right-radius: 1.25rem;
