@@ -461,6 +461,10 @@ body {
       justify-content: space-between;
       padding-inline-end: 1rem;
 
+      &:hover {
+        border: 1px solid var(--venetian-nights);
+      }
+
       &::after {
         content: "";
         background-image: url(../assets/icon-arrow-down.svg);
@@ -662,6 +666,11 @@ body {
       padding-block-end: 1.625rem;
       padding-inline-start: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
       padding-inline-end: clamp(1.188rem, calc(-0.721rem + 8.142vw), 3.188rem);
+
+      &:hover {
+        cursor: pointer;
+        color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+      }
     }
 
     & .invoice-items {
@@ -758,7 +767,14 @@ body {
       }
       & .delete {
         grid-area: delete;
+        margin-block-start: auto;
         width: 0.8125rem;
+        height: 3rem;
+        color: var(--papilio-argeotus);
+        &:hover {
+          cursor: pointer;
+          color: var(--khmer-curry);
+        }
       }
 
       & input[type="number"] {
@@ -804,6 +820,9 @@ body {
       padding-block: 1.125rem 0.938rem;
       padding-inline: clamp(1.007rem, calc(0.536rem + 2.008vw), 1.5rem)
         clamp(0.868rem, calc(0.206rem + 2.827vw), 1.563rem);
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     & button:first-child {
@@ -814,11 +833,19 @@ body {
       margin-inline-start: auto;
       color: light-dark(var(--papilio-argeotus), var(--stotic-white));
       background-color: var(--carbon-blue);
+
+      &:hover {
+        background-color: light-dark(var(--ruined-smores), var(--kon));
+      }
     }
 
     & button:nth-child(3) {
       color: white;
       background-color: var(--venetian-nights);
+
+      &:hover {
+        background-color: var(--forgotten-purple);
+      }
     }
   }
   &::backdrop {
