@@ -407,13 +407,13 @@
       </dialog>
     </div>
     <main>
-      <button class="go-back-btn league-spartan-bold">
+      <button class="go-back-btn go-back-btn-invoice-page league-spartan-bold">
         <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
         Go back
       </button>
       <div class="edit-btns league-spartan-bold">
         <div class="status-cont">
-          <p>Status</p>
+          <p class="league-spartan-medium">Status</p>
           <div class="status-token" data-status="pending">
             <div class="status"></div>
             Pending
@@ -423,27 +423,48 @@
         <button class="delete-btn">Delete</button>
         <button class="mark-btn">Mark as Paid</button>
       </div>
-      Go back Status
-      <!-- Add status -->
 
-      Edit Delete Mark as Paid #
-      <!-- Add id -->
-      <!-- Add description -->
-
-      <!-- Add senderAdress -->
-
-      Invoice Date
-      <!-- Add createdAt -->
-
-      Payment Due
-      <!-- Add paymentDue -->
-
-      Bill To
-      <!-- Add clientName -->
-      <!-- Add clientAdress -->
-
-      Sent To
-      <!-- Add clientEmail -->
+      <div class="individual-invoice">
+        <div class="invoice-info">
+          <div class="invoice-title">
+            <div class="invoice-id">
+              <span>#</span>
+              RT3080
+            </div>
+            <p>Graphic Design</p>
+          </div>
+          <address class="user-addy">
+            <p>19 Union Terrace</p>
+            <p>London</p>
+            <p>E1 3EZ</p>
+            <p>United Kingdom</p>
+          </address>
+          <div class="invoice-date">
+            Invoice Date
+            <p>21 Aug 2021</p>
+          </div>
+          <div class="payment-due">
+            Payment Due
+            <p>20 Sep 2021</p>
+          </div>
+          <div class="bill-to">
+            bill to
+            <div>
+              <p>Alex Grim</p>
+              <address>
+                <p>84 Church Way</p>
+                <p>Bradford</p>
+                <p>BD1 9PB</p>
+                <p>United Kingdom</p>
+              </address>
+            </div>
+          </div>
+          <div class="email">
+            Sent to
+            <p>alexgrim@gmail.com</p>
+          </div>
+        </div>
+      </div>
 
       Item Name QTY. Price Total
 

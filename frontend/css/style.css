@@ -119,10 +119,13 @@ div.edit-btns {
   }
 }
 .edit-btns {
-  padding-inline-start: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
+  /* padding-inline-start: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
   padding-inline-end: clamp(1.188rem, calc(-0.721rem + 8.142vw), 3.188rem);
-  padding-block: 1.313rem 1.375rem;
+  padding-block: 1.313rem 1.375rem; */
 
+  padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+  padding-block: clamp(1.25rem, calc(1.739rem + -1.018vw), 1.5rem)
+    clamp(1.25rem, calc(2.105rem + -1.781vw), 1.688rem);
   /* background-color: light-dark(white, var(--river-styx)); */
   background-color: light-dark(white, var(--kon));
   display: flex;
@@ -356,7 +359,55 @@ div.edit-btns {
     color: light-dark(var(--true-lavender), var(--papilio-argeotus));
   }
 }
+.go-back-btn-invoice-page {
+  padding-inline: 0;
+}
+.individual-invoice {
+  margin-block-start: clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem);
+  padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+  padding-block: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+  border-radius: 0.5rem;
+  background-color: light-dark(white, var(--kon));
 
+  & .invoice-info {
+    display: grid;
+
+    grid-template-areas:
+      "title title"
+      "addy addy"
+      "date bill-to"
+      "due bill-to"
+      "email email";
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1.875rem;
+
+    & > div {
+      display: grid;
+    }
+    & .invoice-title {
+      grid-area: title;
+    }
+    & .user-addy {
+      grid-area: addy;
+    }
+
+    & .invoice-date {
+      grid-area: date;
+    }
+    & .payment-due {
+      grid-area: due;
+      align-items: flex-end;
+    }
+
+    & .bill-to {
+      grid-area: bill-to;
+    }
+
+    & .email {
+      grid-area: email;
+    }
+  }
+}
 .invoices {
   &:has(> *:not(.hide)) + .no-invoices-con {
     display: none;
@@ -1008,6 +1059,20 @@ main {
     display: inline;
   }
 
+  .individual-invoice {
+    padding-inline: clamp(2rem, calc(0.857rem + 2.381vw), 3rem);
+    padding-block: clamp(2rem, calc(0.857rem + 2.381vw), 3rem);
+    & .invoice-info {
+      display: grid;
+
+      row-gap: 1.3125rem;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-areas:
+        "title title . addy"
+        "date bill-to email email"
+        "due bill-to . .";
+    }
+  }
   .invoices {
     &:has(> *:not(.hide)) {
       padding-block-start: clamp(3.438rem, calc(2.795rem + 1.339vw), 4rem);
