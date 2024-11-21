@@ -393,11 +393,18 @@ div.edit-btns {
         font-size: 0.9375rem;
         line-height: 1.33;
         letter-spacing: -0.015625rem;
+        color: light-dark(var(--ruined-smores), white);
       }
     }
     & .invoice-title {
       grid-area: title;
       align-content: center;
+      & > p {
+        font-size: 0.813rem;
+        letter-spacing: -0.006rem;
+        line-height: 1.15;
+        color: light-dark(var(--true-lavender), var(--stotic-white));
+      }
     }
 
     & address {
