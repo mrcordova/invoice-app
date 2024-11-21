@@ -442,8 +442,17 @@ body {
 
     & label:hover {
       cursor: pointer;
+
+      & .label-error {
+        display: flex;
+
+        justify-content: space-between;
+        &::after {
+          content: "dsfsd";
+        }
+      }
     }
-    & span {
+    & .net-span {
       display: flex;
       background-color: light-dark(white, var(--kon));
       border: 1px solid light-dark(var(--stotic-white), var(--royal-curtsy));
