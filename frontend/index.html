@@ -172,7 +172,7 @@
                     Payment Terms
                     <span class=".error-text" aria-live="polite"></span>
                   </span>
-                  <span class="net-span">
+                  <span class="net-span" tabindex="0">
                     Net 30 Days
                     <input type="checkbox" name="terms" id="terms" />
                   </span>
@@ -335,7 +335,7 @@
         </div>
         <!-- Add number here -->
         <div class="filter-status-cont league-spartan-bold">
-          <label class="filter-status-input-lab">
+          <label class="filter-status-input-lab" tabindex="0">
             <input type="checkbox" name="filter" id="filter" />
             Filter
             <span class="hide-mobile">by status</span>
@@ -373,66 +373,72 @@
       </div>
 
       <div class="invoices">
-        <div class="invoice league-spartan-bold">
-          <div class="invoice-id">
-            <span>#</span>
-            RT3080
-          </div>
-          <div class="invoice-user league-spartan-medium">Jensen Huana</div>
-          <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
-
-          <div class="amount">£ 1,800.90</div>
-          <div class="status-cont">
-            <div class="status-token" data-status="paid">
-              <div class="status"></div>
-              Paid
+        <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
+          <div class="invoice league-spartan-bold">
+            <div class="invoice-id">
+              <span>#</span>
+              RT3080
             </div>
-            <img
-              class="hide-mobile"
-              src="./assets/icon-arrow-right.svg"
-              alt="right arrow" />
-          </div>
-        </div>
-        <div class="invoice league-spartan-bold">
-          <div class="invoice-id">
-            <span>#</span>
-            RT3080
-          </div>
-          <div class="invoice-user league-spartan-medium">Alex Grim</div>
-          <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
+            <div class="invoice-user league-spartan-medium">Jensen Huana</div>
+            <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
 
-          <div class="amount">£ 556.00</div>
-          <div class="status-cont">
-            <div class="status-token" data-status="pending">
-              <div class="status"></div>
-              Pending
+            <div class="amount">£ 1,800.90</div>
+            <div class="status-cont">
+              <div class="status-token" data-status="paid">
+                <div class="status"></div>
+                Paid
+              </div>
+              <img
+                class="hide-mobile"
+                src="./assets/icon-arrow-right.svg"
+                alt="right arrow" />
             </div>
-            <img
-              class="hide-mobile"
-              src="./assets/icon-arrow-right.svg"
-              alt="right arrow" />
           </div>
-        </div>
-        <div class="invoice league-spartan-bold">
-          <div class="invoice-id">
-            <span>#</span>
-            RG0314
-          </div>
-          <div class="invoice-user league-spartan-medium">John Morrison</div>
-          <div class="due-date league-spartan-medium">Due 01 Oct 2021</div>
+        </a>
+        <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
+          <div class="invoice league-spartan-bold">
+            <div class="invoice-id">
+              <span>#</span>
+              RT3080
+            </div>
+            <div class="invoice-user league-spartan-medium">Alex Grim</div>
+            <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
 
-          <div class="amount">£ 14,002.33</div>
-          <div class="status-cont">
-            <div class="status-token" data-status="draft">
-              <div class="status"></div>
-              Draft
+            <div class="amount">£ 556.00</div>
+            <div class="status-cont">
+              <div class="status-token" data-status="pending">
+                <div class="status"></div>
+                Pending
+              </div>
+              <img
+                class="hide-mobile"
+                src="./assets/icon-arrow-right.svg"
+                alt="right arrow" />
             </div>
-            <img
-              class="hide-mobile"
-              src="./assets/icon-arrow-right.svg"
-              alt="right arrow" />
           </div>
-        </div>
+        </a>
+        <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
+          <div class="invoice league-spartan-bold">
+            <div class="invoice-id">
+              <span>#</span>
+              RG0314
+            </div>
+            <div class="invoice-user league-spartan-medium">John Morrison</div>
+            <div class="due-date league-spartan-medium">Due 01 Oct 2021</div>
+
+            <div class="amount">£ 14,002.33</div>
+            <div class="status-cont">
+              <div class="status-token" data-status="draft">
+                <div class="status"></div>
+                Draft
+              </div>
+              <img
+                class="hide-mobile"
+                src="./assets/icon-arrow-right.svg"
+                alt="right arrow" />
+            </div>
+          </div>
+        </a>
       </div>
       <div class="no-invoices-con">
         <img src="./assets/illustration-empty.svg" alt="no invoices imgge" />

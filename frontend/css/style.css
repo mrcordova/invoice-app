@@ -284,6 +284,13 @@ body {
     display: none;
   }
 
+  & a {
+    text-decoration: none;
+
+    &:visited {
+      color: inherit;
+    }
+  }
   &:has(> .hide) {
     display: none; /* Hide if all children have the .hide class */
   }
