@@ -162,13 +162,36 @@
                 Invoice Date
                 <input type="date" name="date" id="date" />
               </label>
-              <label class="net">
-                Payment Terms
-                <span>
-                  Net 30 Days
-                  <input type="checkbox" name="terms" id="terms" />
-                </span>
-              </label>
+              <div class="net">
+                <label>
+                  Payment Terms
+                  <span>
+                    Net 30 Days
+                    <input type="checkbox" name="terms" id="terms" />
+                  </span>
+                </label>
+                <menu class="net-menu">
+                  <li>
+                    <label>
+                      <input type="checkbox" name="status" id="draft" />
+                      Draft
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" name="status" id="pending" />
+                      Pending
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" name="status" id="paid" />
+                      Paid
+                    </label>
+                  </li>
+                </menu>
+              </div>
+
               <label class="desc">
                 Project Description
                 <input

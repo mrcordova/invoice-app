@@ -432,8 +432,16 @@ body {
 
   & .net {
     grid-area: net;
+    position: relative;
     & input {
       display: none;
+    }
+    & label:has(input:checked) + .net-menu {
+      display: block;
+    }
+
+    & label:hover {
+      cursor: pointer;
     }
     & span {
       display: flex;
@@ -461,6 +469,20 @@ body {
         display: inline-block;
         vertical-align: middle;
       }
+    }
+
+    & .net-menu {
+      width: 100%;
+      list-style: none;
+      padding: 0;
+      position: absolute;
+      bottom: -3.5rem;
+      border-radius: 0.5rem;
+      display: none;
+      color: light-dark(var(--ruined-smores), white);
+      background-color: light-dark(white, var(--royal-curtsy));
+      box-shadow: 0px 10px 20px 0px
+        light-dark(hsl(from #48549f h s l / 0.25), hsl(from black h s l / 0.25));
     }
   }
 
