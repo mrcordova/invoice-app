@@ -724,6 +724,26 @@ body {
       padding-inline-end: 1rem;
       margin-inline-end: -1rem;
       scrollbar-gutter: stable; */
+      &:has(:user-invalid) {
+        /* position: relative; */
+
+        & > .error-text {
+          font-size: 0.625rem;
+
+          position: relative;
+          &::before {
+            position: absolute;
+            content: "- All fields must be added";
+            display: inline-block;
+            color: var(--khmer-curry);
+
+            width: max-content;
+            margin-top: 0.5rem;
+            /* width: 6.5rem;
+                height: 0.96875rem; */
+          }
+        }
+      }
     }
     & .invoice-item {
       display: grid;
