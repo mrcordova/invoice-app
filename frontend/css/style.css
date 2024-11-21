@@ -380,12 +380,29 @@ div.edit-btns {
       "email email";
     grid-template-columns: repeat(2, 1fr);
     row-gap: 1.875rem;
+    font-size: 0.813rem;
+    letter-spacing: -0.006rem;
+    line-height: 1.15;
 
+    color: light-dark(var(--true-lavender), var(--stotic-white));
     & > div {
       display: grid;
+      row-gap: 0.8125rem;
+
+      & > p {
+        font-size: 0.9375rem;
+        line-height: 1.33;
+        letter-spacing: -0.015625rem;
+      }
     }
     & .invoice-title {
       grid-area: title;
+      align-content: center;
+    }
+
+    & address {
+      line-height: 1.38;
+      font-style: normal;
     }
     & .user-addy {
       grid-area: addy;
@@ -396,15 +413,35 @@ div.edit-btns {
     }
     & .payment-due {
       grid-area: due;
-      align-items: flex-end;
+      /* align-items: flex-end; */
     }
 
     & .bill-to {
       grid-area: bill-to;
+
+      & > p {
+        margin-block-end: clamp(-0.562rem, calc(-0.861rem + 1.272vw), -0.25rem);
+      }
     }
 
     & .email {
       grid-area: email;
+    }
+
+    & .invoice-id {
+      /* margin-block-end: clamp(0.25rem, calc(0.071rem + 0.763vw), 0.438rem); */
+      margin-block-end: clamp(-0.562rem, calc(-0.861rem + 1.272vw), -0.25rem);
+      /* grid-area: id; */
+
+      font-size: 0.938rem;
+      line-height: 1;
+      letter-spacing: -0.016rem;
+      color: light-dark(var(--ruined-smores), white);
+
+      & span {
+        margin-inline-end: -0.25rem;
+        color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+      }
     }
   }
 }
@@ -1071,6 +1108,10 @@ main {
         "title title . addy"
         "date bill-to email email"
         "due bill-to . .";
+
+      & .user-addy {
+        text-align: right;
+      }
     }
   }
   .invoices {
