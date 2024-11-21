@@ -600,6 +600,20 @@ body {
     letter-spacing: -0.00625rem;
     line-height: 1.15;
     gap: 0.5625rem;
+
+    &:has(:user-invalid) {
+      color: var(--khmer-curry);
+      & .label-name {
+        display: flex;
+        justify-content: space-between;
+      }
+      & .error-text::after {
+        content: "can't be empty";
+      }
+      & input {
+        outline: var(--khmer-curry) solid 1px;
+      }
+    }
   }
   & input {
     min-width: 0;
