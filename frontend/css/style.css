@@ -383,6 +383,7 @@ div.edit-btns {
     font-size: 0.813rem;
     letter-spacing: -0.006rem;
     line-height: 1.15;
+    padding-block-end: clamp(2.375rem, calc(1.838rem + 2.29vw), 2.938rem);
 
     color: light-dark(var(--true-lavender), var(--stotic-white));
     & > div {
@@ -455,10 +456,19 @@ div.edit-btns {
   & .invoice-items {
     background-color: light-dark(#f9fafe, var(--royal-curtsy));
 
-    display: grid;
-    row-gap: 1.5rem;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+    & .invoice-table-cont {
+      display: grid;
+      row-gap: 1.5rem;
+      padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+      padding-block: clamp(1.563rem, calc(1.085rem + 2.036vw), 2.063rem)
+        clamp(1.438rem, calc(0.483rem + 4.071vw), 2.438rem);
+      font-size: 0.938rem;
+      letter-spacing: -0.016rem;
+      line-height: 1;
+      color: light-dark(var(--ruined-smores), white);
+    }
     & .invoice-item {
       display: grid;
       grid-template-areas:
@@ -467,15 +477,19 @@ div.edit-btns {
       grid-template-columns: max-content 1fr;
       /* grid-template-rows:  */
       align-items: center;
+      row-gap: 0.5rem;
+      column-gap: 0.25rem;
 
       & .name {
         grid-area: name;
       }
       & .qty {
         grid-area: qty;
+        color: light-dark(var(--true-lavender), var(--papilio-argeotus));
       }
       & .price {
         grid-area: price;
+        color: light-dark(var(--true-lavender), var(--papilio-argeotus));
       }
       & .total {
         grid-area: total;
@@ -483,13 +497,33 @@ div.edit-btns {
     }
     & .invoice-header {
       display: none;
+      font-size: 0.813rem;
+      letter-spacing: -0.006rem;
+      line-height: 1.38;
+      color: light-dark(var(--true-lavender), var(--stotic-white));
     }
 
     & .amount-due-cont {
+      padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+      padding-block: clamp(1.625rem, calc(1.565rem + 0.254vw), 1.688rem)
+        clamp(1.313rem, calc(1.435rem + -0.254vw), 1.375em);
+      display: flex;
+      justify-content: space-between;
       background-color: light-dark(var(--carbon-blue), var(--ruined-smores));
       color: white;
       border-bottom-left-radius: 0.5rem;
       border-bottom-right-radius: 0.5rem;
+      align-items: center;
+      & .amount-due-header {
+        font-size: 0.813rem;
+        line-height: 1.38;
+        letter-spacing: -0.006rem;
+      }
+      & .amount-due {
+        font-size: 1.5rem;
+        line-height: 1.33;
+        letter-spacing: -0.031rem;
+      }
     }
   }
 }
@@ -1169,12 +1203,14 @@ main {
 
         & .price {
           justify-self: end;
+          color: light-dark(var(--true-lavender), var(--stotic-white));
         }
         & .total {
           justify-self: end;
         }
 
         & .qty {
+          color: light-dark(var(--true-lavender), var(--stotic-white));
           & > span {
             display: none;
           }
