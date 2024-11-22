@@ -112,6 +112,72 @@ body {
     grid-area: email;
   }
 }
+
+#delete-dialog {
+  border: 0;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 0.5rem;
+  background-color: light-dark(white, var(--kon));
+  padding-inline: clamp(2rem, calc(1.046rem + 4.071vw), 3rem);
+  padding-block: clamp(2.125rem, calc(1.111rem + 4.326vw), 3.188rem)
+    clamp(2rem, calc(1.046rem + 4.071vw), 3rem);
+
+  width: clamp(20.438rem, calc(11.313rem + 38.931vw), 30rem);
+
+  &::backdrop {
+    background-color: hsl(from black h s l / 0.5);
+  }
+
+  & h1 {
+    font-size: 1.5rem;
+    letter-spacing: -0.031rem;
+    line-height: 1.33;
+    color: light-dark(var(--ruined-smores), white);
+
+    margin-block-end: clamp(0.5rem, calc(0.261rem + 1.018vw), 0.75rem);
+  }
+
+  & p {
+    margin-block-end: clamp(0.875rem, calc(1.852rem + -2.036vw), 1.375rem);
+    font-size: 0.813rem;
+    letter-spacing: -0.006rem;
+    line-height: 1.69;
+    color: var(--papilio-argeotus);
+  }
+  & .btn-cont {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+
+    & button {
+      line-height: 1;
+      font-size: 0.938rem;
+      letter-spacing: -0.016rem;
+      border-radius: 1.5rem;
+      padding-inline: 1.5rem;
+      padding-block: 1.125rem 0.938rem;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    & .cancel-btn {
+      background-color: light-dark(#f9fafe, var(--royal-curtsy));
+      color: light-dark(var(--true-lavender), var(--stotic-white));
+    }
+
+    & .delete-btn {
+      background-color: var(--khmer-curry);
+      color: white;
+    }
+  }
+}
+
 div.edit-btns {
   border-radius: 0.5rem;
   & > button {

@@ -11,11 +11,23 @@
       href="./assets/favicon-32x32.png" />
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/invoice.js"></script>
 
     <title>Frontend Mentor | Invoice app</title>
   </head>
 
   <body>
+    <dialog id="delete-dialog" class="league-spartan-bold">
+      <h1>Confirm Deletion</h1>
+      <p class="league-spartan-medium">
+        Are you sure you want to delete invoice #RT3080? This action cannot be
+        undone
+      </p>
+      <div class="btn-cont">
+        <button class="cancel-btn">Cancel</button>
+        <button class="delete-btn">Delete</button>
+      </div>
+    </dialog>
     <div class="header-cont">
       <header class="header">
         <div class="logo-cont">
@@ -422,7 +434,7 @@
           </div>
         </div>
         <button class="edit-btn" aria-label="discard edit">Edit</button>
-        <button class="delete-btn">Delete</button>
+        <button class="delete-btn" data-show-delete-dialog>Delete</button>
         <button class="mark-btn">Mark as Paid</button>
       </div>
 
@@ -528,7 +540,7 @@
     </main>
     <footer class="edit-btns league-spartan-bold">
       <button class="edit-btn" aria-label="discard edit">Edit</button>
-      <button class="delete-btn">Delete</button>
+      <button class="delete-btn" data-show-delete-dialog>Delete</button>
       <button class="mark-btn">Mark as Paid</button>
     </footer>
   </body>
