@@ -966,7 +966,7 @@ div.edit-btns {
           text-indent: 0;
 
           &::placeholder {
-            color: light-dark(var(--ruined-smores), white);
+            color: light-dark(var(--papilio-argeotus), white);
           }
 
           &:read-only {
