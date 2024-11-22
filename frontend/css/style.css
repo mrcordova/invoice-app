@@ -451,6 +451,43 @@ div.edit-btns {
       }
     }
   }
+
+  & .invoice-items {
+    background-color: light-dark(#f9fafe, var(--royal-curtsy));
+
+    display: grid;
+    row-gap: 1.5rem;
+    & .invoice-item {
+      display: grid;
+      grid-template-areas:
+        "name name total"
+        "qty price total";
+      grid-template-columns: max-content 1fr;
+      /* grid-template-rows:  */
+      align-items: center;
+
+      & .name {
+        grid-area: name;
+      }
+      & .qty {
+        grid-area: qty;
+      }
+      & .price {
+        grid-area: price;
+      }
+      & .total {
+        grid-area: total;
+      }
+    }
+    & .invoice-header {
+      display: none;
+    }
+
+    & .amount-due-cont {
+      background-color: light-dark(var(--carbon-blue), var(--ruined-smores));
+      color: white;
+    }
+  }
 }
 .invoices {
   &:has(> *:not(.hide)) + .no-invoices-con {
@@ -1118,6 +1155,29 @@ main {
 
       & .user-addy {
         text-align: right;
+      }
+    }
+
+    & .invoice-items {
+      & .invoice-item {
+        grid-template-areas: "name name qty price total";
+        grid-template-columns: repeat(2, 1fr) max-content repeat(2, 1fr);
+
+        & .price {
+          justify-self: end;
+        }
+        & .total {
+          justify-self: end;
+        }
+
+        & .qty {
+          & > span {
+            display: none;
+          }
+        }
+      }
+      & .invoice-header {
+        display: grid;
       }
     }
   }
