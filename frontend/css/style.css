@@ -457,6 +457,8 @@ div.edit-btns {
 
     display: grid;
     row-gap: 1.5rem;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
     & .invoice-item {
       display: grid;
       grid-template-areas:
@@ -486,6 +488,8 @@ div.edit-btns {
     & .amount-due-cont {
       background-color: light-dark(var(--carbon-blue), var(--ruined-smores));
       color: white;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
     }
   }
 }
