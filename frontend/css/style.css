@@ -154,6 +154,12 @@ div.edit-btns {
   & button.edit-btn {
     color: light-dark(var(--true-lavender), var(--stotic-white));
     background-color: light-dark(#f9fafe, var(--royal-curtsy));
+
+    &:hover {
+      background-color: light-dark(var(--stotic-white), white);
+      color: var(--true-lavender);
+      cursor: pointer;
+    }
   }
   & button.delete-btn {
     margin-inline-start: auto;
@@ -162,6 +168,7 @@ div.edit-btns {
 
     &:hover {
       /* background-color: light-dark(var(--ruined-smores), var(--kon)); */
+      background-color: var(--american-pink);
     }
   }
 
@@ -170,7 +177,7 @@ div.edit-btns {
     background-color: var(--venetian-nights);
 
     &:hover {
-      /* background-color: var(--forgotten-purple); */
+      background-color: var(--forgotten-purple);
     }
   }
 
@@ -1031,6 +1038,11 @@ div.edit-btns {
     & button:first-child {
       color: light-dark(var(--true-lavender), var(--stotic-white));
       background-color: light-dark(#f9fafe, var(--royal-curtsy));
+
+      &:hover {
+        background-color: light-dark(var(--stotic-white), white);
+        color: var(--true-lavender);
+      }
     }
     & button:nth-child(2) {
       margin-inline-start: auto;
