@@ -510,9 +510,7 @@ div.edit-btns {
     }
 
     & .invoice-id {
-      /* margin-block-end: clamp(0.25rem, calc(0.071rem + 0.763vw), 0.438rem); */
       margin-block-end: clamp(-0.562rem, calc(-0.861rem + 1.272vw), -0.25rem);
-      /* grid-area: id; */
 
       font-size: 0.938rem;
       line-height: 1;
@@ -914,6 +912,15 @@ div.edit-btns {
       cursor: pointer;
       outline: var(--venetian-nights) solid 1px;
     }
+    &:read-only,
+    :disabled {
+      color: var(--true-lavender);
+      pointer-events: none;
+
+      &:hover {
+        outline: none;
+      }
+    }
   }
 
   & .form-cont {
@@ -1130,6 +1137,16 @@ div.edit-btns {
       }
     }
   }
+
+  & .invoice-id {
+    letter-spacing: -0.016rem;
+    color: light-dark(var(--ruined-smores), white);
+
+    & span {
+      margin-inline-end: -0.25rem;
+      color: light-dark(var(--true-lavender), var(--papilio-argeotus));
+    }
+  }
   &::backdrop {
     background-color: hsl(from black h s l / 0.5);
   }
@@ -1340,7 +1357,8 @@ main {
     padding-block: clamp(3.813rem, calc(2.67rem + 2.381vw), 4.813rem)
       clamp(10.813rem, calc(4.027rem + 14.137vw), 16.75rem);
   }
-  #new-invoice-dialog[open] {
+  #new-invoice-dialog[open],
+  #edit-invoice-dialog[open] {
     & .form-cont {
       border-top-right-radius: 1.25rem;
       border-bottom-right-radius: 1.25rem;
@@ -1409,7 +1427,8 @@ main {
     }
   }
 
-  #new-invoice-dialog[open] {
+  #new-invoice-dialog[open],
+  #edit-invoice-dialog[open] {
     flex-direction: row;
     min-width: 90rem;
 

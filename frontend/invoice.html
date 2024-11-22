@@ -73,9 +73,9 @@
           </button>
           <h3>
             Edit
-            <span>
-              #
-              <span>XM9141</span>
+            <span class="invoice-id">
+              <span>#</span>
+              XM9141
             </span>
           </h3>
           <form class="invoice-form">
@@ -221,12 +221,7 @@
                   Invoice Date
                   <span class="error-text" aria-live="polite"></span>
                 </span>
-                <input
-                  type="date"
-                  name="date"
-                  id="date"
-                  required
-                  onclick="this.showPicker()" />
+                <input disabled type="date" name="date" id="date" required />
               </label>
               <div class="net">
                 <label>
