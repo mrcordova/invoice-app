@@ -71,7 +71,13 @@
             <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
             Go back
           </button>
-          <h3>New Invoice</h3>
+          <h3>
+            Edit
+            <span>
+              #
+              <span>XM9141</span>
+            </span>
+          </h3>
           <form class="invoice-form">
             <section class="bill-from-section">
               <h4 class="section-header">Bill From</h4>
@@ -412,10 +418,9 @@
               class="error-text league-spartan-bold"
               aria-live="polite"></span>
           </form>
-          <div class="edit-btns league-spartan-bold">
-            <button>Discard</button>
-            <button>Save as Draft</button>
-            <button>Save & Send</button>
+          <div class="btn-cont form-btns league-spartan-bold">
+            <button class="discard-btn">Cancel</button>
+            <button class="save-btn">Save Changes</button>
           </div>
         </div>
       </dialog>
@@ -433,7 +438,12 @@
             Pending
           </div>
         </div>
-        <button class="edit-btn" aria-label="discard edit">Edit</button>
+        <button
+          class="edit-btn"
+          data-show-edit-dialog
+          aria-label="discard edit">
+          Edit
+        </button>
         <button class="delete-btn" data-show-delete-dialog>Delete</button>
         <button class="mark-btn">Mark as Paid</button>
       </div>
@@ -531,15 +541,11 @@
       Terms Net 1 day Net 7 days Net 14 days Net 30 days Project Description
       Item List Item Name Qty. Price Total Add New Item Cancel Save Changes
       <!-- Edit invoice end -->
-
-      <!-- Delete Modal -->
-      Confirm Deletion Are you sure you want to delete invoice #
-      <!-- Add id -->
-      ? This action cannot be undone. Cancel Delete
-      <!-- Delete Modal end -->
     </main>
     <footer class="edit-btns league-spartan-bold">
-      <button class="edit-btn" aria-label="discard edit">Edit</button>
+      <button class="edit-btn" data-show-edit-dialog aria-label="discard edit">
+        Edit
+      </button>
       <button class="delete-btn" data-show-delete-dialog>Delete</button>
       <button class="mark-btn">Mark as Paid</button>
     </footer>
