@@ -36,7 +36,7 @@ function createInvoices() {
             <div class="invoice-user league-spartan-medium">${clientName}</div>
             <div class="due-date league-spartan-medium" >Due ${new Date(
               paymentDue
-            ).toLocaleDateString("en-AU", dateOptions)}</div>
+            ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</div>
 
             <div class="amount" data-total="${total}">${parseFloat(
         total
@@ -68,7 +68,7 @@ function searchInvoices() {
 }
 
 function updateTotalWithQty(e) {
-  console.log(e.target.value);
+  //   console.log(e.target.value);
   const invoiceItem = e.target.closest("div.invoice-item");
   const total = invoiceItem.querySelector(".total  input");
   const price = invoiceItem.querySelector(".price  input");
@@ -156,6 +156,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const deleteItemBtn = e.target.closest("[data-delete-item]");
+  const draftBtn = e.target.closest("[data-draft]");
   //   console.log(e.target);
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
@@ -318,9 +319,70 @@ newInvoiceDialog.addEventListener("click", (e) => {
     input.checked = !input.checked;
   } else if (deleteItemBtn) {
     deleteItemBtn.parentElement.remove();
+  } else if (draftBtn) {
+    const formInputs = newInvoiceDialog.querySelectorAll(
+      "form label > input:not([id^='net'])"
+    );
+    const invoiceItems = newInvoiceDialog.querySelectorAll(
+      ".invoice-items > .invoice-item"
+    );
+    const invoiceItemsArry = [];
+    let total = 0;
+
+    console.log(invoiceItems);
+    for (const invoiceItem of invoiceItems) {
+      const invoiceTotal = parseFloat(
+        invoiceItem.querySelector(".total > input").value
+      );
+      invoiceItemsArry.push({
+        name: parseInt(invoiceItem.querySelector(".name > input").value),
+        quantity: parseInt(invoiceItem.querySelector(".qty > input").value),
+        price: parseFloat(invoiceItem.querySelector(".price > input").value),
+        total: invoiceTotal,
+      });
+      total += invoiceTotal;
+    }
+    const date = new Date(formInputs[10].value);
+    const paymentTerms = newInvoiceDialog
+      .querySelector("[data-payment-terms-value")
+      .getAttribute("data-payment-terms-value");
+    // console.log(formInputs);
+
+    const invoice = {
+      senderAddress: {
+        street: formInputs[0].value,
+        city: formInputs[1].value,
+        postCode: formInputs[2].value,
+        country: formInputs[3].value,
+      },
+      clientName: formInputs[4].value,
+      clientEmail: formInputs[5].value,
+      clientAddress: {
+        street: formInputs[6].value,
+        city: formInputs[7].value,
+        postCode: formInputs[8].value,
+        country: formInputs[9].value,
+      },
+      createdAt: formInputs[10].value,
+      description: formInputs[11].value,
+      paymentTerms: parseInt(paymentTerms),
+      status: "draft",
+      items: invoiceItemsArry,
+      total,
+      paymentDue: new Date(
+        Date.parse(formInputs[10].value) + parseInt(paymentTerms)
+      ).toLocaleDateString("en-CA", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        formatMatcher: "best fit",
+      }),
+    };
+
+    console.log(invoice);
   }
 });
-newInvoiceDialog.addEventListener("input", (e) => {
-  //   console.log(e.target.value);
-});
+// newInvoiceDialog.addEventListener("input", (e) => {
+//     console.log(e.target.value);
+// });
 createInvoices();
