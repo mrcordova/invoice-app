@@ -243,8 +243,11 @@ newInvoiceDialog.addEventListener("click", (e) => {
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const deleteItemBtn = e.target.closest("[data-delete-item]");
   const draftBtn = e.target.closest("[data-draft]");
+  const goBackBtn = e.target.closest("[data-go-back]");
   //   console.log(e.target);
   if (cancelBtn) {
+    resetForm(newInvoiceDialog);
+  } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");

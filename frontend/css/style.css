@@ -16,7 +16,7 @@
   --independence: #494e6e;
   --paid: #33d69f;
   --pending: #ff8f00;
-  --draft: var(--stotic-white);
+  --draft: light-dark(var(--carbon-blue), var(--stotic-white));
   /* color-scheme: light dark; */
 
   --animated-color: hsl(from light-dark(white, black) h s l / 0);
@@ -41,6 +41,7 @@
   @media (prefers-color-scheme: dark) {
     &:has(#theme:checked) {
       --color-scheme: dark;
+      --draft: var(--stotic-white);
       & .light-mode {
         display: none;
       }
@@ -1236,8 +1237,11 @@ div.edit-btns {
     }
   }
   &[data-status="draft"] {
-    background-color: hsl(from var(--draft) h s l / 0.0571);
     color: var(--draft);
+    background-color: light-dark(
+      hsl(from var(--carbon-blue) h s l / 0.0571),
+      hsl(from var(--stotic-white) h s l / 0.0571)
+    );
 
     & .status {
       background-color: var(--draft);
