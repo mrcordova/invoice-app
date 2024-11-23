@@ -64,7 +64,23 @@ function updateTotalWithPrice(e) {
   const qty = invoiceItem.querySelector(".qty > input");
   total.value = (e.target.value * qty.value).toFixed(2);
 }
-
+function resetForm(invoiceDialog) {
+  invoiceDialog.close();
+  const invoiceForm = invoiceDialog.querySelector("#invoice-form");
+  const formInputs = invoiceDialog.querySelectorAll(
+    "form label > input:not([id^='net'])"
+  );
+  const items = invoiceDialog.querySelectorAll(
+    ".invoice-items > .invoice-item"
+  );
+  for (const item of items) {
+    item.remove();
+  }
+  for (const formInput of formInputs) {
+    formInput.value = "";
+  }
+  invoiceForm.reset();
+}
 // newInvoiceBtn.addEventListener("click", (e) => {
 //   newInvoiceDialog.showModal();
 // });
@@ -74,7 +90,7 @@ main.addEventListener("click", (e) => {
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
-  console.log(e.target);
+  //   console.log(e.target);
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -103,12 +119,16 @@ newInvoiceDialog.addEventListener("click", (e) => {
   const deleteItemBtn = e.target.closest("[data-delete-item]");
   //   console.log(e.target);
   if (cancelBtn) {
-    newInvoiceDialog.close();
+    resetForm(newInvoiceDialog);
   } else if (saveBtn) {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
     } else {
       invoiceForm.reportValidity();
+      //   saveBtn.requestSubmit();
+      invoiceForm.requestSubmit(saveBtn);
+      //   console.log(saveBtn.click());
+      //   saveBtn.click();
       //   console.log(invoiceForm.checkValidity());
     }
   } else if (addItemBtn) {
