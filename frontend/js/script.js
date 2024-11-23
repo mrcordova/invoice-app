@@ -51,8 +51,18 @@ function searchInvoices() {
   }
 }
 
-function updateTotal(e) {
+function updateTotalWithQty(e) {
   console.log(e.target.value);
+  const invoiceItem = e.target.closest("div.invoice-item");
+  const total = invoiceItem.querySelector(".total  input");
+  const price = invoiceItem.querySelector(".price  input");
+  total.value = (e.target.value * price.value).toFixed(2);
+}
+function updateTotalWithPrice(e) {
+  const invoiceItem = e.target.closest("div.invoice-item");
+  const total = invoiceItem.querySelector(".total > input");
+  const qty = invoiceItem.querySelector(".qty > input");
+  total.value = (e.target.value * qty.value).toFixed(2);
 }
 
 // newInvoiceBtn.addEventListener("click", (e) => {
@@ -105,7 +115,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
     if (!addItemBtn.previousElementSibling) {
       addItemBtn.parentElement.insertAdjacentHTML(
         "afterbegin",
-        `<div class="invoice-item">
+        `<div class="invoice-item" data-qty=1 data-price="0.00" data-total="0.00">
                   <label class="name">
                     <span class="label-name">
                       Item name
@@ -165,7 +175,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
     } else {
       addItemBtn.previousElementSibling.insertAdjacentHTML(
         "afterend",
-        `<div class="invoice-item">
+        `<div class="invoice-item" data-qty=1 data-price="0.00" data-total="0.00">
                   <label class="name">
                     <span class="label-name">
                       Item name
@@ -224,10 +234,10 @@ newInvoiceDialog.addEventListener("click", (e) => {
     }
     addItemBtn.previousElementSibling
       .querySelector(".qty")
-      .addEventListener("input", updateTotal);
+      .addEventListener("input", updateTotalWithQty);
     addItemBtn.previousElementSibling
       .querySelector(".price")
-      .addEventListener("input", updateTotal);
+      .addEventListener("input", updateTotalWithPrice);
   } else if (paymentTermsBtn) {
     const parentDiv = paymentTermsBtn.closest("div.net");
     const inputSpan = parentDiv.querySelector(
