@@ -1,6 +1,16 @@
 const data = await (await fetch("data.json")).json();
 
 console.log(data);
+const themeInput = document.querySelector("#theme");
+const perferredColorScheme = "perferredColorScheme";
+if (!(perferredColorScheme in localStorage)) {
+  localStorage.setItem(
+    perferredColorScheme,
+    window.matchMedia("(prefers-color-scheme: dark)").matches ? true : ""
+  );
+}
+themeInput.checked = localStorage.getItem(perferredColorScheme);
+
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 // const newInvoiceBtn = document.querySelector(".new-invoice-btn");
@@ -100,6 +110,7 @@ header.addEventListener("click", (e) => {
     const themeInput = themeBtn.querySelector("input");
     // console.log(themeInput.checked);
     themeInput.checked = !themeInput.checked;
+    localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
   }
 });
 

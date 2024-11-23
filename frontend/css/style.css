@@ -49,6 +49,10 @@
       }
     }
   }
+
+  @media screen and (prefers-reduced-motion: reduce), (update: slow) {
+    transition-duration: 0s;
+  }
 }
 
 @keyframes scroll-appear {
