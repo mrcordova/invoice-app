@@ -119,7 +119,8 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="qty"
+                      value="1"
+                      min="1"
                       required
                       inputmode="numeric" />
                   </label>
@@ -178,7 +179,8 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                     
+                      value="1"
+                      min="1"
                       required
                       inputmode="numeric" />
                   </label>
@@ -187,7 +189,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                     
+                      
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
