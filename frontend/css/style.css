@@ -1405,6 +1405,13 @@ main {
           white-space: nowrap; /* Prevent text wrapping */
           border: 0;
         }
+
+        & .qty {
+          & input[type="number"] {
+            text-indent: 0;
+            text-align: center;
+          }
+        }
       }
     }
 

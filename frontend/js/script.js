@@ -51,6 +51,10 @@ function searchInvoices() {
   }
 }
 
+function updateTotal(e) {
+  console.log(e.target.value);
+}
+
 // newInvoiceBtn.addEventListener("click", (e) => {
 //   newInvoiceDialog.showModal();
 // });
@@ -130,7 +134,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                     
+                     step="any"
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
@@ -190,7 +194,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      
+                      step="any"
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
@@ -200,7 +204,6 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                   
                       required
                       readonly
                       placeholder="0.00" />
@@ -219,6 +222,12 @@ newInvoiceDialog.addEventListener("click", (e) => {
                 </div>`
       );
     }
+    addItemBtn.previousElementSibling
+      .querySelector(".qty")
+      .addEventListener("input", updateTotal);
+    addItemBtn.previousElementSibling
+      .querySelector(".price")
+      .addEventListener("input", updateTotal);
   } else if (paymentTermsBtn) {
     const parentDiv = paymentTermsBtn.closest("div.net");
     const inputSpan = parentDiv.querySelector(
@@ -241,5 +250,8 @@ newInvoiceDialog.addEventListener("click", (e) => {
   } else if (deleteItemBtn) {
     deleteItemBtn.parentElement.remove();
   }
+});
+newInvoiceDialog.addEventListener("input", (e) => {
+  //   console.log(e.target.value);
 });
 createInvoices();
