@@ -56,7 +56,7 @@ function searchInvoices() {
 // });
 
 main.addEventListener("click", (e) => {
-  e.preventDefault();
+  //   e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
@@ -81,8 +81,17 @@ main.addEventListener("click", (e) => {
 
 newInvoiceDialog.addEventListener("click", (e) => {
   const cancelBtn = e.target.closest("[data-cancel]");
+  const saveBtn = e.target.closest("[data-save]");
+  console.log(e.target);
   if (cancelBtn) {
     newInvoiceDialog.close();
+  } else if (saveBtn) {
+    const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
+    if (invoiceForm.checkValidity()) {
+    } else {
+      invoiceForm.reportValidity();
+      //   console.log(invoiceForm.checkValidity());
+    }
   }
 });
 createInvoices();

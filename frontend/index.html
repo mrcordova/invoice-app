@@ -60,7 +60,7 @@
             Go back
           </button>
           <h3>New Invoice</h3>
-          <form class="invoice-form">
+          <form class="invoice-form" id="invoice-form">
             <section class="bill-from-section">
               <h4 class="section-header">Bill From</h4>
               <label class="addy league-spartan-medium">
@@ -391,7 +391,9 @@
                   </button>
                 </div>
 
-                <button class="add-new-item-btn league-spartan-bold">
+                <button
+                  type="button"
+                  class="add-new-item-btn league-spartan-bold">
                   + Add New Item
                 </button>
               </div>
@@ -401,9 +403,21 @@
               aria-live="polite"></span>
           </form>
           <div class="form-btns league-spartan-bold">
-            <button class="discard-btn" data-cancel>Discard</button>
+            <button
+              class="discard-btn"
+              data-cancel
+              commandfor="new-invoice-dialog"
+              command="close">
+              Discard
+            </button>
             <button class="second-btn">Save as Draft</button>
-            <button class="save-btn">Save & Send</button>
+            <button
+              class="save-btn"
+              data-save
+              type="submit"
+              form="invoice-form">
+              Save & Send
+            </button>
           </div>
         </div>
       </dialog>
@@ -448,7 +462,11 @@
             </li>
           </menu>
         </div>
-        <button class="league-spartan-bold new-invoice-btn" data-show-dialog>
+        <button
+          class="league-spartan-bold new-invoice-btn"
+          data-show-dialog
+          commandfor="new-invoice-dialog"
+          command="show-modal">
           <span class="img-span">
             <img src="./assets/icon-plus.svg" alt="plus sign" />
           </span>
