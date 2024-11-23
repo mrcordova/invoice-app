@@ -329,53 +329,72 @@ newInvoiceDialog.addEventListener("click", (e) => {
     const invoiceItemsArry = [];
     let total = 0;
 
-    console.log(invoiceItems);
+    // console.log(invoiceItems);
     for (const invoiceItem of invoiceItems) {
       const invoiceTotal = parseFloat(
         invoiceItem.querySelector(".total > input").value
       );
       invoiceItemsArry.push({
-        name: parseInt(invoiceItem.querySelector(".name > input").value),
+        name: invoiceItem.querySelector(".name > input").value,
         quantity: parseInt(invoiceItem.querySelector(".qty > input").value),
         price: parseFloat(invoiceItem.querySelector(".price > input").value),
         total: invoiceTotal,
       });
       total += invoiceTotal;
     }
-    const date = new Date(formInputs[10].value);
-    const paymentTerms = newInvoiceDialog
-      .querySelector("[data-payment-terms-value")
-      .getAttribute("data-payment-terms-value");
-    // console.log(formInputs);
+    // const date = new Date(formInputs[10].value);
+    const date = newInvoiceDialog.querySelector(
+      "form label > input#date"
+    ).value;
+    // console.log(date);
+    let paymentDue = new Date(`${date}T00:00:00`);
+    console.log(paymentDue);
+    const paymentTerms = parseInt(
+      newInvoiceDialog
+        .querySelector("[data-payment-terms-value")
+        .getAttribute("data-payment-terms-value")
+    );
+    paymentDue.setDate(paymentDue.getDate() + paymentTerms);
 
+    // console.log(new Date(Date.now()));
+    // console.log(new Date(new Date(date).valueOf() + parseInt(paymentTerms)));
     const invoice = {
       senderAddress: {
-        street: formInputs[0].value,
-        city: formInputs[1].value,
-        postCode: formInputs[2].value,
-        country: formInputs[3].value,
+        street: newInvoiceDialog.querySelector("form label > input#addy").value,
+        city: newInvoiceDialog.querySelector("form label > input#city").value,
+        postCode: newInvoiceDialog.querySelector("form label > input#zipcode")
+          .value,
+        country: newInvoiceDialog.querySelector("form label > input#country")
+          .value,
       },
-      clientName: formInputs[4].value,
-      clientEmail: formInputs[5].value,
+      clientName: newInvoiceDialog.querySelector("form label > input#name")
+        .value,
+      clientEmail: newInvoiceDialog.querySelector("form label > input#email")
+        .value,
       clientAddress: {
-        street: formInputs[6].value,
-        city: formInputs[7].value,
-        postCode: formInputs[8].value,
-        country: formInputs[9].value,
+        street: newInvoiceDialog.querySelector("form label > input#client-addy")
+          .value,
+        city: newInvoiceDialog.querySelector("form label > input#client-city")
+          .value,
+        postCode: newInvoiceDialog.querySelector(
+          "form label > input#client-zipcode"
+        ).value,
+        country: newInvoiceDialog.querySelector(
+          "form label > input#client-country"
+        ).value,
       },
-      createdAt: formInputs[10].value,
-      description: formInputs[11].value,
-      paymentTerms: parseInt(paymentTerms),
+      createdAt: date,
+      description: newInvoiceDialog.querySelector(
+        "form label > input#description"
+      ).value,
+      paymentTerms: paymentTerms,
       status: "draft",
       items: invoiceItemsArry,
       total,
-      paymentDue: new Date(
-        Date.parse(formInputs[10].value) + parseInt(paymentTerms)
-      ).toLocaleDateString("en-CA", {
+      paymentDue: paymentDue.toLocaleDateString("en-CA", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
-        formatMatcher: "best fit",
       }),
     };
 
