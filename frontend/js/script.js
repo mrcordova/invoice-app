@@ -86,6 +86,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
   const addItemBtn = e.target.closest("[data-add-item]");
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
+  const deleteItemBtn = e.target.closest("[data-delete-item]");
   //   console.log(e.target);
   if (cancelBtn) {
     newInvoiceDialog.close();
@@ -144,7 +145,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                       readonly
                       placeholder="0.00" />
                   </label>
-                  <button class="delete">
+                  <button class="delete" data-delete-item>
                     <svg
                       width="13"
                       height="16"
@@ -204,7 +205,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                       readonly
                       placeholder="0.00" />
                   </label>
-                  <button class="delete">
+                  <button class="delete" data-delete-item>
                     <svg
                       width="13"
                       height="16"
@@ -237,6 +238,8 @@ newInvoiceDialog.addEventListener("click", (e) => {
   } else if (paymentTermInput) {
     const input = paymentTermInput.querySelector("input");
     input.checked = !input.checked;
+  } else if (deleteItemBtn) {
+    deleteItemBtn.parentElement.remove();
   }
 });
 createInvoices();

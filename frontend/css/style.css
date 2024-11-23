@@ -1380,6 +1380,10 @@ main {
 
       & .item-header {
         padding-block-end: 0.938rem;
+
+        & .delete {
+          height: 0;
+        }
       }
       & .invoice-item {
         display: grid;
