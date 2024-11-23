@@ -24,7 +24,7 @@ function createInvoices() {
     const { id, paymentDue, clientName, total, status } = invoice;
     invoices.insertAdjacentHTML(
       "beforeend",
-      `<a href="./invoice.html?invoicd-id=${id}" tabindex="0" data-status="${status}">
+      `<a href="./invoice.html?invoicd-id=${id}" tabindex="0" data-status="${status}" data-invoice>
           <div class="invoice league-spartan-bold">
             <div class="invoice-id">
               <span>#</span>
@@ -119,8 +119,9 @@ main.addEventListener("click", (e) => {
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
-
+  const invoiceEle = e.target.closest("[data-invoice]");
   //   console.log(e.target);
+  //   console.log(e.target); console.log(invoiceEle);
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -136,6 +137,9 @@ main.addEventListener("click", (e) => {
     input.checked = !input.checked;
   } else if (dialog) {
     newInvoiceDialog.showModal();
+  } else if (invoiceEle) {
+    // console.log(invoiceEle);
+    location.href = invoiceEle.getAttribute("href");
   }
 });
 
