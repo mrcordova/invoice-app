@@ -17,9 +17,38 @@
   --paid: #33d69f;
   --pending: #ff8f00;
   --draft: var(--stotic-white);
-  color-scheme: light dark;
+  /* color-scheme: light dark; */
 
   --animated-color: hsl(from light-dark(white, black) h s l / 0);
+
+  color-scheme: var(--color-scheme, light);
+  & .light-mode {
+    display: block;
+  }
+  & .dark-mode {
+    display: none;
+  }
+
+  &:has(#theme:checked) {
+    --color-scheme: dark;
+    & .light-mode {
+      display: none;
+    }
+    & .dark-mode {
+      display: block;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    &:has(#theme:checked) {
+      --color-scheme: dark;
+      & .light-mode {
+        display: none;
+      }
+      & .dark-mode {
+        display: block;
+      }
+    }
+  }
 }
 
 @keyframes scroll-appear {

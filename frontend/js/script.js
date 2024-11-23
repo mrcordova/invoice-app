@@ -5,6 +5,7 @@ const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 // const newInvoiceBtn = document.querySelector(".new-invoice-btn");
 const main = document.querySelector("main");
+const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const filterOptions = new Set();
 function createInvoices() {
@@ -92,11 +93,22 @@ function resetForm(invoiceDialog) {
 //   newInvoiceDialog.showModal();
 // });
 
+header.addEventListener("click", (e) => {
+  e.preventDefault();
+  const themeBtn = e.target.closest("[data-theme]");
+  if (themeBtn) {
+    const themeInput = themeBtn.querySelector("input");
+    // console.log(themeInput.checked);
+    themeInput.checked = !themeInput.checked;
+  }
+});
+
 main.addEventListener("click", (e) => {
-  //   e.preventDefault();
+  e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
+
   //   console.log(e.target);
 
   if (statusFilterOption) {
