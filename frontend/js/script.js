@@ -3,7 +3,7 @@ const data = await (await fetch("data.json")).json();
 console.log(data);
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
-const newInvoiceBtn = document.querySelector(".new-invoice-btn");
+// const newInvoiceBtn = document.querySelector(".new-invoice-btn");
 const main = document.querySelector("main");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const filterOptions = new Set();
@@ -51,14 +51,16 @@ function searchInvoices() {
   }
 }
 
-newInvoiceBtn.addEventListener("click", (e) => {
-  newInvoiceDialog.showModal();
-});
+// newInvoiceBtn.addEventListener("click", (e) => {
+//   newInvoiceDialog.showModal();
+// });
 
 main.addEventListener("click", (e) => {
   e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
+  const dialog = e.target.closest("[data-show-dialog]");
+  console.log(e.target);
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -69,10 +71,18 @@ main.addEventListener("click", (e) => {
       filterOptions.delete(statusFilterOption.dataset.filterOption);
     }
     searchInvoices();
-    // console.log(filterOptions);
   } else if (filterDropdown) {
     const input = filterDropdown.querySelector('[name="filter"]');
     input.checked = !input.checked;
+  } else if (dialog) {
+    newInvoiceDialog.showModal();
+  }
+});
+
+newInvoiceDialog.addEventListener("click", (e) => {
+  const cancelBtn = e.target.closest("[data-cancel]");
+  if (cancelBtn) {
+    newInvoiceDialog.close();
   }
 });
 createInvoices();
