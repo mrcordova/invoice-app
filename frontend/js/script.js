@@ -66,7 +66,14 @@ function searchInvoices() {
     );
   }
 }
-
+function generateCustomId() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const randomLetters =
+    letters.charAt(Math.floor(Math.random() * letters.length)) +
+    letters.charAt(Math.floor(Math.random() * letters.length));
+  const randomNumbers = Math.floor(1000 + Math.random() * 9000).toString();
+  return `${randomLetters}${randomNumbers}`;
+}
 function updateTotalWithQty(e) {
   //   console.log(e.target.value);
   const invoiceItem = e.target.closest("div.invoice-item");
@@ -107,6 +114,85 @@ function resetForm(invoiceDialog) {
 // newInvoiceBtn.addEventListener("click", (e) => {
 //   newInvoiceDialog.showModal();
 // });
+
+function saveInvoice(status) {
+  const invoiceItems = newInvoiceDialog.querySelectorAll(
+    ".invoice-items > .invoice-item"
+  );
+  const invoiceItemsArry = [];
+  let total = 0;
+
+  // console.log(invoiceItems);
+  for (const invoiceItem of invoiceItems) {
+    const invoiceTotal = parseFloat(
+      invoiceItem.querySelector(".total > input").value
+    );
+    invoiceItemsArry.push({
+      name: invoiceItem.querySelector(".name > input").value,
+      quantity: parseInt(invoiceItem.querySelector(".qty > input").value),
+      price: parseFloat(invoiceItem.querySelector(".price > input").value),
+      total: invoiceTotal,
+    });
+    total += invoiceTotal;
+  }
+  // const date = new Date(formInputs[10].value);
+  const date = newInvoiceDialog.querySelector("form label > input#date").value;
+  // console.log(date);
+  let paymentDue = new Date(`${date}T00:00:00`);
+  // console.log(paymentDue);
+  const paymentTerms = parseInt(
+    newInvoiceDialog
+      .querySelector("[data-payment-terms-value")
+      .getAttribute("data-payment-terms-value")
+  );
+  paymentDue.setDate(paymentDue.getDate() + paymentTerms);
+
+  // console.log(new Date(Date.now()));
+  // console.log(new Date(new Date(date).valueOf() + parseInt(paymentTerms)));
+  const invoice = {
+    id: generateCustomId(),
+    senderAddress: {
+      street: newInvoiceDialog.querySelector("form label > input#addy").value,
+      city: newInvoiceDialog.querySelector("form label > input#city").value,
+      postCode: newInvoiceDialog.querySelector("form label > input#zipcode")
+        .value,
+      country: newInvoiceDialog.querySelector("form label > input#country")
+        .value,
+    },
+    clientName: newInvoiceDialog.querySelector("form label > input#name").value,
+    clientEmail: newInvoiceDialog.querySelector("form label > input#email")
+      .value,
+    clientAddress: {
+      street: newInvoiceDialog.querySelector("form label > input#client-addy")
+        .value,
+      city: newInvoiceDialog.querySelector("form label > input#client-city")
+        .value,
+      postCode: newInvoiceDialog.querySelector(
+        "form label > input#client-zipcode"
+      ).value,
+      country: newInvoiceDialog.querySelector(
+        "form label > input#client-country"
+      ).value,
+    },
+    createdAt: date,
+    description: newInvoiceDialog.querySelector(
+      "form label > input#description"
+    ).value,
+    paymentTerms: paymentTerms,
+    status: status,
+    items: invoiceItemsArry,
+    total,
+    paymentDue: paymentDue.toLocaleDateString("en-CA", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }),
+  };
+
+  console.log(invoice);
+
+  resetForm(newInvoiceDialog);
+}
 
 header.addEventListener("click", (e) => {
   e.preventDefault();
@@ -163,6 +249,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
   } else if (saveBtn) {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
+      saveInvoice("pending");
     } else {
       invoiceForm.reportValidity();
       //   saveBtn.requestSubmit();
@@ -320,85 +407,11 @@ newInvoiceDialog.addEventListener("click", (e) => {
   } else if (deleteItemBtn) {
     deleteItemBtn.parentElement.remove();
   } else if (draftBtn) {
-    const formInputs = newInvoiceDialog.querySelectorAll(
-      "form label > input:not([id^='net'])"
-    );
-    const invoiceItems = newInvoiceDialog.querySelectorAll(
-      ".invoice-items > .invoice-item"
-    );
-    const invoiceItemsArry = [];
-    let total = 0;
-
-    // console.log(invoiceItems);
-    for (const invoiceItem of invoiceItems) {
-      const invoiceTotal = parseFloat(
-        invoiceItem.querySelector(".total > input").value
-      );
-      invoiceItemsArry.push({
-        name: invoiceItem.querySelector(".name > input").value,
-        quantity: parseInt(invoiceItem.querySelector(".qty > input").value),
-        price: parseFloat(invoiceItem.querySelector(".price > input").value),
-        total: invoiceTotal,
-      });
-      total += invoiceTotal;
-    }
-    // const date = new Date(formInputs[10].value);
-    const date = newInvoiceDialog.querySelector(
-      "form label > input#date"
-    ).value;
-    // console.log(date);
-    let paymentDue = new Date(`${date}T00:00:00`);
-    console.log(paymentDue);
-    const paymentTerms = parseInt(
-      newInvoiceDialog
-        .querySelector("[data-payment-terms-value")
-        .getAttribute("data-payment-terms-value")
-    );
-    paymentDue.setDate(paymentDue.getDate() + paymentTerms);
-
-    // console.log(new Date(Date.now()));
-    // console.log(new Date(new Date(date).valueOf() + parseInt(paymentTerms)));
-    const invoice = {
-      senderAddress: {
-        street: newInvoiceDialog.querySelector("form label > input#addy").value,
-        city: newInvoiceDialog.querySelector("form label > input#city").value,
-        postCode: newInvoiceDialog.querySelector("form label > input#zipcode")
-          .value,
-        country: newInvoiceDialog.querySelector("form label > input#country")
-          .value,
-      },
-      clientName: newInvoiceDialog.querySelector("form label > input#name")
-        .value,
-      clientEmail: newInvoiceDialog.querySelector("form label > input#email")
-        .value,
-      clientAddress: {
-        street: newInvoiceDialog.querySelector("form label > input#client-addy")
-          .value,
-        city: newInvoiceDialog.querySelector("form label > input#client-city")
-          .value,
-        postCode: newInvoiceDialog.querySelector(
-          "form label > input#client-zipcode"
-        ).value,
-        country: newInvoiceDialog.querySelector(
-          "form label > input#client-country"
-        ).value,
-      },
-      createdAt: date,
-      description: newInvoiceDialog.querySelector(
-        "form label > input#description"
-      ).value,
-      paymentTerms: paymentTerms,
-      status: "draft",
-      items: invoiceItemsArry,
-      total,
-      paymentDue: paymentDue.toLocaleDateString("en-CA", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      }),
-    };
-
-    console.log(invoice);
+    // const formInputs = newInvoiceDialog.querySelectorAll(
+    //   "form label > input:not([id^='net'])"
+    // );
+    saveInvoice("draft");
+    // console.log(invoice);
   }
 });
 // newInvoiceDialog.addEventListener("input", (e) => {
