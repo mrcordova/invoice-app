@@ -1081,6 +1081,8 @@ div.edit-btns {
       border-radius: 1.5rem;
       &:hover {
         cursor: pointer;
+        background-color: light-dark(var(--stotic-white), white);
+        color: var(--true-lavender);
       }
     }
   }

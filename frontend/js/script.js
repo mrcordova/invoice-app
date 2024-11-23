@@ -110,7 +110,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="text"
                       name="items"
-                      id="item-name"
+                    
                       required
                       autocomplete="off" />
                   </label>
@@ -128,7 +128,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="price"
+                     
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
@@ -138,7 +138,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="total"
+                     
                       required
                       readonly
                       placeholder="0.00" />
@@ -169,7 +169,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="text"
                       name="items"
-                      id="item-name"
+                     
                       required
                       autocomplete="off" />
                   </label>
@@ -178,7 +178,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="qty"
+                     
                       required
                       inputmode="numeric" />
                   </label>
@@ -187,7 +187,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="price"
+                     
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
@@ -197,7 +197,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      id="total"
+                   
                       required
                       readonly
                       placeholder="0.00" />
