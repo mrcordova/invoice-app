@@ -14,11 +14,12 @@ themeInput.checked = localStorage.getItem(perferredColorScheme);
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 const invoiceTotal = document.querySelector("[data-invoice-total]");
-invoiceTotal.textContent = data.length;
+invoiceTotal.textContent = data.length4;
 // const newInvoiceBtn = document.querySelector(".new-invoice-btn");
 const main = document.querySelector("main");
 const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
+const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
 function createInvoices() {
   for (const invoice of data) {
@@ -33,7 +34,9 @@ function createInvoices() {
               ${id}
             </div>
             <div class="invoice-user league-spartan-medium">${clientName}</div>
-            <div class="due-date league-spartan-medium">Due ${paymentDue}</div>
+            <div class="due-date league-spartan-medium" >Due ${new Date(
+              paymentDue
+            ).toLocaleDateString("en-AU", dateOptions)}</div>
 
             <div class="amount" data-total="${total}">${parseFloat(
         total

@@ -101,6 +101,9 @@ Use this section to outline areas that you want to continue focusing on in futur
 
 https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/
 https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus
+https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/
+https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events
+https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector
 
 - [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
 - [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
