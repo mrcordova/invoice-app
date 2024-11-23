@@ -605,6 +605,7 @@ div.edit-btns {
 
   & a {
     text-decoration: none;
+    color: inherit;
 
     &:visited {
       color: inherit;

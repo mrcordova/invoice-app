@@ -419,26 +419,29 @@
         </div>
         <!-- Add number here -->
         <div class="filter-status-cont league-spartan-bold">
-          <label class="filter-status-input-lab" tabindex="0">
+          <label
+            class="filter-status-input-lab"
+            tabindex="0"
+            data-filter-dropdown="false">
             <input type="checkbox" name="filter" id="filter" />
             Filter
             <span class="hide-mobile">by status</span>
           </label>
           <menu class="filter-status-menu">
             <li>
-              <label>
+              <label data-filter-option="draft">
                 <input type="checkbox" name="status" id="draft" />
                 Draft
               </label>
             </li>
             <li>
-              <label>
+              <label data-filter-option="pending">
                 <input type="checkbox" name="status" id="pending" />
                 Pending
               </label>
             </li>
             <li>
-              <label>
+              <label data-filter-option="paid">
                 <input type="checkbox" name="status" id="paid" />
                 Paid
               </label>
@@ -457,7 +460,7 @@
       </div>
 
       <div class="invoices">
-        <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
+        <!-- <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
           <div class="invoice league-spartan-bold">
             <div class="invoice-id">
               <span>#</span>
@@ -522,7 +525,7 @@
                 alt="right arrow" />
             </div>
           </div>
-        </a>
+        </a> -->
       </div>
       <div class="no-invoices-con">
         <img src="./assets/illustration-empty.svg" alt="no invoices imgge" />
