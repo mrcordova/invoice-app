@@ -1,3 +1,5 @@
+import { resetForm } from "./functions.js";
+
 const data = await (await fetch("data.json")).json();
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
@@ -100,15 +102,21 @@ for (const item of invoice.items) {
 // amountDue.insertAdjacentHTML('')
 amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 body.addEventListener("click", (e) => {
+  //   console.log(e.target);
   e.preventDefault();
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
   const editDialogTarget = e.target.closest("[data-show-edit-dialog]");
   const goBackBtn = e.target.closest("[data-go-back]");
+  const goBackPageBtn = e.target.closest("[data-go-back-page]");
   const markAsPaidBtn = e.target.closest("[data-mark-status-paid]");
   const themeBtn = e.target.closest("[data-theme]");
+  const closeDeleteDialog = e.target.closest("[data-close-delete-dialog]");
+  const deleteInvoiceBtn = e.target.closest("[delete-invoice]");
   //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
+    const deleteId = deleteDialog.querySelector("[data-invoice-id]");
+    deleteId.textContent = `#${invoiceId}`;
   } else if (editDialogTarget) {
     editDialog.showModal();
   } else if (goBackBtn) {
@@ -123,5 +131,15 @@ body.addEventListener("click", (e) => {
     // console.log(themeInput.checked);
     themeInput.checked = !themeInput.checked;
     localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
+  } else if (closeDeleteDialog) {
+    deleteDialog.close();
+  } else if (goBackPageBtn) {
+    //   editDialog.close();
+    resetForm(editDialog);
+  } else if (deleteInvoiceBtn) {
+    const idxOfInvoice = data
+      .map((invoice) => invoice.id)
+      .indexOf(`${invoiceId}`);
+    data.splice(idxOfInvoice, 1);
   }
 });

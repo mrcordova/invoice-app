@@ -20,12 +20,13 @@
     <dialog id="delete-dialog" class="league-spartan-bold">
       <h1>Confirm Deletion</h1>
       <p class="league-spartan-medium">
-        Are you sure you want to delete invoice #RT3080? This action cannot be
-        undone
+        Are you sure you want to delete invoice
+        <span data-invoice-id>#RT3080</span>
+        ? This action cannot be undone
       </p>
       <div class="btn-cont">
-        <button class="cancel-btn">Cancel</button>
-        <button class="delete-btn">Delete</button>
+        <button class="cancel-btn" data-close-delete-dialog>Cancel</button>
+        <button class="delete-btn" delete-invoice>Delete</button>
       </div>
     </dialog>
     <div class="header-cont">
@@ -81,7 +82,7 @@
           </div>
         </header>
         <div class="form-cont league-spartan-bold">
-          <button class="go-back-btn" data-go-back>
+          <button class="go-back-btn" data-go-back-page>
             <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
             Go back
           </button>
@@ -92,7 +93,7 @@
               XM9141
             </span>
           </h3>
-          <form class="invoice-form">
+          <form class="invoice-form" id="invoice-form">
             <section class="bill-from-section">
               <h4 class="section-header">Bill From</h4>
               <label class="addy league-spartan-medium">
@@ -238,48 +239,48 @@
                 <input disabled type="date" name="date" id="date" required />
               </label>
               <div class="net">
-                <label>
+                <label data-payment-terms-input data-payment-terms-value="30">
                   <span class="label-name">
                     Payment Terms
                     <span class="error-text" aria-live="polite"></span>
                   </span>
                   <span class="net-span" tabindex="0">
-                    Net 30 Days
+                    <span>Net 30 Days</span>
                     <input type="checkbox" name="terms" id="terms" />
                   </span>
                 </label>
                 <menu id="net-menu" class="net-menu">
                   <li>
-                    <label>
+                    <label data-payment-terms-option="1">
                       <input type="radio" name="net-term-days" id="net-one" />
-                      Net 1 Day
+                      <span>Net 1 Day</span>
                     </label>
                   </li>
                   <li>
-                    <label>
+                    <label data-payment-terms-option="7">
                       <input
                         type="radio"
                         name="new-invoice-days"
                         id="net-seven" />
-                      Net 7 Days
+                      <span>Net 7 Days</span>
                     </label>
                   </li>
                   <li>
-                    <label>
+                    <label data-payment-terms-option="14">
                       <input
                         type="radio"
                         name="new-invoice-days"
                         id="net-fourteen" />
-                      Net 14 Days
+                      <span>Net 14 Days</span>
                     </label>
                   </li>
                   <li>
-                    <label>
+                    <label data-payment-terms-option="30">
                       <input
                         type="radio"
                         name="new-invoice-days"
                         id="net-thirty" />
-                      Net 30 Days
+                      <span>Net 30 Days</span>
                     </label>
                   </li>
                 </menu>
@@ -532,26 +533,6 @@
           </div>
         </div>
       </div>
-
-      Item Name QTY. Price Total
-
-      <!-- Add item.name -->
-      <!-- Add item.quanity -->
-      <!-- Add item.price -->
-      <!-- Add item.total -->
-
-      Amount Due £
-      <!-- Add total -->
-
-      <!-- Edit invoice form -->
-      Go back Edit #
-      <!-- Add id -->
-
-      Bill From Street Address City Post Code Country Bill To Client's Name
-      Client's Email Street Address City Post Code Country Invoice Date Payment
-      Terms Net 1 day Net 7 days Net 14 days Net 30 days Project Description
-      Item List Item Name Qty. Price Total Add New Item Cancel Save Changes
-      <!-- Edit invoice end -->
     </main>
     <footer class="edit-btns league-spartan-bold">
       <button class="edit-btn" data-show-edit-dialog aria-label="discard edit">
