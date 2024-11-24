@@ -21,14 +21,14 @@ let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
 // console.log(invoiceId);
 let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
-console.log(invoice);
+// console.log(invoice);
 statusBarEle.insertAdjacentHTML(
   "afterbegin",
   `<div class="status-cont">
           <p class="league-spartan-medium">Status</p>
           <div class="status-token" data-status="${invoice.status}">
             <div class="status"></div>
-            ${invoice.status}
+            <span data-status-text>${invoice.status}<span>
           </div>
         </div>`
 );
@@ -100,13 +100,28 @@ for (const item of invoice.items) {
 // amountDue.insertAdjacentHTML('')
 amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 body.addEventListener("click", (e) => {
-  //   e.preventDefault();
+  e.preventDefault();
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
   const editDialogTarget = e.target.closest("[data-show-edit-dialog]");
-
+  const goBackBtn = e.target.closest("[data-go-back]");
+  const markAsPaidBtn = e.target.closest("[data-mark-status-paid]");
+  const themeBtn = e.target.closest("[data-theme]");
+  //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
   } else if (editDialogTarget) {
     editDialog.showModal();
+  } else if (goBackBtn) {
+    history.back();
+  } else if (markAsPaidBtn) {
+    const statusEle = statusBarEle.querySelector("[data-status]");
+    const statusText = statusEle.querySelector("[data-status-text]");
+    statusEle.setAttribute("data-status", "paid");
+    statusText.textContent = "Paid";
+  } else if (themeBtn) {
+    const themeInput = themeBtn.querySelector("input");
+    // console.log(themeInput.checked);
+    themeInput.checked = !themeInput.checked;
+    localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
   }
 });
