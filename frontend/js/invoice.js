@@ -1,6 +1,7 @@
 import {
   addItemRow,
   resetForm,
+  saveInvoice,
   showPaymentTermsMenu,
   updatePaymentTerms,
 } from "./functions.js";
@@ -40,72 +41,74 @@ statusBarEle.insertAdjacentHTML(
           </div>
         </div>`
 );
-invoiceEle.insertAdjacentHTML(
-  "afterbegin",
-  `<div class="invoice-info league-spartan-medium">
-          <div class="invoice-title">
-            <div class="invoice-id league-spartan-bold">
-              <span>#</span>
-              ${invoice.id}
-            </div>
-            <p>${invoice.description}</p>
-          </div>
-          <address class="user-addy">
-            <p>${invoice.senderAddress.street}</p>
-            <p>${invoice.senderAddress.city}</p>
-            <p>${invoice.senderAddress.postCode}</p>
-            <p>${invoice.senderAddress.country}m</p>
-          </address>
-          <div class="invoice-date">
-            Invoice Date
-            <p class="league-spartan-bold">${new Date(
-              `${invoice.createdAt}T00:00:00`
-            ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
-          </div>
-          <div class="payment-due">
-            Payment Due
-            <p class="league-spartan-bold">${new Date(
-              `${invoice.paymentDue}T00:00:00`
-            ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
-          </div>
-          <div class="bill-to">
-            Bill to
-            <p class="league-spartan-bold">${invoice.clientName}</p>
-            <address>
-              <p>${invoice.clientAddress.street}</p>
-              <p>${invoice.clientAddress.city}</p>
-              <p>${invoice.clientAddress.postCode}</p>
-              <p>${invoice.clientAddress.country}</p>
-            </address>
-          </div>
-          <div class="email">
-            Sent to
-            <p class="league-spartan-bold">${invoice.clientEmail}</p>
-          </div>
-        </div>`
-);
-
-for (const item of invoice.items) {
-  invoiceItemsTable.insertAdjacentHTML(
-    "beforeend",
-    ` <div class="invoice-item">
-        <span class="name" aria-describedby="name">${item.name}</span>
-        <span class="qty">
-        ${item.quantity}
-        <span>x</span>
-        </span>
-        <span class="price">${item.price.toLocaleString(
-          "en",
-          currencyOptions
-        )}</span>
-        <span class="total">${item.total.toLocaleString(
-          "en",
-          currencyOptions
-        )}</span>
-        </div>`
+function updateInvoice(invoice) {
+  invoiceEle.insertAdjacentHTML(
+    "afterbegin",
+    `<div class="invoice-info league-spartan-medium">
+    <div class="invoice-title">
+    <div class="invoice-id league-spartan-bold">
+    <span>#</span>
+    ${invoice.id}
+    </div>
+    <p>${invoice.description}</p>
+    </div>
+    <address class="user-addy">
+    <p>${invoice.senderAddress.street}</p>
+    <p>${invoice.senderAddress.city}</p>
+    <p>${invoice.senderAddress.postCode}</p>
+    <p>${invoice.senderAddress.country}m</p>
+    </address>
+    <div class="invoice-date">
+    Invoice Date
+    <p class="league-spartan-bold">${new Date(
+      `${invoice.createdAt}T00:00:00`
+    ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
+    </div>
+    <div class="payment-due">
+    Payment Due
+    <p class="league-spartan-bold">${new Date(
+      `${invoice.paymentDue}T00:00:00`
+    ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
+    </div>
+    <div class="bill-to">
+    Bill to
+    <p class="league-spartan-bold">${invoice.clientName}</p>
+    <address>
+    <p>${invoice.clientAddress.street}</p>
+    <p>${invoice.clientAddress.city}</p>
+    <p>${invoice.clientAddress.postCode}</p>
+    <p>${invoice.clientAddress.country}</p>
+    </address>
+    </div>
+    <div class="email">
+    Sent to
+    <p class="league-spartan-bold">${invoice.clientEmail}</p>
+    </div>
+    </div>`
   );
-}
 
+  for (const item of invoice.items) {
+    invoiceItemsTable.insertAdjacentHTML(
+      "beforeend",
+      ` <div class="invoice-item">
+      <span class="name" aria-describedby="name">${item.name}</span>
+      <span class="qty">
+      ${item.quantity}
+      <span>x</span>
+      </span>
+      <span class="price">${item.price.toLocaleString(
+        "en",
+        currencyOptions
+      )}</span>
+      <span class="total">${item.total.toLocaleString(
+        "en",
+        currencyOptions
+      )}</span>
+      </div>`
+    );
+  }
+}
+updateInvoice(invoice);
 amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 body.addEventListener("click", (e) => {
   //   console.log(e.target);
@@ -122,6 +125,7 @@ body.addEventListener("click", (e) => {
   const addItemBtn = e.target.closest("[data-add-item]");
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
+  const saveChangesBtn = e.target.closest("[data-save]");
   //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -268,5 +272,9 @@ body.addEventListener("click", (e) => {
     updatePaymentTerms(paymentTermsBtn);
   } else if (paymentTermInput) {
     showPaymentTermsMenu(paymentTermInput);
+  } else if (saveChangesBtn) {
+    const tempInvoice = saveInvoice(editDialog, invoice.status, invoice.id);
+    invoiceEle.replaceChildren();
+    updateInvoice(tempInvoice);
   }
 });
