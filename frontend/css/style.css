@@ -691,6 +691,7 @@ div.edit-btns {
       }
     }
     & .invoice-user {
+      text-transform: capitalize;
       margin-block-end: 1.5rem;
       grid-area: user;
       text-align: right;

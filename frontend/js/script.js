@@ -89,6 +89,46 @@ function updateTotalWithPrice(e) {
   total.value = (e.target.value * qty.value).toFixed(2);
 }
 
+function formatDueDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
+}
+
+function formatCurrency(totalStr) {
+  return parseFloat(totalStr).toLocaleString("en", currencyOptions);
+}
+function addInvoice(invoice) {
+  invoices.insertAdjacentHTML(
+    "beforeend",
+    `<a href="./invoice.html?invoicd-id=${
+      invoice.id
+    }" tabindex="0" data-invoice>
+          <div class="invoice league-spartan-bold">
+            <div class="invoice-id">
+              <span>#</span>
+              ${invoice.id}
+            </div>
+            <div class="invoice-user league-spartan-medium">${
+              invoice.clientName
+            }</div>
+            <div class="due-date league-spartan-medium">Due ${formatDueDate(
+              invoice.paymentDue
+            )}</div>
+
+            <div class="amount">${formatCurrency(invoice.total)}</div>
+            <div class="status-cont">
+              <div class="status-token" data-status="${invoice.status}">
+                <div class="status"></div>
+               ${invoice.status}
+              </div>
+              <img
+                class="hide-mobile"
+                src="./assets/icon-arrow-right.svg"
+                alt="right arrow" />
+            </div>
+          </div>
+        </a>`
+  );
+}
 // newInvoiceBtn.addEventListener("click", (e) => {
 //   newInvoiceDialog.showModal();
 // });
@@ -167,9 +207,10 @@ function saveInvoice(status) {
     }),
   };
 
-  console.log(invoice);
+  // console.log(invoice);
 
   resetForm(newInvoiceDialog);
+  return invoice;
 }
 
 header.addEventListener("click", (e) => {
@@ -222,22 +263,22 @@ newInvoiceDialog.addEventListener("click", (e) => {
   const deleteItemBtn = e.target.closest("[data-delete-item]");
   const draftBtn = e.target.closest("[data-draft]");
   const goBackBtn = e.target.closest("[data-go-back]");
-  //   console.log(e.target);
+  // console.log(e.target);
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
+    // console.log(pendingInvoice);
+    console.log(invoiceForm.checkValidity());
     if (invoiceForm.checkValidity()) {
-      saveInvoice("pending");
+      const pendingInvoice = saveInvoice("pending");
+      addInvoice(pendingInvoice);
+      console.log(pendingInvoice);
     } else {
       invoiceForm.reportValidity();
-      //   saveBtn.requestSubmit();
       invoiceForm.requestSubmit(saveBtn);
-      //   console.log(saveBtn.click());
-      //   saveBtn.click();
-      //   console.log(invoiceForm.checkValidity());
     }
   } else if (addItemBtn) {
     if (!addItemBtn.previousElementSibling) {
@@ -388,10 +429,8 @@ newInvoiceDialog.addEventListener("click", (e) => {
   } else if (deleteItemBtn) {
     deleteItemBtn.parentElement.remove();
   } else if (draftBtn) {
-    // const formInputs = newInvoiceDialog.querySelectorAll(
-    //   "form label > input:not([id^='net'])"
-    // );
-    saveInvoice("draft");
+    const draftInvoice = saveInvoice("draft");
+    addInvoice(draftInvoice);
     // console.log(invoice);
   }
 });
