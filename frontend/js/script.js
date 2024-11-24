@@ -175,12 +175,9 @@ newInvoiceDialog.addEventListener("click", (e) => {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
-    // console.log(pendingInvoice);
-    // console.log(invoiceForm.checkValidity());
     if (invoiceForm.checkValidity()) {
       const pendingInvoice = saveInvoice(newInvoiceDialog, "pending");
       addInvoice(pendingInvoice);
-      // console.log(pendingInvoice);
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveBtn);

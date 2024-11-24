@@ -31,16 +31,18 @@ const invoiceId = params.get("invoice-id");
 // console.log(invoiceId);
 let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
 // console.log(invoice);
-statusBarEle.insertAdjacentHTML(
-  "afterbegin",
-  `<div class="status-cont">
-          <p class="league-spartan-medium">Status</p>
-          <div class="status-token" data-status="${invoice.status}">
-            <div class="status"></div>
-            <span data-status-text>${invoice.status}<span>
-          </div>
-        </div>`
-);
+function updateStatus({ status }) {
+  statusBarEle.insertAdjacentHTML(
+    "afterbegin",
+    `<div class="status-cont">
+    <p class="league-spartan-medium">Status</p>
+    <div class="status-token" data-status="${status}">
+    <div class="status"></div>
+    <span data-status-text>${status}<span>
+    </div>
+    </div>`
+  );
+}
 function updateInvoice(invoice) {
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
@@ -56,7 +58,7 @@ function updateInvoice(invoice) {
     <p>${invoice.senderAddress.street}</p>
     <p>${invoice.senderAddress.city}</p>
     <p>${invoice.senderAddress.postCode}</p>
-    <p>${invoice.senderAddress.country}m</p>
+    <p>${invoice.senderAddress.country}</p>
     </address>
     <div class="invoice-date">
     Invoice Date
@@ -107,9 +109,10 @@ function updateInvoice(invoice) {
       </div>`
     );
   }
+  amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 }
+updateStatus(invoice);
 updateInvoice(invoice);
-amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 body.addEventListener("click", (e) => {
   //   console.log(e.target);
   e.preventDefault();
@@ -244,8 +247,10 @@ body.addEventListener("click", (e) => {
   } else if (markAsPaidBtn) {
     const statusEle = statusBarEle.querySelector("[data-status]");
     const statusText = statusEle.querySelector("[data-status-text]");
-    statusEle.setAttribute("data-status", "paid");
-    statusText.textContent = "Paid";
+    const status =
+      statusEle.dataset.status == "pending" ? "paid" : statusEle.dataset.status;
+    statusEle.setAttribute("data-status", status);
+    statusText.textContent = status;
   } else if (themeBtn) {
     const themeInput = themeBtn.querySelector("input");
     themeInput.checked = !themeInput.checked;
@@ -273,8 +278,24 @@ body.addEventListener("click", (e) => {
   } else if (paymentTermInput) {
     showPaymentTermsMenu(paymentTermInput);
   } else if (saveChangesBtn) {
-    const tempInvoice = saveInvoice(editDialog, invoice.status, invoice.id);
-    invoiceEle.replaceChildren();
-    updateInvoice(tempInvoice);
+    const invoiceForm = editDialog.querySelector("#invoice-form");
+    if (invoiceForm.checkValidity()) {
+      const tempInvoice = saveInvoice(
+        editDialog,
+        invoice.status === "draft" ? "pending" : invoice.status,
+        invoice.id
+      );
+      // invoiceEle.replaceChildren();
+      statusBarEle.replaceChildren();
+      // invoiceEle.replaceChild()
+      invoiceEle.childNodes[0].remove();
+      invoiceItemsTable.replaceChildren();
+      updateStatus(tempInvoice);
+      updateInvoice(tempInvoice);
+      invoice = tempInvoice;
+    } else {
+      invoiceForm.reportValidity();
+      invoiceForm.requestSubmit(saveChangesBtn);
+    }
   }
 });
