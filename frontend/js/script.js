@@ -275,7 +275,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
     if (invoiceForm.checkValidity()) {
       const pendingInvoice = saveInvoice("pending");
       addInvoice(pendingInvoice);
-      console.log(pendingInvoice);
+      // console.log(pendingInvoice);
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveBtn);

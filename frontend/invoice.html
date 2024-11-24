@@ -90,7 +90,7 @@
             Edit
             <span class="invoice-id">
               <span>#</span>
-              XM9141
+              <span data-invoice-id></span>
             </span>
           </h3>
           <form class="invoice-form" id="invoice-form">
@@ -118,7 +118,7 @@
                   class="league-spartan-bold"
                   type="text"
                   name="addy"
-                  id="ciy"
+                  id="city"
                   required
                   autocomplete="address-level2" />
               </label>
@@ -199,7 +199,7 @@
                   class="league-spartan-bold"
                   type="text"
                   name="c-addy"
-                  id="client-ciy"
+                  id="client-city"
                   required
                   autocomplete="address-level2" />
               </label>
@@ -311,7 +311,7 @@
                 <div class="delete"></div>
               </div>
               <div class="invoice-items">
-                <div class="invoice-item">
+                <!-- <div class="invoice-item">
                   <label class="name">
                     <span class="label-name">
                       Item name
@@ -364,7 +364,6 @@
                         fill="currentColor"
                         fill-rule="nonzero" />
                     </svg>
-                    <!-- <img src="./assets/icon-delete.svg" alt="delete-icon" /> -->
                   </button>
                 </div>
                 <div class="invoice-item">
@@ -416,11 +415,13 @@
                         fill="currentColor"
                         fill-rule="nonzero" />
                     </svg>
-                    <!-- <img src="./assets/icon-delete.svg" alt="delete-icon" /> -->
                   </button>
-                </div>
+                </div> -->
 
-                <button class="add-new-item-btn league-spartan-bold">
+                <button
+                  class="add-new-item-btn league-spartan-bold"
+                  data-add-item
+                  type="button">
                   + Add New Item
                 </button>
               </div>
@@ -430,8 +431,14 @@
               aria-live="polite"></span>
           </form>
           <div class="btn-cont form-btns league-spartan-bold">
-            <button class="discard-btn">Cancel</button>
-            <button class="save-btn">Save Changes</button>
+            <button class="discard-btn" data-go-back-page>Cancel</button>
+            <button
+              class="save-btn"
+              type="submit"
+              data-save
+              form="invoice-form">
+              Save Changes
+            </button>
           </div>
         </div>
       </dialog>

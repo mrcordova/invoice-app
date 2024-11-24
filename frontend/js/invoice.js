@@ -11,6 +11,7 @@ const amountDue = document.querySelector("[data-amount-due]");
 const themeInput = document.querySelector("#theme");
 const perferredColorScheme = "perferredColorScheme";
 const currencyOptions = { style: "currency", currency: "GBP" };
+const homePage = "index.html";
 // const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
@@ -78,7 +79,7 @@ invoiceEle.insertAdjacentHTML(
           </div>
         </div>`
 );
-// console.log(invoiceItemsTable);
+
 for (const item of invoice.items) {
   invoiceItemsTable.insertAdjacentHTML(
     "beforeend",
@@ -99,7 +100,7 @@ for (const item of invoice.items) {
         </div>`
   );
 }
-// amountDue.insertAdjacentHTML('')
+
 amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
 body.addEventListener("click", (e) => {
   //   console.log(e.target);
@@ -112,6 +113,7 @@ body.addEventListener("click", (e) => {
   const themeBtn = e.target.closest("[data-theme]");
   const closeDeleteDialog = e.target.closest("[data-close-delete-dialog]");
   const deleteInvoiceBtn = e.target.closest("[delete-invoice]");
+  const deleteItemBtn = e.target.closest("[data-delete-item]");
   //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -119,6 +121,102 @@ body.addEventListener("click", (e) => {
     deleteId.textContent = `#${invoiceId}`;
   } else if (editDialogTarget) {
     editDialog.showModal();
+    const editId = editDialog.querySelector("[data-invoice-id]");
+    const addItemBtn = editDialog.querySelector("[ data-add-item]");
+    editId.textContent = `${invoiceId}`;
+    const {
+      senderAddress: { street, city, postCode, country },
+      clientAddress,
+      clientName,
+      clientEmail,
+      createdAt,
+      description,
+      items,
+    } = invoice;
+    // console.log(editDialog.querySelector("form label > input#addy"));
+    editDialog.querySelector("form label > input#addy").value = street;
+    editDialog.querySelector("form label > input#city").value = city;
+    editDialog.querySelector("form label > input#zipcode").value = postCode;
+    editDialog.querySelector("form label > input#country").value = country;
+
+    editDialog.querySelector("form label > input#name").value = clientName;
+    editDialog.querySelector("form label > input#email").value = clientEmail;
+
+    editDialog.querySelector("form label > input#client-addy").value =
+      clientAddress.street;
+    editDialog.querySelector("form label > input#client-city").value =
+      clientAddress.city;
+    editDialog.querySelector("form label > input#client-zipcode").value =
+      clientAddress.postCode;
+    editDialog.querySelector("form label > input#client-country").value =
+      clientAddress.country;
+    editDialog.querySelector("form label > input#date").value = createdAt;
+    editDialog.querySelector("form label > input#description").value =
+      description;
+    for (const [index, item] of items.entries()) {
+      const { name, price, quantity, total } = item;
+      addItemBtn.insertAdjacentHTML(
+        "beforebegin",
+        `<div class="invoice-item">
+                  <label class="name">
+                    <span class="label-name">
+                      Item name
+                      <span class="error-text" aria-live="polite"></span>
+                    </span>
+
+                    <input
+                      type="text"
+                      name="items"
+                      
+                      value="${name}"
+                      required
+                      autocomplete="off" />
+                  </label>
+                  <label class="qty">
+                    <span class="label-name">Qty.</span>
+                    <input
+                      type="number"
+                      name="items"
+                      
+                      value="${quantity}"
+                      required
+                      inputmode="numeric" />
+                  </label>
+                  <label class="price">
+                    <span class="label-name">Price</span>
+                    <input
+                      type="number"
+                      value="${price}"
+                      name="items"
+                     
+                      required
+                      placeholder="0.00"
+                      inputmode="numeric" />
+                  </label>
+                  <label class="total">
+                    <span class="label-name">Total</span>
+                    <input
+                      type="number"
+                      name="items"
+                      value="${total}"
+                      required
+                      readonly
+                      placeholder="0.00" />
+                  </label>
+                  <button class="delete" data-delete-item data-item-index="${index}">
+                    <svg
+                      width="13"
+                      height="16"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
+                        fill="currentColor"
+                        fill-rule="nonzero" />
+                    </svg>
+                  </button>
+                </div>`
+      );
+    }
   } else if (goBackBtn) {
     history.back();
   } else if (markAsPaidBtn) {
@@ -128,7 +226,6 @@ body.addEventListener("click", (e) => {
     statusText.textContent = "Paid";
   } else if (themeBtn) {
     const themeInput = themeBtn.querySelector("input");
-    // console.log(themeInput.checked);
     themeInput.checked = !themeInput.checked;
     localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
   } else if (closeDeleteDialog) {
@@ -141,5 +238,11 @@ body.addEventListener("click", (e) => {
       .map((invoice) => invoice.id)
       .indexOf(`${invoiceId}`);
     data.splice(idxOfInvoice, 1);
+    // console.log(data);
+    location.href = homePage;
+  } else if (deleteItemBtn) {
+    const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
+    // invoice.items.splice(deleteItemIndx, 1);
+    deleteItemBtn.parentElement.remove();
   }
 });
