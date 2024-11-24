@@ -104,6 +104,9 @@ https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inp
 https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/
 https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events
 https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector
+https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Testing_media_queries
+https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off
+https://stackoverflow.com/questions/563406/how-to-add-days-to-date
 
 - [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
 - [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.

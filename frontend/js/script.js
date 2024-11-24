@@ -27,7 +27,7 @@ function createInvoices() {
     const { id, paymentDue, clientName, total, status } = invoice;
     invoices.insertAdjacentHTML(
       "beforeend",
-      `<a href="./invoice.html?invoicd-id=${id}" tabindex="0" data-status="${status}" data-invoice>
+      `<a href="./invoice.html?invoice-id=${id}" tabindex="0" data-status="${status}" data-invoice>
           <div class="invoice league-spartan-bold">
             <div class="invoice-id">
               <span>#</span>
