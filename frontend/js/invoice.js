@@ -1,4 +1,9 @@
-import { resetForm } from "./functions.js";
+import {
+  addItemRow,
+  resetForm,
+  showPaymentTermsMenu,
+  updatePaymentTerms,
+} from "./functions.js";
 
 const data = await (await fetch("data.json")).json();
 const deleteDialog = document.querySelector("#delete-dialog");
@@ -114,6 +119,9 @@ body.addEventListener("click", (e) => {
   const closeDeleteDialog = e.target.closest("[data-close-delete-dialog]");
   const deleteInvoiceBtn = e.target.closest("[delete-invoice]");
   const deleteItemBtn = e.target.closest("[data-delete-item]");
+  const addItemBtn = e.target.closest("[data-add-item]");
+  const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
+  const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -254,5 +262,11 @@ body.addEventListener("click", (e) => {
     const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
     // invoice.items.splice(deleteItemIndx, 1);
     deleteItemBtn.parentElement.remove();
+  } else if (addItemBtn) {
+    addItemRow(addItemBtn);
+  } else if (paymentTermsBtn) {
+    updatePaymentTerms(paymentTermsBtn);
+  } else if (paymentTermInput) {
+    showPaymentTermsMenu(paymentTermInput);
   }
 });
