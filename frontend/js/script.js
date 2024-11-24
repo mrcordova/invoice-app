@@ -323,7 +323,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                     
+                      step="any"
                       required
                       readonly
                       placeholder="0.00" />
@@ -383,6 +383,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
+                       step="any"
                       required
                       readonly
                       placeholder="0.00" />

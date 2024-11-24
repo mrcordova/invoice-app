@@ -132,8 +132,16 @@ body.addEventListener("click", (e) => {
       createdAt,
       description,
       items,
+      paymentTerms,
     } = invoice;
     // console.log(editDialog.querySelector("form label > input#addy"));
+    const netEle = editDialog.querySelector("form [data-payment-terms-value]");
+    netEle.setAttribute("data-payment-terms-value", paymentTerms);
+
+    netEle.querySelector(".net-span > span").textContent =
+      editDialog.querySelector(
+        `form [data-payment-terms-option="${paymentTerms}"] > span`
+      ).textContent;
     editDialog.querySelector("form label > input#addy").value = street;
     editDialog.querySelector("form label > input#city").value = city;
     editDialog.querySelector("form label > input#zipcode").value = postCode;
@@ -186,9 +194,9 @@ body.addEventListener("click", (e) => {
                     <span class="label-name">Price</span>
                     <input
                       type="number"
-                      value="${price}"
+                      value="${price.toFixed(2)}"
                       name="items"
-                     
+                      step="any"
                       required
                       placeholder="0.00"
                       inputmode="numeric" />
@@ -198,7 +206,9 @@ body.addEventListener("click", (e) => {
                     <input
                       type="number"
                       name="items"
-                      value="${total}"
+
+                       step="any"
+                      value="${total.toFixed(2)}"
                       required
                       readonly
                       placeholder="0.00" />
