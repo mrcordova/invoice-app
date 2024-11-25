@@ -203,7 +203,14 @@ app.delete('/deleteInvoice/:id', async (req, res) => {
   }
 });
 app.get("/health-check", async (req, res) => {
-  res.json({ success: true });
+  try {
+    const selectQuery = 'Select 1 from invoices';
+    const [result, error] = await poolPromise.query(selectQuery);
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error(`health-check: ${error}`);
+  }
 });
 
 app.listen(PORT, () => {
