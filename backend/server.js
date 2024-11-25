@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql2");
 const cors = require("cors");
-const data = require('../frontend/data.json');
+// const data = require("../frontend/data.json");
 
 // console.log(data);
 
@@ -29,10 +29,9 @@ const pool = mysql.createPool({
     if (field.type === "NEWDECIMAL") {
       return parseFloat(field.string());
     } else if (field.type === "NEWDATE") {
-      
     }
     return next();
-  }
+  },
 });
 const poolPromise = pool.promise();
 
@@ -59,11 +58,41 @@ app.use(express.json({ type: "*/*" }));
 
 async function setUpDb() {
   for (const invoice of data) {
-    const { id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, clientAddress, status, senderAddress, items, total } = invoice;
-    
-    const insertQuery = 'INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)';
+    const {
+      id,
+      createdAt,
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      clientAddress,
+      status,
+      senderAddress,
+      items,
+      total,
+    } = invoice;
+
+    const insertQuery =
+      "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
     try {
-      await poolPromise.query({ sql: insertQuery, values: [id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, JSON.stringify(clientAddress), status, JSON.stringify(senderAddress), JSON.stringify(items), total] });
+      await poolPromise.query({
+        sql: insertQuery,
+        values: [
+          id,
+          createdAt,
+          paymentDue,
+          description,
+          paymentTerms,
+          clientName,
+          clientEmail,
+          JSON.stringify(clientAddress),
+          status,
+          JSON.stringify(senderAddress),
+          JSON.stringify(items),
+          total,
+        ],
+      });
     } catch (error) {
       console.error(error);
     }
@@ -71,9 +100,15 @@ async function setUpDb() {
 }
 // setUpDb();
 
-app.get('/getInvoices', async (req, res) => {
-
-})
+app.get("/getInvoices", async (req, res) => {
+  try {
+    const selectQuery = "SELECT * FROM invoices";
+    const [results] = await poolPromise.query(selectQuery);
+    res.json({ invoices: results });
+  } catch (error) {
+    console.error(`getInvoices: ${error}`);
+  }
+});
 app.get("/health-check", async (req, res) => {
   res.json({ success: true });
 });
