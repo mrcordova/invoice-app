@@ -116,7 +116,44 @@ app.get('/getInvoice/:id', async (req, res) => {
     const [invoice] = await poolPromise.query({ sql: selectQuery, values: [id] });
     res.json(invoice[0]);
   } catch (error) {
-    
+    console.log(`getInvoice: ${error}`);
+  }
+});
+app.post('/saveInvoice', async (req, res) => {
+  try {
+    const {
+      id,
+      createdAt,
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      clientAddress,
+      status,
+      senderAddress,
+      items,
+      total,
+    } = req.body;
+     const insertQuery =
+       "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
+    const [result] = await poolPromise.query({
+      sql: insertQuery, values: [id,
+        createdAt,
+        paymentDue,
+        description,
+        paymentTerms,
+        clientName,
+        clientEmail,
+        JSON.stringify(clientAddress),
+        status,
+        JSON.stringify(senderAddress),
+        JSON.stringify(items),
+        total]
+    });
+    res.json({ success: true, result });
+  } catch (error) {
+    console.log(`saveInvoice: ${error}`);
   }
 })
 app.get("/health-check", async (req, res) => {
