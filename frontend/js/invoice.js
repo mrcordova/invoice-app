@@ -8,7 +8,15 @@ import {
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-let { invoice } = await (await fetch(`${URL}/getInvoice/${invoiceId}`)).json();
+
+let invoice = await (
+  await fetch(`${URL}/getInvoice/${invoiceId}`, {
+    method: "GET",
+    headers: { "Content-type": "application/json" },
+    cache: "reload",
+  })
+).json();
+
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
@@ -29,10 +37,6 @@ if (!(perferredColorScheme in localStorage)) {
 }
 themeInput.checked = localStorage.getItem(perferredColorScheme);
 
-// console.log(invoiceId);
-// let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
-// console.log(invoice);
-// console.log(invoice);
 function updateStatus({ status }) {
   statusBarEle.insertAdjacentHTML(
     "afterbegin",

@@ -6,7 +6,13 @@ import {
   saveInvoice,
   URL,
 } from "./functions.js";
-const { invoices: data } = await (await fetch(`${URL}/getInvoices`)).json();
+const { invoices: data } = await (
+  await fetch(`${URL}/getInvoices`, {
+    method: "GET",
+    headers: { "Content-type": "application/json" },
+    cache: "reload",
+  })
+).json();
 
 console.log(data);
 const themeInput = document.querySelector("#theme");
@@ -99,7 +105,7 @@ function formatCurrency(totalStr) {
 function addInvoice(invoice) {
   invoices.insertAdjacentHTML(
     "beforeend",
-    `<a href="./invoice.html?invoicd-id=${
+    `<a href="./invoice.html?invoice-id=${
       invoice.id
     }" tabindex="0" data-invoice>
           <div class="invoice league-spartan-bold">
@@ -209,6 +215,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
   } else if (draftBtn) {
     const draftInvoice = saveInvoice(newInvoiceDialog, "draft");
     await saveInvoiceToDB(draftInvoice);
+
+    // location.reload();
     addInvoice(draftInvoice);
     // console.log(invoice);
   }
