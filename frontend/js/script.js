@@ -28,7 +28,7 @@ themeInput.checked = localStorage.getItem(perferredColorScheme);
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 const invoiceTotal = document.querySelector("[data-invoice-total]");
-invoiceTotal.textContent = data.length4;
+invoiceTotal.textContent = data.length;
 
 const main = document.querySelector("main");
 const header = document.querySelector("header");
