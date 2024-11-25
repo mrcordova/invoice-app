@@ -5,6 +5,8 @@ import {
   saveInvoice,
   showPaymentTermsMenu,
   updatePaymentTerms,
+  perferredColorScheme,
+  themeUpdate,
   URL,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
@@ -26,18 +28,22 @@ const statusBarEle = document.querySelector("[data-status-bar]");
 const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
-const themeInput = document.querySelector("#theme");
-const perferredColorScheme = "perferredColorScheme";
+// const themeInput = document.querySelector("#theme");
+// const perferredColorScheme = "perferredColorScheme";
 const currencyOptions = { style: "currency", currency: "GBP" };
 const homePage = "index.html";
-// const dateOptions = { day: "numeric", month: "short", year: "numeric" };
+const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
+
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
     perferredColorScheme,
     window.matchMedia("(prefers-color-scheme: dark)").matches ? true : ""
   );
 }
-themeInput.checked = localStorage.getItem(perferredColorScheme);
+for (const themeInput of themeInputs) {
+  const input = themeInput.querySelector("input");
+  input.checked = localStorage.getItem(perferredColorScheme);
+}
 
 function updateStatus({ status }) {
   statusBarEle.insertAdjacentHTML(
@@ -144,6 +150,7 @@ body.addEventListener("click", async (e) => {
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const saveChangesBtn = e.target.closest("[data-save]");
+  // const themeBtn = e.target.closest('[data-theme]');
   //   console.log(goBackBtn);
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -291,9 +298,7 @@ body.addEventListener("click", async (e) => {
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;
   } else if (themeBtn) {
-    const themeInput = themeBtn.querySelector("input");
-    themeInput.checked = !themeInput.checked;
-    localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
+    themeUpdate(e, themeInputs);
   } else if (closeDeleteDialog) {
     deleteDialog.close();
   } else if (goBackPageBtn) {

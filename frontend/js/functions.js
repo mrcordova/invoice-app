@@ -1,3 +1,6 @@
+export const URL = "https://invoice-backend.noahprojects.work";
+export const perferredColorScheme = "perferredColorScheme";
+
 function generateCustomId() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const randomLetters =
@@ -7,12 +10,23 @@ function generateCustomId() {
   return `${randomLetters}${randomNumbers}`;
 }
 
-export const URL = "https://invoice-backend.noahprojects.work";
 // const dataResponse = await fetch(`${URL}/health-check`);
 // console.log(await dataResponse.json());
+
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
+}
+
+export function themeUpdate(e, themeInputs) {
+  const checked = !e.target.closest("label").querySelector("input").checked;
+  console.log(checked);
+  for (const themeInput of themeInputs) {
+    const input = themeInput.querySelector("input");
+    input.checked = checked;
+    console.log(input);
+    localStorage.setItem(perferredColorScheme, input.checked ? true : "");
+  }
 }
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));

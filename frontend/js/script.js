@@ -4,6 +4,8 @@ import {
   showPaymentTermsMenu,
   updatePaymentTerms,
   saveInvoice,
+  themeUpdate,
+  perferredColorScheme,
   URL,
 } from "./functions.js";
 const { invoices: data } = await (
@@ -15,15 +17,18 @@ const { invoices: data } = await (
 ).json();
 
 console.log(data);
-const themeInput = document.querySelector("#theme");
-const perferredColorScheme = "perferredColorScheme";
+const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
+
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
     perferredColorScheme,
     window.matchMedia("(prefers-color-scheme: dark)").matches ? true : ""
   );
 }
-themeInput.checked = localStorage.getItem(perferredColorScheme);
+for (const themeInput of themeInputs) {
+  const input = themeInput.querySelector("input");
+  input.checked = localStorage.getItem(perferredColorScheme);
+}
 
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
@@ -143,10 +148,7 @@ header.addEventListener("click", (e) => {
   e.preventDefault();
   const themeBtn = e.target.closest("[data-theme]");
   if (themeBtn) {
-    const themeInput = themeBtn.querySelector("input");
-    // console.log(themeInput.checked);
-    themeInput.checked = !themeInput.checked;
-    localStorage.setItem(perferredColorScheme, themeInput.checked ? true : "");
+    themeUpdate(e, themeInputs);
   }
 });
 
@@ -156,6 +158,7 @@ main.addEventListener("click", (e) => {
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
   const invoiceEle = e.target.closest("[data-invoice]");
+  const themeBtn = e.target.closest("[data-theme]");
   //   console.log(e.target);
   //   console.log(e.target); console.log(invoiceEle);
 
@@ -174,7 +177,6 @@ main.addEventListener("click", (e) => {
   } else if (dialog) {
     newInvoiceDialog.showModal();
   } else if (invoiceEle) {
-    // console.log(invoiceEle);
     location.href = invoiceEle.getAttribute("href");
   }
 });
@@ -189,6 +191,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
   const deleteItemBtn = e.target.closest("[data-delete-item]");
   const draftBtn = e.target.closest("[data-draft]");
   const goBackBtn = e.target.closest("[data-go-back]");
+  const themeBtn = e.target.closest("[data-theme]");
+  // console.log(themeBtn);
   // console.log(e.target);
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
@@ -219,6 +223,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
     // location.reload();
     addInvoice(draftInvoice);
     // console.log(invoice);
+  } else if (themeBtn) {
+    themeUpdate(e, themeInputs);
   }
 });
 // newInvoiceDialog.addEventListener("input", (e) => {
