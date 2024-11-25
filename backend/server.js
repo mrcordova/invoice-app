@@ -2,6 +2,9 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql2");
 const cors = require("cors");
+const data = require('../frontend/data.json');
+
+// console.log(data);
 
 require("dotenv").config();
 
@@ -20,7 +23,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 10, 
+  connectionLimit: 10,
   queueLimit: 0,
   typeCast: function (field, next) {
     if (field.type === "NEWDECIMAL") {
@@ -30,7 +33,8 @@ const pool = mysql.createPool({
     }
     return next();
   }
-})
+});
+const poolPromise = pool.promise();
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -53,6 +57,23 @@ app.use(express.static(path.join(__dirname, "../frontend/")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ type: "*/*" }));
 
+async function setUpDb() {
+  for (const invoice of data) {
+    const { id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, clientAddress, status, senderAddress, items, total } = invoice;
+    
+    const insertQuery = 'INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)';
+    try {
+      await poolPromise.query({ sql: insertQuery, values: [id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, JSON.stringify(clientAddress), status, JSON.stringify(senderAddress), JSON.stringify(items), total] });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}
+// setUpDb();
+
+app.get('/getInvoices', async (req, res) => {
+
+})
 app.get("/health-check", async (req, res) => {
   res.json({ success: true });
 });
