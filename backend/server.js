@@ -156,6 +156,18 @@ app.post('/saveInvoice', async (req, res) => {
     console.log(`saveInvoice: ${error}`);
   }
 })
+app.put('/updateStatus/:id', async (req, res) => {
+  try {
+    const {id} = req.params;
+    const { status } = req.body;
+    const updateQuery = `UPDATE invoices SET status = ? WHERE id = ?`;
+    const [result, error] = await poolPromise.query({ sql: updateQuery, values: [status, id] });
+    res.json({success: true})
+    
+  } catch (error) {
+    console.error(`updateStatus: ${error}`)
+  }
+})
 app.get("/health-check", async (req, res) => {
   res.json({ success: true });
 });
