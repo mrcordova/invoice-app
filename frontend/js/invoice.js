@@ -1,5 +1,6 @@
 import {
   addItemRow,
+  formatDate,
   resetForm,
   saveInvoice,
   showPaymentTermsMenu,
@@ -51,9 +52,11 @@ function updateStatus({ status }) {
   );
 }
 function updateInvoice(invoice) {
+  // console.log(invoice);
   const senderAddress = JSON.parse(invoice.senderAddress);
   const clientAddress = JSON.parse(invoice.clientAddress);
   const items = JSON.parse(invoice.items);
+  // console.log(invoice.items);
   // console.log(invoice);
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
@@ -101,6 +104,7 @@ function updateInvoice(invoice) {
   );
 
   for (const item of items) {
+    // console.log(item);
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
@@ -151,7 +155,7 @@ body.addEventListener("click", async (e) => {
     const addItemBtn = editDialog.querySelector("[ data-add-item]");
     editId.textContent = `${invoiceId}`;
     const {
-      senderAddress: { street, city, postCode, country },
+      senderAddress,
       clientAddress,
       clientName,
       clientEmail,
@@ -160,6 +164,14 @@ body.addEventListener("click", async (e) => {
       items,
       paymentTerms,
     } = invoice;
+    const { street, city, postCode, country } = JSON.parse(senderAddress);
+    const {
+      street: clientStreet,
+      city: clientCity,
+      postCode: clientPostCode,
+      country: clientCountry,
+    } = JSON.parse(clientAddress);
+    const itemsArry = JSON.parse(items).entries();
     // console.log(editDialog.querySelector("form label > input#addy"));
     const netEle = editDialog.querySelector("form [data-payment-terms-value]");
     netEle.setAttribute("data-payment-terms-value", paymentTerms);
@@ -168,26 +180,31 @@ body.addEventListener("click", async (e) => {
       editDialog.querySelector(
         `form [data-payment-terms-option="${paymentTerms}"] > span`
       ).textContent;
-    editDialog.querySelector("form label > input#addy").value = street;
-    editDialog.querySelector("form label > input#city").value = city;
-    editDialog.querySelector("form label > input#zipcode").value = postCode;
-    editDialog.querySelector("form label > input#country").value = country;
+    editDialog.querySelector("form label > input#addy").value = street ?? "";
+    editDialog.querySelector("form label > input#city").value = city ?? "";
+    editDialog.querySelector("form label > input#zipcode").value =
+      postCode ?? "";
+    editDialog.querySelector("form label > input#country").value =
+      country ?? "";
 
-    editDialog.querySelector("form label > input#name").value = clientName;
-    editDialog.querySelector("form label > input#email").value = clientEmail;
+    editDialog.querySelector("form label > input#name").value =
+      clientName ?? "";
+    editDialog.querySelector("form label > input#email").value =
+      clientEmail ?? "";
 
     editDialog.querySelector("form label > input#client-addy").value =
-      clientAddress.street;
+      clientStreet ?? "";
     editDialog.querySelector("form label > input#client-city").value =
-      clientAddress.city;
+      clientCity ?? "";
     editDialog.querySelector("form label > input#client-zipcode").value =
-      clientAddress.postCode;
+      clientPostCode ?? "";
     editDialog.querySelector("form label > input#client-country").value =
-      clientAddress.country;
-    editDialog.querySelector("form label > input#date").value = createdAt;
+      clientCountry ?? "";
+    editDialog.querySelector("form label > input#date").value =
+      formatDate(createdAt);
     editDialog.querySelector("form label > input#description").value =
-      description;
-    for (const [index, item] of items.entries()) {
+      description ?? "";
+    for (const [index, item] of itemsArry) {
       const { name, price, quantity, total } = item;
       addItemBtn.insertAdjacentHTML(
         "beforebegin",
@@ -318,11 +335,19 @@ body.addEventListener("click", async (e) => {
         invoice.status === "draft" ? "pending" : invoice.status,
         invoice.id
       );
-      // invoiceEle.replaceChildren();
       statusBarEle.replaceChildren();
-      // invoiceEle.replaceChild()
       invoiceEle.childNodes[0].remove();
       invoiceItemsTable.replaceChildren();
+      const response = await (
+        await fetch(`${URL}/updateInvoice/${invoice.id}`, {
+          method: "POST",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(tempInvoice),
+        })
+      ).json();
+      tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
+      tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+      tempInvoice.items = JSON.stringify(tempInvoice.items);
       updateStatus(tempInvoice);
       updateInvoice(tempInvoice);
       invoice = tempInvoice;

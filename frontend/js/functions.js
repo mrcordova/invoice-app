@@ -14,6 +14,9 @@ function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
+export function formatDate(date) {
+  return new Intl.DateTimeFormat("en-CA").format(new Date(date));
+}
 export function resetForm(invoiceDialog) {
   invoiceDialog.close();
   const invoiceForm = invoiceDialog.querySelector("#invoice-form");
