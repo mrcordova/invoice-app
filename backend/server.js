@@ -8,7 +8,10 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3004;
 
-const allowedOrigins = ["", "http://127.0.0.1:5500"];
+const allowedOrigins = [
+  "https://invoice-app-3705.onrender.com",
+  "http://127.0.0.1:5500",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
