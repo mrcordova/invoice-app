@@ -283,15 +283,26 @@ body.addEventListener("click", async (e) => {
     //   editDialog.close();
     resetForm(editDialog);
   } else if (deleteInvoiceBtn) {
-    const idxOfInvoice = data
-      .map((invoice) => invoice.id)
-      .indexOf(`${invoiceId}`);
-    data.splice(idxOfInvoice, 1);
+    const response = await (
+      await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
+        method: "DELETE",
+        headers: { "Content-type": "application/json" },
+      })
+    ).json();
+    // console.log(response);
+    if (response.success) {
+      history.back();
+    }
+    // const idxOfInvoice = data
+    //   .map((invoice) => invoice.id)
+    //   .indexOf(`${invoiceId}`);
+    // data.splice(idxOfInvoice, 1);
     // console.log(data);
-    location.href = homePage;
+    // location.href = homePage;
   } else if (deleteItemBtn) {
     const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
     // invoice.items.splice(deleteItemIndx, 1);
+
     deleteItemBtn.parentElement.remove();
   } else if (addItemBtn) {
     addItemRow(addItemBtn);
