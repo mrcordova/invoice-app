@@ -6,7 +6,13 @@ import {
   saveInvoice,
   URL,
 } from "./functions.js";
-const { invoices: data } = await (await fetch(`${URL}/getInvoices`)).json();
+const { invoices: data } = await (
+  await fetch(`${URL}/getInvoices`, {
+    method: "GET",
+    headers: { "Content-type": "application/json" },
+    cache: "reload",
+  })
+).json();
 
 console.log(data);
 const themeInput = document.querySelector("#theme");
@@ -22,7 +28,7 @@ themeInput.checked = localStorage.getItem(perferredColorScheme);
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 const invoiceTotal = document.querySelector("[data-invoice-total]");
-invoiceTotal.textContent = data.length4;
+invoiceTotal.textContent = data.length;
 
 const main = document.querySelector("main");
 const header = document.querySelector("header");
@@ -74,6 +80,20 @@ function searchInvoices() {
     );
   }
 }
+async function saveInvoiceToDB(invoice) {
+  try {
+    const result = await (
+      await fetch(`${URL}/saveInvoice`, {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify(invoice),
+      })
+    ).json();
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 function formatDueDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
@@ -85,7 +105,7 @@ function formatCurrency(totalStr) {
 function addInvoice(invoice) {
   invoices.insertAdjacentHTML(
     "beforeend",
-    `<a href="./invoice.html?invoicd-id=${
+    `<a href="./invoice.html?invoice-id=${
       invoice.id
     }" tabindex="0" data-invoice>
           <div class="invoice league-spartan-bold">
@@ -159,7 +179,7 @@ main.addEventListener("click", (e) => {
   }
 });
 
-newInvoiceDialog.addEventListener("click", (e) => {
+newInvoiceDialog.addEventListener("click", async (e) => {
   e.preventDefault();
   const cancelBtn = e.target.closest("[data-cancel]");
   const saveBtn = e.target.closest("[data-save]");
@@ -178,6 +198,7 @@ newInvoiceDialog.addEventListener("click", (e) => {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
       const pendingInvoice = saveInvoice(newInvoiceDialog, "pending");
+      saveInvoiceToDB(pendingInvoice);
       addInvoice(pendingInvoice);
     } else {
       invoiceForm.reportValidity();
@@ -193,6 +214,9 @@ newInvoiceDialog.addEventListener("click", (e) => {
     deleteItemBtn.parentElement.remove();
   } else if (draftBtn) {
     const draftInvoice = saveInvoice(newInvoiceDialog, "draft");
+    await saveInvoiceToDB(draftInvoice);
+
+    // location.reload();
     addInvoice(draftInvoice);
     // console.log(invoice);
   }

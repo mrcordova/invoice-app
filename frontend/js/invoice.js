@@ -8,7 +8,16 @@ import {
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-let invoice = await (await fetch(`${URL}/getInvoice/${invoiceId}`)).json();
+
+let invoice = await (
+  await fetch(`${URL}/getInvoice/${invoiceId}`, {
+    method: "GET",
+    headers: { "Content-type": "application/json" },
+    cache: "reload",
+  })
+).json();
+
+console.log(invoice);
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
@@ -29,10 +38,6 @@ if (!(perferredColorScheme in localStorage)) {
 }
 themeInput.checked = localStorage.getItem(perferredColorScheme);
 
-// console.log(invoiceId);
-// let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
-// console.log(invoice);
-// console.log(invoice);
 function updateStatus({ status }) {
   statusBarEle.insertAdjacentHTML(
     "afterbegin",
@@ -119,7 +124,7 @@ function updateInvoice(invoice) {
 }
 updateStatus(invoice);
 updateInvoice(invoice);
-body.addEventListener("click", (e) => {
+body.addEventListener("click", async (e) => {
   //   console.log(e.target);
   e.preventDefault();
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
@@ -255,6 +260,17 @@ body.addEventListener("click", (e) => {
     const statusText = statusEle.querySelector("[data-status-text]");
     const status =
       statusEle.dataset.status == "pending" ? "paid" : statusEle.dataset.status;
+    if (status !== statusEle.dataset.status) {
+      const response = await (
+        await fetch(`${URL}/updateStatus/${invoice.id}`, {
+          method: "PUT",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify({ status }),
+        })
+      ).json();
+      invoice.status = status;
+      // console.log(invoice);
+    }
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;
   } else if (themeBtn) {

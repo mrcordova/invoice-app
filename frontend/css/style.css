@@ -29,7 +29,7 @@
     display: none;
   }
 
-  &:has(#theme:checked) {
+  &:has(input[name="theme"]:checked) {
     --color-scheme: dark;
     & .light-mode {
       display: none;
@@ -39,7 +39,7 @@
     }
   }
   @media (prefers-color-scheme: dark) {
-    &:has(#theme:checked) {
+    &:has(input[name="theme"]:checked) {
       --color-scheme: dark;
       --draft: var(--stotic-white);
       & .light-mode {
