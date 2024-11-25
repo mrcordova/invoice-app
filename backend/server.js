@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql2");
 const cors = require("cors");
-// const data = require("../frontend/data.json");
+const data = require("../frontend/data.json");
 
 // console.log(data);
 
@@ -168,6 +168,29 @@ app.put('/updateStatus/:id', async (req, res) => {
     console.error(`updateStatus: ${error}`)
   }
 });
+app.post('/updateInvoice/:id',async (req, res) => {
+  try {
+    const { id } = req.params;
+     const {
+     
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      status,
+      clientAddress,
+      senderAddress,
+      items,
+      total,
+    } = req.body;
+    const updateQuery = 'UPDATE invoices SET  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ?';
+    const [results, error] = await poolPromise.query({ sql: updateQuery, values: [ paymentDue, description, paymentTerms, clientName, clientEmail, status, JSON.stringify(clientAddress), JSON.stringify(senderAddress), JSON.stringify(items), total, id] });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(`updateInvoice: ${error}`)
+  }
+});
 app.delete('/deleteInvoice/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -180,7 +203,14 @@ app.delete('/deleteInvoice/:id', async (req, res) => {
   }
 });
 app.get("/health-check", async (req, res) => {
-  res.json({ success: true });
+  try {
+    const selectQuery = 'Select 1 from invoices';
+    const [result, error] = await poolPromise.query(selectQuery);
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error(`health-check: ${error}`);
+  }
 });
 
 app.listen(PORT, () => {
