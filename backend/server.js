@@ -34,7 +34,9 @@ app.use(express.static(path.join(__dirname, "../frontend/")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ type: "*/*" }));
 
-app.get("/health-check", async (req, res) => {});
+app.get("/health-check", async (req, res) => {
+  res.json({ success: true });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running of ${PORT}`);
