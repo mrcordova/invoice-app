@@ -13,6 +13,25 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
 ];
 
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10, 
+  queueLimit: 0,
+  typeCast: function (field, next) {
+    if (field.type === "NEWDECIMAL") {
+      return parseFloat(field.string());
+    } else if (field.type === "NEWDATE") {
+      
+    }
+    return next();
+  }
+})
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (allowedOrigins.includes(origin) || !origin) {
