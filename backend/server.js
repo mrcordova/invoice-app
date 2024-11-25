@@ -109,6 +109,16 @@ app.get("/getInvoices", async (req, res) => {
     console.error(`getInvoices: ${error}`);
   }
 });
+app.get('/getInvoice/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const selectQuery = 'SELECT * FROM invoices WHERE id = ? LIMIT 1';
+    const [invoice] = await poolPromise.query({ sql: selectQuery, values: [id] });
+    res.json(invoice[0]);
+  } catch (error) {
+    
+  }
+})
 app.get("/health-check", async (req, res) => {
   res.json({ success: true });
 });
