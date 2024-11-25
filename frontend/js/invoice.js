@@ -8,7 +8,7 @@ import {
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-let invoice = await (await fetch(`${URL}/getInvoice/${invoiceId}`)).json();
+let { invoice } = await (await fetch(`${URL}/getInvoice/${invoiceId}`)).json();
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
