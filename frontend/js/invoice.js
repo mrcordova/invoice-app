@@ -4,9 +4,11 @@ import {
   saveInvoice,
   showPaymentTermsMenu,
   updatePaymentTerms,
+  URL,
 } from "./functions.js";
-
-const data = await (await fetch("data.json")).json();
+let params = new URLSearchParams(document.location.search);
+const invoiceId = params.get("invoice-id");
+let invoice = await (await fetch(`${URL}/getInvoice/${invoiceId}`)).json();
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
@@ -26,10 +28,10 @@ if (!(perferredColorScheme in localStorage)) {
   );
 }
 themeInput.checked = localStorage.getItem(perferredColorScheme);
-let params = new URLSearchParams(document.location.search);
-const invoiceId = params.get("invoice-id");
+
 // console.log(invoiceId);
-let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
+// let invoice = data.find((invoiceObj) => invoiceObj.id === invoiceId);
+// console.log(invoice);
 // console.log(invoice);
 function updateStatus({ status }) {
   statusBarEle.insertAdjacentHTML(
@@ -44,6 +46,10 @@ function updateStatus({ status }) {
   );
 }
 function updateInvoice(invoice) {
+  const senderAddress = JSON.parse(invoice.senderAddress);
+  const clientAddress = JSON.parse(invoice.clientAddress);
+  const items = JSON.parse(invoice.items);
+  // console.log(invoice);
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
     `<div class="invoice-info league-spartan-medium">
@@ -55,31 +61,31 @@ function updateInvoice(invoice) {
     <p>${invoice.description}</p>
     </div>
     <address class="user-addy">
-    <p>${invoice.senderAddress.street}</p>
-    <p>${invoice.senderAddress.city}</p>
-    <p>${invoice.senderAddress.postCode}</p>
-    <p>${invoice.senderAddress.country}</p>
+    <p>${senderAddress.street}</p>
+    <p>${senderAddress.city}</p>
+    <p>${senderAddress.postCode}</p>
+    <p>${senderAddress.country}</p>
     </address>
     <div class="invoice-date">
     Invoice Date
     <p class="league-spartan-bold">${new Date(
-      `${invoice.createdAt}T00:00:00`
+      `${invoice.createdAt}`
     ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
     </div>
     <div class="payment-due">
     Payment Due
     <p class="league-spartan-bold">${new Date(
-      `${invoice.paymentDue}T00:00:00`
+      `${invoice.paymentDue}`
     ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
     </div>
     <div class="bill-to">
     Bill to
     <p class="league-spartan-bold">${invoice.clientName}</p>
     <address>
-    <p>${invoice.clientAddress.street}</p>
-    <p>${invoice.clientAddress.city}</p>
-    <p>${invoice.clientAddress.postCode}</p>
-    <p>${invoice.clientAddress.country}</p>
+    <p>${clientAddress.street}</p>
+    <p>${clientAddress.city}</p>
+    <p>${clientAddress.postCode}</p>
+    <p>${clientAddress.country}</p>
     </address>
     </div>
     <div class="email">
@@ -89,7 +95,7 @@ function updateInvoice(invoice) {
     </div>`
   );
 
-  for (const item of invoice.items) {
+  for (const item of items) {
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
