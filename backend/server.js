@@ -135,8 +135,8 @@ app.post('/saveInvoice', async (req, res) => {
       items,
       total,
     } = req.body;
-     const insertQuery =
-       "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
+    const insertQuery =
+      "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
     const [result] = await poolPromise.query({
       sql: insertQuery, values: [id,
         createdAt,
@@ -155,19 +155,30 @@ app.post('/saveInvoice', async (req, res) => {
   } catch (error) {
     console.log(`saveInvoice: ${error}`);
   }
-})
+});
 app.put('/updateStatus/:id', async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const { status } = req.body;
     const updateQuery = `UPDATE invoices SET status = ? WHERE id = ?`;
     const [result, error] = await poolPromise.query({ sql: updateQuery, values: [status, id] });
-    res.json({success: true})
+    res.json({ success: true })
     
   } catch (error) {
     console.error(`updateStatus: ${error}`)
   }
-})
+});
+app.delete('/deleteInvoice/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteQuery = 'DELETE FROM invoices WHERE id = ? LIMIT 1';
+    const [result, error] = await poolPromise.query({ sql: deleteQuery, values: [id] });
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error(`deleteInvoice: ${error}`);
+  }
+});
 app.get("/health-check", async (req, res) => {
   res.json({ success: true });
 });
