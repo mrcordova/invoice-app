@@ -4,7 +4,6 @@ import {
   showPaymentTermsMenu,
   updatePaymentTerms,
   saveInvoice,
-  createdAt,
 } from "./functions.js";
 const data = await (await fetch("data.json")).json();
 
@@ -78,7 +77,7 @@ function searchInvoices() {
 function formatDueDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
 }
-console.log(createdAt());
+// console.log(createdAt());
 function formatCurrency(totalStr) {
   return parseFloat(totalStr).toLocaleString("en", currencyOptions);
 }

@@ -10,7 +10,7 @@ function generateCustomId() {
 export const URL = "https://invoice-backend.noahprojects.work";
 // const dataResponse = await fetch(`${URL}/health-check`);
 // console.log(await dataResponse.json());
-export function createdAt() {
+function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
