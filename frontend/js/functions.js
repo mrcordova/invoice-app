@@ -7,6 +7,9 @@ function generateCustomId() {
   return `${randomLetters}${randomNumbers}`;
 }
 
+export const URL = "https://invoice-backend.noahprojects.work";
+// const dataResponse = await fetch(`${URL}/health-check`);
+// console.log(await dataResponse.json());
 export function resetForm(invoiceDialog) {
   invoiceDialog.close();
   const invoiceForm = invoiceDialog.querySelector("#invoice-form");
