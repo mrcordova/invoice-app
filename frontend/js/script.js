@@ -4,8 +4,9 @@ import {
   showPaymentTermsMenu,
   updatePaymentTerms,
   saveInvoice,
+  URL,
 } from "./functions.js";
-const data = await (await fetch("data.json")).json();
+const { invoices: data } = await (await fetch(`${URL}/getInvoices`)).json();
 
 console.log(data);
 const themeInput = document.querySelector("#theme");
