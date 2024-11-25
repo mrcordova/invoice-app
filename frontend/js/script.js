@@ -4,6 +4,7 @@ import {
   showPaymentTermsMenu,
   updatePaymentTerms,
   saveInvoice,
+  createdAt,
 } from "./functions.js";
 const data = await (await fetch("data.json")).json();
 
@@ -22,7 +23,7 @@ const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
 const invoiceTotal = document.querySelector("[data-invoice-total]");
 invoiceTotal.textContent = data.length4;
-// const newInvoiceBtn = document.querySelector(".new-invoice-btn");
+
 const main = document.querySelector("main");
 const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
@@ -77,7 +78,7 @@ function searchInvoices() {
 function formatDueDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
 }
-
+console.log(createdAt());
 function formatCurrency(totalStr) {
   return parseFloat(totalStr).toLocaleString("en", currencyOptions);
 }

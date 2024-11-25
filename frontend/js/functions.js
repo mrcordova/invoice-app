@@ -10,6 +10,10 @@ function generateCustomId() {
 export const URL = "https://invoice-backend.noahprojects.work";
 // const dataResponse = await fetch(`${URL}/health-check`);
 // console.log(await dataResponse.json());
+export function createdAt() {
+  const currentDate = new Date(Date.now());
+  return new Intl.DateTimeFormat("en-CA").format(currentDate);
+}
 export function resetForm(invoiceDialog) {
   invoiceDialog.close();
   const invoiceForm = invoiceDialog.querySelector("#invoice-form");
@@ -199,8 +203,9 @@ export function saveInvoice(invoiceDialog, status, id = null) {
   }
   // const date = new Date(formInputs[10].value);
   const date = invoiceDialog.querySelector("form label > input#date").value;
+  const createdAtVal = date === "" ? createdAt() : date;
   // console.log(date);
-  let paymentDue = new Date(`${date}T00:00:00`);
+  let paymentDue = new Date(`${createdAtVal}T00:00:00`);
   // console.log(paymentDue);
   const paymentTerms = parseInt(
     invoiceDialog
@@ -230,7 +235,7 @@ export function saveInvoice(invoiceDialog, status, id = null) {
       country: invoiceDialog.querySelector("form label > input#client-country")
         .value,
     },
-    createdAt: date,
+    createdAt: createdAtVal,
     description: invoiceDialog.querySelector("form label > input#description")
       .value,
     paymentTerms: paymentTerms,
