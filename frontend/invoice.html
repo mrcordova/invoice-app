@@ -250,7 +250,12 @@
                   Invoice Date
                   <span class="error-text" aria-live="polite"></span>
                 </span>
-                <input disabled type="date" name="date" id="date" required />
+                <input
+                  type="date"
+                  name="date"
+                  id="date"
+                  required
+                  onclick="this.showPicker()" />
               </label>
               <div class="net">
                 <label data-payment-terms-input data-payment-terms-value="30">

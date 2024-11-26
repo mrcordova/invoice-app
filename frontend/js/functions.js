@@ -20,11 +20,11 @@ function createdAt() {
 
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
-  console.log(checked);
+  // console.log(checked);
   for (const themeInput of themeInputs) {
     const input = themeInput.querySelector("input");
     input.checked = checked;
-    console.log(input);
+    // console.log(input);
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
 }
@@ -219,10 +219,22 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     total += invoiceTotal;
   }
   // const date = new Date(formInputs[10].value);
-  const date = invoiceDialog.querySelector("form label > input#date").value;
+  let date = invoiceDialog.querySelector("form label > input#date").value;
+  // console.log(date);
+  // date = new Date(`${date}T00:00:00`).toLocaleDateString("en-CA", {
+  //   year: "numeric",
+  //   month: "numeric",
+  //   day: "numeric",
+  // });
+  // console.log(date);
+  // console.log(new Intl.DateTimeFormat("en-CA").format(`${date}T00:00:00`));
+
+  // console.log(formatDate(date));
   const createdAtVal = date === "" ? createdAt() : date;
   // console.log(date);
   let paymentDue = new Date(`${createdAtVal}T00:00:00`);
+  // let paymentDue =
+  //   date == "Invalid Date" ? "No Due Date" : new Date(`${date}T00:00:00`);
   // console.log(paymentDue);
   const paymentTerms = parseInt(
     invoiceDialog
@@ -230,9 +242,21 @@ export function saveInvoice(invoiceDialog, status, id = null) {
       .getAttribute("data-payment-terms-value")
   );
   paymentDue.setDate(paymentDue.getDate() + paymentTerms);
+  paymentDue = paymentDue.toLocaleDateString("en-CA", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+  // if (paymentDue != "No Due Date") {
+  //   paymentDue.setDate(paymentDue.getDate() + paymentTerms);
 
-  // console.log(new Date(Date.now()));
-  // console.log(new Date(new Date(date).valueOf() + parseInt(paymentTerms)));
+  //   paymentDue = paymentDue.toLocaleDateString("en-CA", {
+  //     year: "numeric",
+  //     month: "numeric",
+  //     day: "numeric",
+  //   });
+  // }
+
   const invoice = {
     id: id ?? generateCustomId(),
     senderAddress: {
@@ -252,18 +276,14 @@ export function saveInvoice(invoiceDialog, status, id = null) {
       country: invoiceDialog.querySelector("form label > input#client-country")
         .value,
     },
-    createdAt: createdAtVal,
+    createdAt: `${createdAtVal}T00:00:00`,
     description: invoiceDialog.querySelector("form label > input#description")
       .value,
     paymentTerms: paymentTerms,
     status: status,
     items: invoiceItemsArry,
     total,
-    paymentDue: paymentDue.toLocaleDateString("en-CA", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    }),
+    paymentDue: `${paymentDue}T00:00:00`,
   };
 
   // console.log(invoice);

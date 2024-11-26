@@ -94,7 +94,9 @@ async function saveInvoiceToDB(invoice) {
         body: JSON.stringify(invoice),
       })
     ).json();
-    console.log(result);
+
+    // get date and payment due
+    // console.log(result);
   } catch (error) {
     console.error(error);
   }
