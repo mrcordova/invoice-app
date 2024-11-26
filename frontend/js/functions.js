@@ -198,6 +198,7 @@ export function addItemRow(addItemBtn) {
     .querySelector(".price")
     .addEventListener("input", updateTotalWithPrice);
 }
+
 export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItems = invoiceDialog.querySelectorAll(
     ".invoice-items > .invoice-item"
@@ -310,4 +311,8 @@ export function updatePaymentTerms(paymentTermsBtn) {
 export function showPaymentTermsMenu(paymentTermInput) {
   const input = paymentTermInput.querySelector("input");
   input.checked = !input.checked;
+}
+export function showFormErrors(e) {
+  const form = e.closest("form");
+  form.reportValidity();
 }
