@@ -48,17 +48,18 @@ label {
   & .label-name {
     display: none;
   }
+  & .error-text {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+    top: 1rem;
+  }
 
   &:has(:user-invalid) {
     color: var(--khmer-curry);
 
     position: relative;
-    & .error-text {
-      position: absolute;
-      right: 1rem;
-      bottom: 0;
-      top: 1rem;
-    }
+
     & .error-text::after {
       content: "Invalid";
     }
