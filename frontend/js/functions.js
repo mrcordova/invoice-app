@@ -219,7 +219,7 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     total += invoiceTotal;
   }
   // const date = new Date(formInputs[10].value);
-  let date = invoiceDialog.querySelector("form label > input#date").value;
+  const date = invoiceDialog.querySelector("form label > input#date").value;
   // console.log(date);
   // date = new Date(`${date}T00:00:00`).toLocaleDateString("en-CA", {
   //   year: "numeric",
