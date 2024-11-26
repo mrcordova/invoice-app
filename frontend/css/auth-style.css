@@ -67,7 +67,7 @@ label {
       /* line-height: 1; */
     }
     & .error-text::after {
-      content: "Can't be empty";
+      content: "Invalid";
       text-align: center;
 
       display: inline-block;
@@ -97,14 +97,8 @@ label {
       cursor: pointer;
       outline: var(--venetian-nights) solid 1px;
     }
-    &:read-only,
-    :disabled {
-      color: var(--true-lavender);
-      pointer-events: none;
-
-      &:hover {
-        outline: none;
-      }
+    &::placeholder {
+      color: light-dark(var(--ruined-smores), white);
     }
   }
 }
