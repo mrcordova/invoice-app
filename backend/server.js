@@ -172,7 +172,7 @@ app.post('/updateInvoice/:id',async (req, res) => {
   try {
     const { id } = req.params;
      const {
-     
+     createdAt,
       paymentDue,
       description,
       paymentTerms,
@@ -184,8 +184,8 @@ app.post('/updateInvoice/:id',async (req, res) => {
       items,
       total,
     } = req.body;
-    const updateQuery = 'UPDATE invoices SET  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ?';
-    const [results, error] = await poolPromise.query({ sql: updateQuery, values: [ paymentDue, description, paymentTerms, clientName, clientEmail, status, JSON.stringify(clientAddress), JSON.stringify(senderAddress), JSON.stringify(items), total, id] });
+    const updateQuery = 'UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ?';
+    const [results, error] = await poolPromise.query({ sql: updateQuery, values: [ createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, JSON.stringify(clientAddress), JSON.stringify(senderAddress), JSON.stringify(items), total, id] });
     res.json({ success: true });
   } catch (error) {
     console.error(`updateInvoice: ${error}`)
