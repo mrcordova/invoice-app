@@ -314,5 +314,5 @@ export function showPaymentTermsMenu(paymentTermInput) {
 }
 export function showFormErrors(e) {
   const form = e.closest("form");
-  form.reportValidity();
+  return form.reportValidity();
 }
