@@ -10,14 +10,13 @@ document.addEventListener("click", async (e) => {
     console.log("sign pressed");
     if (showFormErrors(signUp)) {
       const formData = new FormData(signUp.parentElement);
+      const formDataObj = Object.fromEntries(formData.entries());
 
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(`${key}: ${value}`);
-      // }
       try {
         const response = await fetch(`${URL}/registerUser`, {
           method: "POST",
-          body: formData,
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(formDataObj),
         });
         if (response.ok) {
           console.log("user successfully registerd");
