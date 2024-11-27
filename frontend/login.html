@@ -12,7 +12,7 @@
     <div class="user-form-cont">
       <h1 class="league-spartan-bold">Login</h1>
       <form class="user-form" id="login-form">
-        <label>
+        <!-- <label>
           <span class="label-name">Email Address</span>
           <input
             required
@@ -23,6 +23,18 @@
             autocomplete="email"
             title="[email-name]@[domain-name] e.g john@gmail.com"
             placeholder="Email Address" />
+          <span class="error-text"></span>
+        </label> -->
+        <label>
+          <span class="label-name">Username</span>
+          <input
+            required
+            type="text"
+            name="username"
+            minlength="1"
+            id="username"
+            autocomplete="name"
+            placeholder="Username" />
           <span class="error-text"></span>
         </label>
         <label>
