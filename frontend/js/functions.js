@@ -206,7 +206,6 @@ export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItemsArry = [];
   let total = 0;
 
-  // console.log(invoiceItems);
   for (const invoiceItem of invoiceItems) {
     const invoiceTotal = parseFloat(
       invoiceItem.querySelector(".total > input").value
@@ -219,24 +218,28 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     });
     total += invoiceTotal;
   }
-  // const date = new Date(formInputs[10].value);
-  const date = invoiceDialog.querySelector("form label > input#date").value;
-  // console.log(date);
-  // date = new Date(`${date}T00:00:00`).toLocaleDateString("en-CA", {
-  //   year: "numeric",
-  //   month: "numeric",
-  //   day: "numeric",
-  // });
-  // console.log(date);
-  // console.log(new Intl.DateTimeFormat("en-CA").format(`${date}T00:00:00`));
+  const form = invoiceDialog.querySelector("form");
+  const formData = new FormData(form);
+  const formObj = Object.fromEntries(formData);
+  // const date = invoiceDialog.querySelector("form label > input#date").value;
+  const {
+    date,
+    city,
+    "client-city": clientCity,
+    "client-country": clientCountry,
+    "client-street": clientStreet,
+    "client-postal-code": clientPostCode,
+    "client-email": clientEmail,
+    description,
+    "postal-code": postCode,
+    street,
+    country,
+    "client-name": clientName,
+  } = formObj;
 
-  // console.log(formatDate(date));
   const createdAtVal = date === "" ? createdAt() : date;
-  // console.log(date);
   let paymentDue = new Date(`${createdAtVal}T00:00:00`);
-  // let paymentDue =
-  //   date == "Invalid Date" ? "No Due Date" : new Date(`${date}T00:00:00`);
-  // console.log(paymentDue);
+
   const paymentTerms = parseInt(
     invoiceDialog
       .querySelector("[data-payment-terms-value")
@@ -248,44 +251,58 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     month: "numeric",
     day: "numeric",
   });
-  // if (paymentDue != "No Due Date") {
-  //   paymentDue.setDate(paymentDue.getDate() + paymentTerms);
 
-  //   paymentDue = paymentDue.toLocaleDateString("en-CA", {
-  //     year: "numeric",
-  //     month: "numeric",
-  //     day: "numeric",
-  //   });
-  // }
-
+  // console.log(formObj);
   const invoice = {
     id: id ?? generateCustomId(),
-    senderAddress: {
-      street: invoiceDialog.querySelector("form label > input#addy").value,
-      city: invoiceDialog.querySelector("form label > input#city").value,
-      postCode: invoiceDialog.querySelector("form label > input#zipcode").value,
-      country: invoiceDialog.querySelector("form label > input#country").value,
-    },
-    clientName: invoiceDialog.querySelector("form label > input#name").value,
-    clientEmail: invoiceDialog.querySelector("form label > input#email").value,
+    senderAddress: { street, city, postCode, country },
+    clientName,
+    clientEmail,
     clientAddress: {
-      street: invoiceDialog.querySelector("form label > input#client-addy")
-        .value,
-      city: invoiceDialog.querySelector("form label > input#client-city").value,
-      postCode: invoiceDialog.querySelector("form label > input#client-zipcode")
-        .value,
-      country: invoiceDialog.querySelector("form label > input#client-country")
-        .value,
+      street: clientStreet,
+      city: clientCity,
+      country: clientCountry,
+      postCode: clientPostCode,
     },
-    createdAt: `${createdAtVal}T00:00:00`,
-    description: invoiceDialog.querySelector("form label > input#description")
-      .value,
-    paymentTerms: paymentTerms,
     status: status,
+    createdAt: `${createdAtVal}T00:00:00`,
+    description,
+    paymentTerms,
     items: invoiceItemsArry,
     total,
     paymentDue: `${paymentDue}T00:00:00`,
   };
+
+  // console.log(invoice);
+
+  // const invoice = {
+  //   id: id ?? generateCustomId(),
+  //   senderAddress: {
+  //     street: invoiceDialog.querySelector("form label > input#addy").value,
+  //     city: invoiceDialog.querySelector("form label > input#city").value,
+  //     postCode: invoiceDialog.querySelector("form label > input#zipcode").value,
+  //     country: invoiceDialog.querySelector("form label > input#country").value,
+  //   },
+  //   clientName: invoiceDialog.querySelector("form label > input#name").value,
+  //   clientEmail: invoiceDialog.querySelector("form label > input#email").value,
+  //   clientAddress: {
+  //     street: invoiceDialog.querySelector("form label > input#client-addy")
+  //       .value,
+  //     city: invoiceDialog.querySelector("form label > input#client-city").value,
+  //     postCode: invoiceDialog.querySelector("form label > input#client-zipcode")
+  //       .value,
+  //     country: invoiceDialog.querySelector("form label > input#client-country")
+  //       .value,
+  //   },
+  //   createdAt: `${createdAtVal}T00:00:00`,
+  //   description: invoiceDialog.querySelector("form label > input#description")
+  //     .value,
+  //   paymentTerms: paymentTerms,
+  //   status: status,
+  //   items: invoiceItemsArry,
+  //   total,
+  //   paymentDue: `${paymentDue}T00:00:00`,
+  // };
 
   // console.log(invoice);
 

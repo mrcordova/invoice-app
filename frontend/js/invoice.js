@@ -54,7 +54,16 @@ function updateStatus({ status }) {
     <div class="status"></div>
     <span data-status-text>${status}<span>
     </div>
-    </div>`
+    </div>
+     <button
+          class="edit-btn"
+          data-show-edit-dialog
+          aria-label="discard edit">
+          Edit
+        </button>
+        <button class="delete-btn" data-show-delete-dialog>Delete</button>
+        <button class="mark-btn" data-mark-status-paid="">Mark as Paid</button>
+    `
   );
 }
 function updateInvoice(invoice) {
