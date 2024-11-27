@@ -187,6 +187,7 @@ body.addEventListener("click", async (e) => {
       postCode: clientPostCode,
       country: clientCountry,
     } = JSON.parse(clientAddress);
+
     const itemsArry = JSON.parse(items).entries();
     // console.log(editDialog.querySelector("form label > input#addy"));
     const netEle = editDialog.querySelector("form [data-payment-terms-value]");
@@ -196,23 +197,23 @@ body.addEventListener("click", async (e) => {
       editDialog.querySelector(
         `form [data-payment-terms-option="${paymentTerms}"] > span`
       ).textContent;
-    editDialog.querySelector("form label > input#addy").value = street ?? "";
+    editDialog.querySelector("form label > input#street").value = street ?? "";
     editDialog.querySelector("form label > input#city").value = city ?? "";
-    editDialog.querySelector("form label > input#zipcode").value =
+    editDialog.querySelector("form label > input#postal-code").value =
       postCode ?? "";
     editDialog.querySelector("form label > input#country").value =
       country ?? "";
 
-    editDialog.querySelector("form label > input#name").value =
+    editDialog.querySelector("form label > input#client-name").value =
       clientName ?? "";
-    editDialog.querySelector("form label > input#email").value =
+    editDialog.querySelector("form label > input#client-email").value =
       clientEmail ?? "";
 
-    editDialog.querySelector("form label > input#client-addy").value =
+    editDialog.querySelector("form label > input#client-street").value =
       clientStreet ?? "";
     editDialog.querySelector("form label > input#client-city").value =
       clientCity ?? "";
-    editDialog.querySelector("form label > input#client-zipcode").value =
+    editDialog.querySelector("form label > input#client-postal-code").value =
       clientPostCode ?? "";
     editDialog.querySelector("form label > input#client-country").value =
       clientCountry ?? "";
