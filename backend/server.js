@@ -191,6 +191,11 @@ app.post('/updateInvoice/:id',async (req, res) => {
     console.error(`updateInvoice: ${error}`)
   }
 });
+app.post('/registerUser', (req, res) => {
+  const { username, email, password } = req.body;
+  console.log(username, email, password);
+  res.send('done');
+})
 app.delete('/deleteInvoice/:id', async (req, res) => {
   try {
     const { id } = req.params;
