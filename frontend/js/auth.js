@@ -12,6 +12,7 @@ document.addEventListener("click", async (e) => {
       const formData = new FormData(signUp.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
 
+      // console.log(formDataObj);
       try {
         const response = await fetch(`${URL}/registerUser`, {
           method: "POST",
@@ -19,8 +20,12 @@ document.addEventListener("click", async (e) => {
           body: JSON.stringify(formDataObj),
         });
         if (response.ok) {
-          console.log("user successfully registerd");
+          signUp.parentElement.reset();
+          alert("user successfully registerd");
+          location = "index.html";
         } else {
+          const { message } = await response.json();
+          alert(`Error: ${message}`);
         }
       } catch (error) {
         console.error(`Sign up: ${error}`);
