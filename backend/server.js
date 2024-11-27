@@ -3,14 +3,29 @@ const path = require("path");
 const mysql = require("mysql2");
 const cors = require("cors");
 const data = require("../frontend/data.json");
+const { randomBytes, scryptSync } = require('crypto');
 
 // console.log(data);
 
 require("dotenv").config();
-
+// console.log(process.env.SALT);
 const app = express();
 const PORT = process.env.PORT || 3004;
-
+const encryptPassword = (password, salt) => {
+  return scryptSync(password, salt, 32).toString('hex');
+}
+const hashPassword = (password) => {
+  // const salt = randomBytes(16).toString("hex");
+  // return encryptPassword(password, salt) + salt;
+  return encryptPassword(password, process.env.SALT);
+}
+const matchPassword = (password, hash) => {
+  // const salt = hash.slice(64);
+  const originalPassHash = hash.slice(0, 64);
+  // const currentPassHash = encryptPassword(password, salt);
+  const currentPassHash = encryptPassword(password, process.env.SALT);
+  return originalPassHash === currentPassHash;
+}
 const allowedOrigins = [
   "https://invoice-app-3705.onrender.com",
   "http://127.0.0.1:5500",
@@ -190,6 +205,11 @@ app.post('/updateInvoice/:id',async (req, res) => {
   } catch (error) {
     console.error(`updateInvoice: ${error}`)
   }
+});
+app.post('/registerUser', (req, res) => {
+  const { username, email, password } = req.body;
+  console.log(username, email, password);
+  res.send('done');
 });
 app.delete('/deleteInvoice/:id', async (req, res) => {
   try {
