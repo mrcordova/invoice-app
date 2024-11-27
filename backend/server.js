@@ -31,6 +31,13 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
 ];
 
+async function checkUserExists(username, email) {
+  const selectQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username, email] });
+
+  return rows.length > 0;
+}
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -206,10 +213,25 @@ app.post('/updateInvoice/:id',async (req, res) => {
     console.error(`updateInvoice: ${error}`)
   }
 });
-app.post('/registerUser', (req, res) => {
-  const { username, email, password } = req.body;
-  console.log(username, email, password);
-  res.send('done');
+app.post('/registerUser', async (req, res) => {
+  const { username, email, password, "repeat-password":repeatPassword } = req.body;
+  const password_hash = hashPassword(password);
+
+  if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
+    return res.status(401).json({message: 'some creditionals are missing'});
+  }
+  // console.log( await checkUserExists(username, email));
+  if ( await checkUserExists(username, email)) {
+    return res.status(409).json({ message: 'User already exists' });
+  }
+try {
+  const insertQuery = 'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)';
+  const [results, error] = await poolPromise.query({ sql: insertQuery, values: [username, password_hash, email] });
+  res.json({ success: true });
+
+} catch (error) {
+  console.error(`registerUser: ${error}`);
+}
 });
 app.delete('/deleteInvoice/:id', async (req, res) => {
   try {
