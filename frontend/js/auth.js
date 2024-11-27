@@ -7,7 +7,7 @@ document.addEventListener("click", async (e) => {
   const goPage = e.target.closest("[data-page]");
 
   if (signUp) {
-    console.log("sign pressed");
+    // console.log("sign pressed");
     if (showFormErrors(signUp)) {
       const formData = new FormData(signUp.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
@@ -22,7 +22,7 @@ document.addEventListener("click", async (e) => {
         if (response.ok) {
           signUp.parentElement.reset();
           alert("user successfully registerd");
-          location = "index.html";
+          location.href = "index.html";
         } else {
           const { message } = await response.json();
           alert(`Error: ${message}`);
@@ -35,14 +35,20 @@ document.addEventListener("click", async (e) => {
     console.log("login pressed");
     if (showFormErrors(login)) {
       const formData = new FormData(login.parentElement);
+      const formObj = Object.fromEntries(formData.entries());
       try {
-        const response = await fetch(`${URL}/login`, {
+        const response = await fetch(`${URL}/loginUser`, {
           method: "POST",
-          body: formData,
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(formObj),
         });
         if (response.ok) {
-          console.log("user successfully logged");
+          login.parentElement.reset();
+          alert("user successfully logged in");
+          location.href = "index.html";
         } else {
+          const { message } = await response.json();
+          alert(`Error: ${message}`);
         }
       } catch (error) {
         console.log(`Login: ${error}`);
