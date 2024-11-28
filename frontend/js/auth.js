@@ -7,12 +7,10 @@ document.addEventListener("click", async (e) => {
   const goPage = e.target.closest("[data-page]");
 
   if (signUp) {
-    // console.log("sign pressed");
     if (showFormErrors(signUp)) {
       const formData = new FormData(signUp.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
 
-      // console.log(formDataObj);
       try {
         const response = await fetch(`${URL}/registerUser`, {
           method: "POST",
@@ -22,7 +20,7 @@ document.addEventListener("click", async (e) => {
         if (response.ok) {
           signUp.parentElement.reset();
           alert("user successfully registerd");
-          location.href = "index.html";
+          location.href = "login.html";
         } else {
           const { message } = await response.json();
           alert(`Error: ${message}`);
@@ -41,11 +39,14 @@ document.addEventListener("click", async (e) => {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formObj),
+          credentials: "include",
         });
         if (response.ok) {
           login.parentElement.reset();
-          alert("user successfully logged in");
-          location.href = "index.html";
+          const { accessToken } = await response.json();
+          localStorage.setItem("accessToken", accessToken);
+          // localStorage.setItem("refreshToken", refreshToken);
+          location.href = "/frontend/index.html";
         } else {
           const { message } = await response.json();
           alert(`Error: ${message}`);

@@ -1,3 +1,4 @@
+// import { socket } from "./auth.js";
 import {
   addItemRow,
   resetForm,
@@ -8,16 +9,35 @@ import {
   perferredColorScheme,
   URL,
 } from "./functions.js";
-const { invoices: data } = await (
-  await fetch(`${URL}/getInvoices`, {
-    method: "GET",
-    headers: { "Content-type": "application/json" },
-    cache: "reload",
-  })
-).json();
 
-console.log(data);
+const accessToken = localStorage.getItem("accessToken");
+
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
+const invoices = document.querySelector(".invoices");
+const newInvoiceDialog = document.getElementById("new-invoice-dialog");
+const invoiceTotal = document.querySelector("[data-invoice-total]");
+
+const main = document.querySelector("main");
+const header = document.querySelector("header");
+const currencyOptions = { style: "currency", currency: "GBP" };
+const dateOptions = { day: "numeric", month: "short", year: "numeric" };
+const filterOptions = new Set();
+
+window.addEventListener("DOMContentLoaded", async (e) => {
+  const response = await fetch(`${URL}/getInvoices`, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      "Access-Control-Allow-Origin": true,
+    },
+    cache: "reload",
+    credentials: "include",
+  });
+  const { invoices } = await response.json();
+  createInvoices(invoices);
+  invoiceTotal.textContent = invoices.length;
+});
 
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
@@ -30,19 +50,8 @@ for (const themeInput of themeInputs) {
   input.checked = localStorage.getItem(perferredColorScheme);
 }
 
-const invoices = document.querySelector(".invoices");
-const newInvoiceDialog = document.getElementById("new-invoice-dialog");
-const invoiceTotal = document.querySelector("[data-invoice-total]");
-invoiceTotal.textContent = data.length;
-
-const main = document.querySelector("main");
-const header = document.querySelector("header");
-const currencyOptions = { style: "currency", currency: "GBP" };
-const dateOptions = { day: "numeric", month: "short", year: "numeric" };
-const filterOptions = new Set();
-function createInvoices() {
+function createInvoices(data) {
   for (const invoice of data) {
-    // console.log(invoice);
     const { id, paymentDue, clientName, total, status } = invoice;
     invoices.insertAdjacentHTML(
       "beforeend",
@@ -94,9 +103,6 @@ async function saveInvoiceToDB(invoice) {
         body: JSON.stringify(invoice),
       })
     ).json();
-
-    // get date and payment due
-    // console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -105,7 +111,6 @@ async function saveInvoiceToDB(invoice) {
 function formatDueDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
 }
-// console.log(createdAt());
 function formatCurrency(totalStr) {
   return parseFloat(totalStr).toLocaleString("en", currencyOptions);
 }
@@ -141,10 +146,8 @@ function addInvoice(invoice) {
           </div>
         </a>`
   );
+  invoiceTotal.textContent = parseInt(invoiceTotal.textContent) + 1;
 }
-// newInvoiceBtn.addEventListener("click", (e) => {
-//   newInvoiceDialog.showModal();
-// });
 
 header.addEventListener("click", (e) => {
   e.preventDefault();
@@ -161,8 +164,6 @@ main.addEventListener("click", (e) => {
   const dialog = e.target.closest("[data-show-dialog]");
   const invoiceEle = e.target.closest("[data-invoice]");
   const themeBtn = e.target.closest("[data-theme]");
-  //   console.log(e.target);
-  //   console.log(e.target); console.log(invoiceEle);
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -194,8 +195,7 @@ newInvoiceDialog.addEventListener("click", async (e) => {
   const draftBtn = e.target.closest("[data-draft]");
   const goBackBtn = e.target.closest("[data-go-back]");
   const themeBtn = e.target.closest("[data-theme]");
-  // console.log(themeBtn);
-  // console.log(e.target);
+
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
   } else if (goBackBtn) {
@@ -222,14 +222,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
     const draftInvoice = saveInvoice(newInvoiceDialog, "draft");
     await saveInvoiceToDB(draftInvoice);
 
-    // location.reload();
     addInvoice(draftInvoice);
-    // console.log(invoice);
   } else if (themeBtn) {
     themeUpdate(e, themeInputs);
   }
 });
-// newInvoiceDialog.addEventListener("input", (e) => {
-//     console.log(e.target.value);
-// });
-createInvoices();
