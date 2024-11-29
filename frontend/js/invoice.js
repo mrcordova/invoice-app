@@ -7,20 +7,40 @@ import {
   updatePaymentTerms,
   perferredColorScheme,
   themeUpdate,
+  refreshAccessToken,
   URL,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-
-let invoice = await (
-  await fetch(`${URL}/getInvoice/${invoiceId}`, {
-    method: "GET",
-    headers: { "Content-type": "application/json" },
-    cache: "reload",
-  })
-).json();
-
-console.log(invoice);
+let accessToken = localStorage.getItem("accessToken");
+let invoice = await getInvoice(invoiceId);
+async function getInvoice(invoiceId) {
+  let response;
+  try {
+    response = await fetch(`${URL}/getInvoice/${invoiceId}`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Access-Control-Allow-Origin": true,
+      },
+      cache: "reload",
+      credentials: "include",
+    });
+    if (response.status === 403) {
+      const newAccessToken = await refreshAccessToken();
+      localStorage.setItem("accessToken", newAccessToken);
+      accessToken = localStorage.getItem("accessToken");
+      // console.log(newAccessToken);
+      return await getInvoice(invoiceId);
+    } else {
+      return await response.json();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+// console.log(invoice);
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");

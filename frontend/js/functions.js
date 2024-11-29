@@ -325,6 +325,40 @@ export function updatePaymentTerms(paymentTermsBtn) {
   input.checked = !input.checked;
 }
 
+export async function logout() {
+  const token = localStorage.getItem("accessToken");
+  const response = await fetch(`${URL}/logout`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Access-Control-Allow-Origin": true,
+    },
+    credentials: "include",
+  });
+  localStorage.removeItem("accessToken");
+}
+
+export async function refreshAccessToken() {
+  try {
+    const tokenResponse = await fetch(`${URL}/refresh-token`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (tokenResponse.ok) {
+      const { accessToken } = await tokenResponse.json();
+      // localStorage.setItem("accessToken",  await accessToken);
+      return accessToken;
+    } else {
+      // await logout();
+      location.href = "login.html";
+      console.log(tokenResponse.ok);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export function showPaymentTermsMenu(paymentTermInput) {
   const input = paymentTermInput.querySelector("input");
   input.checked = !input.checked;
