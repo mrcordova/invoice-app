@@ -78,48 +78,14 @@ async function generateRefreshToken(user) {
 async function generateAccessToken(user) {
   return jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
-// async function generateRefreshToken(userId) {
-//   const refreshToken = randomBytes(64).toString('hex');
-//   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days;
 
-//   const insertQuery = 'INSERT INTO refresh_tokens(user_id, token, expires_at) VALUES (?, ?, ?)';
-//   const [results, error] = await poolPromise.query({ sql: insertQuery, values: [userId, refreshToken, expiresAt] });
-//   return refreshToken;
-// }
-// async function refreshAccessToken(refreshToken) {
-//   const selectQuery = ' SELECT * FROM refresh_tokens WHERE token = ? AND expires_at > NOW()';
-//   const [rows] = await poolPromise.query({ sql: selectQuery, values: [refreshToken] })
-  
-//   const tokenData = rows[0];
-//   if (!tokenData) { 
-//     console.error('refresh token expired');
-
-//   }
-//   const userSelectQuery = 'SELECT * FROM users WHERE id = ?';
-//   const [userRows] = await poolPromise.query({ sql: userSelectQuery, values: [tokenData.user_id] });
-//   const user = userRows[0];
-//   const newAccessToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, {expiresIn: '1h'})
-//   return newAccessToken;
-// }
-async function checkUserToken(token) {
-  const hashToken = hashPassword(token);
-  const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND expires_at > NOW()';
-  const [rows] = await poolPromise.query({ sql: selectQuery, values: [ hashToken] });
-
-  return (rows.length > 0);
-}
 const extractToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  // console.log(authHeader);
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
-    // console.log(!token)
-    // if (!token) return res.sendStauts(403);
-    // const token  = jwt.verify(tokenStr, process.env.JWT_SECRET);
+    
     req.token =  token == 'null' ? null : token;
-    // console.log(token)
-    // if (!user) return res.sendStauts(401);
-    // req.user = user
+  
     next();
   } else {
     req.token = undefined;
@@ -155,8 +121,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.options("*", cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "../frontend/")));
-// app.use(express.static(path.join(__dirname, "../")));
-// console.log(path.join(__dirname, "../frontend/"));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ type: "*/*" }));
 
@@ -210,17 +175,11 @@ async function checkTokens(req, res) {
   if (!token) {
     return 403;
   };
-  // if (!refreshToken) {
-  //   return 403;
-  // }
+
   try {
-    // const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    // console.log(refreshToken);
+  
     const userForAccessToken = jwt.verify(token, process.env.JWT_SECRET);
-    // if (!user || !userForAccessToken) {
-      // console.log(user, "here")
-      // return 403;
-    // }
+   
     
   } catch (error) {  
     console.error(`checkTokens ${error}`);
@@ -230,12 +189,7 @@ async function checkTokens(req, res) {
   return 200;
 }
 
-// app.get('/test', (req, res) => {
-//   res.status(200).sendFile(path.join(__dirname, "../frontend/login.html"));
-// })
-// app.get('/index', (req, res) => {
-//   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
-// });
+
 
 app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
@@ -244,7 +198,6 @@ app.get('/', (req, res) => {
 app.get("/getInvoices", extractToken, async (req, res) => {
   
   const statusCode = await checkTokens(req, res);
-  // console.log(statusCode);
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
@@ -433,7 +386,6 @@ app.post('/logout', async (req, res) => {
 })
 app.delete('/deleteInvoice/:id', extractToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
-  // console.log('here')
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
@@ -441,7 +393,6 @@ app.delete('/deleteInvoice/:id', extractToken, async (req, res) => {
     const { id } = req.params;
     const deleteQuery = 'DELETE FROM invoices WHERE id = ? LIMIT 1';
     const [result, error] = await poolPromise.query({ sql: deleteQuery, values: [id] });
-    // console.log(result);
     res.status(200).json({ success: result['affectedRows'] > 0 });
     
   } catch (error) {
@@ -467,26 +418,16 @@ app.post('/refresh-token', async (req, res) => {
     return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
   }
 
-  // if (!checkUserToken(refreshToken)) {
-  //   const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ?';
-  //   const hashToken = hashPassword(refreshToken);
-  //   const [result] = await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
-  //   return res.status(403).json({ message: 'refresh token expired' });
-  // }
 
   try {
     const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    // console.log(user);
     const hashToken = hashPassword(refreshToken);
-    // console.log(hashToken.valueOf());
     const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
     const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
-    // console.log(token);
     if (!token) return res.status(403).json({ message: 'invalid refresh token test' });
 
     const newAccessToken = await generateAccessToken(user);
 
-    // console.log(newAccessToken);
     res.json({ accessToken: newAccessToken });
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
@@ -494,11 +435,7 @@ app.post('/refresh-token', async (req, res) => {
       // Optionally delete expired token immediately on TokenExpiredError
       await poolPromise.query('DELETE FROM refresh_tokens WHERE token = ?', [hashToken]);
     }
-    // if (err.name === 'TokenExpiredError') {
-    //   console.error(`refresh_token expires: ${err.expiresAt}`);
-    // } else {
-    //   console.error(`refresh_token message: ${err.message}`);
-    // }
+   
     res.status(403).send('Invalid refresh token');
   }
 

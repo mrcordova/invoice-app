@@ -333,9 +333,11 @@ export async function logout() {
       Authorization: `Bearer ${token}`,
       "Access-Control-Allow-Origin": true,
     },
+    cache: 'reload',
     credentials: "include",
   });
   localStorage.removeItem("accessToken");
+  location.href = '/login.html';
 }
 
 export async function refreshAccessToken() {

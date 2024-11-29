@@ -237,7 +237,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
 
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
-    // await logout();
+    // const response = await logout();
+    // console.log(response);
     // location.href = "/frontend/login.html";
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
