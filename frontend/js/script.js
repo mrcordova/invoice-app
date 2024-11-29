@@ -8,6 +8,7 @@ import {
   themeUpdate,
   perferredColorScheme,
   URL,
+  logout,
   refreshAccessToken,
 } from "./functions.js";
 
@@ -25,7 +26,8 @@ const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
 
 window.addEventListener("DOMContentLoaded", async (e) => {
-  const response = await fetch(`${URL}/getInvoices`, {
+  let response;
+  response = await fetch(`${URL}/getInvoices`, {
     method: "GET",
     headers: {
       "Content-type": "application/json",
@@ -35,7 +37,22 @@ window.addEventListener("DOMContentLoaded", async (e) => {
     cache: "reload",
     credentials: "include",
   });
-
+  // console.log(response.status);
+  if (response.status === 403) {
+    // console.log("here");
+    const newAccessToken = await refreshAccessToken();
+    localStorage.setItem("accessToken", newAccessToken);
+    response = await fetch(`${URL}/getInvoices`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${newAccessToken}`,
+        "Access-Control-Allow-Origin": true,
+      },
+      cache: "reload",
+      credentials: "include",
+    });
+  }
   const { invoices } = await response.json();
   createInvoices(invoices);
   invoiceTotal.textContent = invoices.length;
@@ -97,14 +114,34 @@ function searchInvoices() {
   }
 }
 async function saveInvoiceToDB(invoice) {
+  let response;
   try {
-    const result = await (
-      await fetch(`${URL}/saveInvoice`, {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(invoice),
-      })
-    ).json();
+    response = await fetch(`${URL}/saveInvoice`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Access-Control-Allow-Origin": true,
+      },
+      body: JSON.stringify(invoice),
+      credentials: "include",
+    });
+    if (response.status === 403) {
+      //  console.log("here");
+      const newAccessToken = await refreshAccessToken();
+      localStorage.setItem("accessToken", newAccessToken);
+      saveInvoiceToDB(invoice);
+      //  response = await fetch(`${URL}/getInvoices`, {
+      //    method: "GET",
+      //    headers: {
+      //      "Content-type": "application/json",
+      //      Authorization: `Bearer ${newAccessToken}`,
+      //      "Access-Control-Allow-Origin": true,
+      //    },
+      //    cache: "reload",
+      //    credentials: "include",
+      //  });
+    }
   } catch (error) {
     console.error(error);
   }
@@ -200,6 +237,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
 
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
+    // await logout();
+    // location.href = "/frontend/login.html";
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {
