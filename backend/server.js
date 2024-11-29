@@ -7,12 +7,29 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
 
-// console.log(data);
+
 
 require("dotenv").config();
-// console.log(process.env.SALT);
-// console.log(randomBytes(16).toString("hex"))
+
+const allowedOrigins = [
+  "https://invoice-app-3705.onrender.com",
+  "http://127.0.0.1:5500",
+];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Origin"],
+};
 const app = express();
+
+
 const PORT = process.env.PORT || 3004;
 const encryptPassword = (password, salt) => {
   return scryptSync(password, salt, 32).toString('hex');
@@ -29,10 +46,7 @@ const matchPassword = (password, hash) => {
   const currentPassHash = encryptPassword(password, process.env.SALT);
   return originalPassHash === currentPassHash;
 }
-const allowedOrigins = [
-  "https://invoice-app-3705.onrender.com",
-  "http://127.0.0.1:5500",
-];
+
 
 async function checkUserExists(username, email) {
   const selectQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
@@ -57,14 +71,29 @@ async function refreshAccessToken(refreshToken) {
   if (!tokenData) { 
     console.error('refresh token expired');
   }
-  // console.log(tokenData);
   const userSelectQuery = 'SELECT * FROM users WHERE id = ?';
   const [userRows] = await poolPromise.query({ sql: userSelectQuery, values: [tokenData.user_id] });
   const user = userRows[0];
   const newAccessToken = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, {expiresIn: '1h'})
   return newAccessToken;
 }
+async function checkUserToken(userId, token) {
+  const selectQuery = 'SELECT * FROM refresh_tokens WHERE user_id = ? AND token = ? AND expires_at > NOW()';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [userId, token] });
 
+  return (rows.length > 0);
+}
+const extractToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    req.token = token;
+  } else {
+    req.token = null;
+  }
+  next();
+}
+ 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -84,20 +113,11 @@ const pool = mysql.createPool({
 });
 const poolPromise = pool.promise();
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials"],
-};
+
 
 app.use(cors(corsOptions));
 
+app.use(extractToken);
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.options("*", cors(corsOptions));
@@ -152,6 +172,15 @@ async function setUpDb() {
 // setUpDb();
 
 app.get("/getInvoices", async (req, res) => {
+  const token = req.token;
+
+  // console.log(token);
+  // console.log(req.signedCookies['refresh_token']);
+  // console.log(req.cookies);
+  // console.log(req.cookies['refresh_token']);
+  // if (!token) {
+  //   return res.status(401).json({message : "Access Denied"});
+  // }
   try {
     const selectQuery = "SELECT * FROM invoices";
     const [results] = await poolPromise.query(selectQuery);
@@ -249,7 +278,6 @@ app.post('/registerUser', async (req, res) => {
   if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
     return res.status(401).json({message: 'some creditionals are missing'});
   }
-  // console.log( await checkUserExists(username, email));
   if ( await checkUserExists(username, email)) {
     return res.status(409).json({ message: 'User already exists' });
   }
@@ -276,21 +304,19 @@ app.post('/loginUser', async (req, res) => {
       return res.status(401).json({ message: "Password is incorrect" });
     }
 
-    // const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const refreshToken = await generateRefreshToken(user.id);
-    // console.log(refreshToken);
     const accessToken = await refreshAccessToken(refreshToken);
-    // console.log(accessToken);
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       signed: true,
       secure: true,
+      sameSite: 'None',
+      path: '/' ,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     
-    res.json({ accessToken});
-    // console.log(user);
-    // if (!matchPassword(password, ))
+    res.json({ accessToken });
+
   } catch (error) {
     console.error(`loginUser: ${error}`);
   
