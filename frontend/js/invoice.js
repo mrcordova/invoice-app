@@ -315,14 +315,33 @@ body.addEventListener("click", async (e) => {
     const status =
       statusEle.dataset.status == "pending" ? "paid" : statusEle.dataset.status;
     if (status !== statusEle.dataset.status) {
-      const response = await (
-        await fetch(`${URL}/updateStatus/${invoice.id}`, {
-          method: "PUT",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify({ status }),
-        })
-      ).json();
-      invoice.status = status;
+      let response;
+      try {
+        response =
+         await fetch(`${URL}/updateStatus/${invoice.id}`, {
+           method: "PUT",
+           headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
+           body: JSON.stringify({ status }),
+           cache: 'reload',
+           credentials: 'same-origin'
+         });
+        if (response.status === 403) {
+          const newAccessToken = await refreshAccessToken();
+          localStorage.setItem('accessToken', newAccessToken);
+          response =
+         await fetch(`${URL}/updateStatus/${invoice.id}`, {
+           method: "PUT",
+           headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
+           body: JSON.stringify({ status }),
+           cache: 'reload',
+           credentials: 'same-origin'
+         });
+        }
+       invoice.status = status;
+        
+      } catch (error) {
+        console.error(`Status Update: ${error}`);
+      }
       // console.log(invoice);
     }
     statusEle.setAttribute("data-status", status);
