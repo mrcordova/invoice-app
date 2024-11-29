@@ -45,8 +45,8 @@ document.addEventListener("click", async (e) => {
           login.parentElement.reset();
           const { accessToken } = await response.json();
           localStorage.setItem("accessToken", accessToken);
-          // localStorage.setItem("refreshToken", refreshToken);
-          location.href = `/index.html`;
+
+          location.href = "/index.html";
         } else {
           const { message } = await response.json();
           alert(`Error: ${message}`);
