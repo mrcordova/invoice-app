@@ -153,7 +153,8 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.options("*", cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "../frontend/")));
-
+// app.use(express.static(path.join(__dirname, "../")));
+// console.log(path.join(__dirname, "../frontend/"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ type: "*/*" }));
 
@@ -250,9 +251,9 @@ async function checkTokens(req, res) {
 // app.get('/test', (req, res) => {
 //   res.status(200).sendFile(path.join(__dirname, "../frontend/login.html"));
 // })
-app.get('/index', (req, res) => {
-  res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
-});
+// app.get('/index', (req, res) => {
+//   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
+// });
 
 app.get("/getInvoices", extractToken, async (req, res) => {
   
