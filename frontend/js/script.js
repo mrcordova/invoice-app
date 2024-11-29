@@ -8,6 +8,7 @@ import {
   themeUpdate,
   perferredColorScheme,
   URL,
+  refreshAccessToken,
 } from "./functions.js";
 
 const accessToken = localStorage.getItem("accessToken");
@@ -34,6 +35,7 @@ window.addEventListener("DOMContentLoaded", async (e) => {
     cache: "reload",
     credentials: "include",
   });
+
   const { invoices } = await response.json();
   createInvoices(invoices);
   invoiceTotal.textContent = invoices.length;
