@@ -25,7 +25,7 @@ async function getInvoice(invoiceId) {
         "Access-Control-Allow-Origin": true,
       },
       cache: "reload",
-      credentials: "include",
+      credentials: "same-origin",
     });
     if (response.status === 403) {
       const newAccessToken = await refreshAccessToken();
@@ -51,7 +51,7 @@ const amountDue = document.querySelector("[data-amount-due]");
 // const themeInput = document.querySelector("#theme");
 // const perferredColorScheme = "perferredColorScheme";
 const currencyOptions = { style: "currency", currency: "GBP" };
-const homePage = "index.html";
+const homePage = "/index.html";
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 
 if (!(perferredColorScheme in localStorage)) {
@@ -335,16 +335,41 @@ body.addEventListener("click", async (e) => {
     //   editDialog.close();
     resetForm(editDialog);
   } else if (deleteInvoiceBtn) {
-    const response = await (
-      await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
+    let response;
+    try {
+      response = await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
         method: "DELETE",
-        headers: { "Content-type": "application/json" },
-      })
-    ).json();
-    // console.log(response);
-    if (response.success) {
-      history.back();
+        headers: {
+          "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": true
+        },
+        cache: "reload",
+        credentials: 'same-origin'
+      });
+      if (response.status === 403) {
+        const newAccessToken = await refreshAccessToken();
+        localStorage.setItem("accessToken", newAccessToken);
+        accessToken = localStorage.getItem("accessToken");
+        response = await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": true
+        },
+        cache: "reload",
+        credentials: 'same-origin'
+      });
+      }
+      const {success} = await response.json();
+      if (response.ok && success) {
+        history.back();
+      }
+      // alert(`Invoice found: ${success}`);
+    } catch (error) {
+      
     }
+    
+    // console.log(response);
     // const idxOfInvoice = data
     //   .map((invoice) => invoice.id)
     //   .indexOf(`${invoiceId}`);

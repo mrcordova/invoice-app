@@ -431,6 +431,7 @@ app.post('/logout', async (req, res) => {
 })
 app.delete('/deleteInvoice/:id', extractToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
+  // console.log('here')
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
@@ -438,10 +439,12 @@ app.delete('/deleteInvoice/:id', extractToken, async (req, res) => {
     const { id } = req.params;
     const deleteQuery = 'DELETE FROM invoices WHERE id = ? LIMIT 1';
     const [result, error] = await poolPromise.query({ sql: deleteQuery, values: [id] });
-    res.json({ success: true });
+    // console.log(result);
+    res.status(200).json({ success: result['affectedRows'] > 0 });
     
   } catch (error) {
     console.error(`deleteInvoice: ${error}`);
+    res.status(401).json({ success: false });
   }
 });
 app.get("/health-check", async (req, res) => {

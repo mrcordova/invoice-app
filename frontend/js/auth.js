@@ -39,7 +39,7 @@ document.addEventListener("click", async (e) => {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formObj),
-          credentials: "include",
+          credentials: "same-origin",
         });
         if (response.ok) {
           login.parentElement.reset();
