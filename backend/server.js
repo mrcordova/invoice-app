@@ -57,24 +57,24 @@ async function checkUserExists(username, email) {
 }
 
 async function generateRefreshToken(user) {
-  // const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  const expiresAt = new Date(Date.now() +  15 * 1000);
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  // const expiresAt = new Date(Date.now() +  15 * 1000);
   // const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
-  const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "15s" });
+  const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
   const hashToken = hashPassword(refreshToken);
   const insertQuery = 'INSERT INTO refresh_tokens(user_id, token, expires_at) VALUES (?, ?, ?)';
   
   try {
     const [results, error] = await poolPromise.query({ sql: insertQuery, values: [user.id, hashToken, expiresAt] });
+    return refreshToken;
   } catch (error) {
     console.error(`generateRefreshToken: ${error}`);
   }
 
-  return refreshToken;
   // return jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
 }
 async function generateAccessToken(user) {
-  return jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '20s' });
+  return jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 // async function generateRefreshToken(userId) {
 //   const refreshToken = randomBytes(64).toString('hex');
@@ -196,23 +196,23 @@ async function setUpDb() {
         ],
       });
     } catch (error) {
-      console.error(error);
+      console.error(`setUpDb: ${error}`);
     }
   }
 }
 // setUpDb();
 
 async function checkTokens(req, res) {
-  const refreshToken = req.signedCookies['refresh_token'];
+  // const refreshToken = req.signedCookies['refresh_token'];
   const token = req.token;
   if (!token) {
     return 403;
   };
-  if (!refreshToken) {
-    return 403;
-  }
+  // if (!refreshToken) {
+  //   return 403;
+  // }
   try {
-    const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
     // console.log(refreshToken);
     const userForAccessToken = jwt.verify(token, process.env.JWT_SECRET);
     // if (!user || !userForAccessToken) {
@@ -220,28 +220,8 @@ async function checkTokens(req, res) {
       // return 403;
     // }
     
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ? AND expires_at < NOW()';
-      const hashToken = hashPassword(refreshToken);
-      const [result] = await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
-      // console.log(result['affectedRows']);
-      if (result['affectedRows'] > 0) {
-          res.clearCookie('refresh_token', {
-              httpOnly: true,
-              signed: true,
-              secure: true,
-              sameSite: 'None',
-              path: '/' ,
-          });
-      }
-      // if (result)
-      // console.log(hashToken);
-    console.error(`check tokens ${error}`);
-  } else {
-    console.error(`check tokens  ${error}`);
-    }
-    
+  } catch (error) {  
+    console.error(`checkTokens ${error}`);
     return 403;
   }
 
@@ -254,6 +234,10 @@ async function checkTokens(req, res) {
 // app.get('/index', (req, res) => {
 //   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
 // });
+
+app.get('/', (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
+})
 
 app.get("/getInvoices", extractToken, async (req, res) => {
   
@@ -281,7 +265,7 @@ app.get('/getInvoice/:id', extractToken,  async (req, res) => {
     const [invoice] = await poolPromise.query({ sql: selectQuery, values: [id] });
     res.json(invoice[0]);
   } catch (error) {
-    console.log(`getInvoice: ${error}`);
+    console.log(`getInvoice/:id: ${error}`);
   }
 });
 app.post('/saveInvoice', extractToken, async (req, res) => {
@@ -415,9 +399,9 @@ app.post('/loginUser', async (req, res) => {
       httpOnly: true,
       signed: true,
       secure: true,
-      sameSite: 'None',
+      sameSite: 'strict',
       path: '/' ,
-      maxAge: 31 * 24 * 60 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     
     res.json({ accessToken });
@@ -429,12 +413,18 @@ app.post('/loginUser', async (req, res) => {
  }
 })
 
-app.post('/logout', (req, res) => {
+app.post('/logout', async (req, res) => {
+
+  const refreshToken = req.signedCookies['refresh_token'];
+  if (!refreshToken) return res.status(204);
+  const hashToken = hashPassword(refreshToken);
+  const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ?';
+  await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
   res.clearCookie('refresh_token', {
     httpOnly: true,
     signed: true,
     secure: true,
-    sameSite: 'None',
+    sameSite: 'strict',
     path: '/' ,
   });
   res.send("Logged out successfully");
@@ -481,17 +471,31 @@ app.post('/refresh-token', async (req, res) => {
 
   try {
     const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // console.log(user);
+    const hashToken = hashPassword(refreshToken);
+    // console.log(hashToken.valueOf());
+    const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
+    const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
+    // console.log(token);
+    if (!token) return res.status(403).json({ message: 'invalid refresh token test' });
+
     const newAccessToken = await generateAccessToken(user);
+
+    // console.log(newAccessToken);
     res.json({ accessToken: newAccessToken });
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
-      console.error(`refresh_token expires: ${err.expiresAt}`);
-    } else {
-      console.error(`refresh_token message: ${err.message}`);
+      const hashToken = hashPassword(refreshToken);
+      // Optionally delete expired token immediately on TokenExpiredError
+      await poolPromise.query('DELETE FROM refresh_tokens WHERE token = ?', [hashToken]);
     }
+    // if (err.name === 'TokenExpiredError') {
+    //   console.error(`refresh_token expires: ${err.expiresAt}`);
+    // } else {
+    //   console.error(`refresh_token message: ${err.message}`);
+    // }
     res.status(403).send('Invalid refresh token');
   }
-  // jwt.verify(refreshToken, process.env.)
 
 });
 

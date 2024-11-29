@@ -352,8 +352,8 @@ export async function refreshAccessToken() {
     } else {
       // await logout();
       // console.error(tokenResponse.ok);
-      console.error(await tokenResponse.json());
-      location.href = "login.html";
+      console.error(await tokenResponse.text());
+      location.href = "/login.html";
     }
   } catch (error) {
     console.error(error);

@@ -35,7 +35,7 @@ window.addEventListener("DOMContentLoaded", async (e) => {
       "Access-Control-Allow-Origin": true,
     },
     cache: "reload",
-    credentials: "include",
+    credentials: "same-origin",
   });
   // console.log(response.status);
   if (response.status === 403) {
@@ -50,7 +50,7 @@ window.addEventListener("DOMContentLoaded", async (e) => {
         "Access-Control-Allow-Origin": true,
       },
       cache: "reload",
-      credentials: "include",
+      credentials: "same-origin",
     });
   }
   const { invoices } = await response.json();
