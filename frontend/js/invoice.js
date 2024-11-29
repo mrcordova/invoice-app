@@ -366,7 +366,7 @@ body.addEventListener("click", async (e) => {
       }
       // alert(`Invoice found: ${success}`);
     } catch (error) {
-      
+      console.error(`Delete Invoice: ${error}`);
     }
     
     // console.log(response);
@@ -377,7 +377,7 @@ body.addEventListener("click", async (e) => {
     // console.log(data);
     // location.href = homePage;
   } else if (deleteItemBtn) {
-    const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
+    // const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
     // invoice.items.splice(deleteItemIndx, 1);
 
     deleteItemBtn.parentElement.remove();
@@ -390,27 +390,47 @@ body.addEventListener("click", async (e) => {
   } else if (saveChangesBtn) {
     const invoiceForm = editDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
-      const tempInvoice = saveInvoice(
-        editDialog,
-        invoice.status === "draft" ? "pending" : invoice.status,
-        invoice.id
-      );
-      statusBarEle.replaceChildren();
-      invoiceEle.childNodes[0].remove();
-      invoiceItemsTable.replaceChildren();
-      const response = await (
-        await fetch(`${URL}/updateInvoice/${invoice.id}`, {
-          method: "POST",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify(tempInvoice),
-        })
-      ).json();
-      tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
-      tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
-      tempInvoice.items = JSON.stringify(tempInvoice.items);
-      updateStatus(tempInvoice);
-      updateInvoice(tempInvoice);
-      invoice = tempInvoice;
+      let response;
+      try {  
+        const tempInvoice = saveInvoice(
+          editDialog,
+          invoice.status === "draft" ? "pending" : invoice.status,
+          invoice.id
+        );
+        statusBarEle.replaceChildren();
+        invoiceEle.childNodes[0].remove();
+        invoiceItemsTable.replaceChildren();
+        response = 
+          await fetch(`${URL}/updateInvoice/${invoice.id}`, {
+            method: "POST",
+            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
+            body: JSON.stringify(tempInvoice),
+            cache: 'reload',
+            credentials: 'same-origin'
+          });
+        if (response.status === 403) {
+          
+        const newAccessToken = await refreshAccessToken();
+        localStorage.setItem("accessToken", newAccessToken);
+        accessToken = localStorage.getItem("accessToken");
+        response = 
+          await fetch(`${URL}/updateInvoice/${invoice.id}`, {
+            method: "POST",
+            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
+            body: JSON.stringify(tempInvoice),
+            cache: 'reload',
+            credentials: 'same-origin'
+          });
+        }
+        tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
+        tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+        tempInvoice.items = JSON.stringify(tempInvoice.items);
+        updateStatus(tempInvoice);
+        updateInvoice(tempInvoice);
+        invoice = tempInvoice;
+      } catch (error) {
+        console.error(`update invoice: ${error}`);
+      }
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveChangesBtn);

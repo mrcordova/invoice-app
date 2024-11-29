@@ -15,6 +15,7 @@ const allowedOrigins = [
   "https://invoice-app-3705.onrender.com",
   'https://invoice-backend.noahprojects.work',
   "http://127.0.0.1:5500",
+  "chrome-extension://mpognobbkildjkofajifpdfhcoklimli"
 ];
 const corsOptions = {
   origin: function (origin, callback) {
