@@ -342,7 +342,6 @@ body.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`Status Update: ${error}`);
       }
-      // console.log(invoice);
     }
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;

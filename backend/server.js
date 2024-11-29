@@ -6,6 +6,7 @@ const data = require("../frontend/data.json");
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
+const cron = require('node-cron');
 
 
 
@@ -503,6 +504,20 @@ app.post('/refresh-token', async (req, res) => {
 
 });
 
+
 app.listen(PORT, () => {
   console.log(`Server is running of ${PORT}`);
 });
+
+const task = cron.schedule('0 0 * * * *', async () => {
+  try {
+    const now = new Date();
+    const [result] = await poolPromise.query({ sql: 'DELETE FROM refresh_tokens WHERE expires_at < ?', values: [now] });
+    console.log(`Deleted ${result.affectedRows} expired refresh tokens at ${now}`);
+  } catch (error) {
+    console.error(`$ cron job : ${error}`);
+  }
+}, {
+  scheduled: true
+});
+
