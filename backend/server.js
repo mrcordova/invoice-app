@@ -78,7 +78,34 @@ async function generateRefreshToken(user) {
 async function generateAccessToken(user) {
   return jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
+async function blacklistToken(token) {
+  const { exp, id } = jwt.decode(token);
+  console.log(exp);
+  const now = Math.floor(Date.now() / 1000);
+  const ttl = exp - now;
+  const expirDate = new Date(Date.now() + ttl * 1000);
 
+  try {
+    const hashToken = hashPassword(token);
+    const insertQuery = 'INSERT INTO blacklist_tokens(user_id, token, ttl) VALUES (?, ?, ?)';
+    const [result, error] = await poolPromise.query({ sql: insertQuery, values: [id, hashToken, expirDate] });
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error(`blacklisted: ${error}`);
+  }
+  
+}
+
+async function isTokenBlacklisted(token) {
+  try {
+    const hashToken = hashPassword(token);
+    const selectQuery = 'SELECT * FROM blacklist_tokens WHERE token = ?';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [hashToken] });
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error(`isTokenBlacked: ${error}`);
+  }
+}
 const extractToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -90,6 +117,16 @@ const extractToken = async (req, res, next) => {
   } else {
     req.token = undefined;
   }
+}
+async function validateToken(req, res, next) {
+  const refreshToken = req.signedCookies['refresh_token'];
+  if (!refreshToken) return res.status(403).send('Token is invalid');
+
+  const blacklisted = await isTokenBlacklisted(refreshToken);
+  if (blacklisted) return res.status(403).send('Token is blacklisted');
+
+  next();
+  
 }
  
 const pool = mysql.createPool({
@@ -115,7 +152,6 @@ const poolPromise = pool.promise();
 
 app.use(cors(corsOptions));
 
-// app.use(extractToken);
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.options("*", cors(corsOptions));
@@ -195,7 +231,7 @@ app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
 })
 
-app.get("/getInvoices", extractToken, async (req, res) => {
+app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
   
   const statusCode = await checkTokens(req, res);
   if (statusCode === 403) {
@@ -209,7 +245,7 @@ app.get("/getInvoices", extractToken, async (req, res) => {
     console.error(`getInvoices: ${error}`);
   }
 });
-app.get('/getInvoice/:id', extractToken,  async (req, res) => {
+app.get('/getInvoice/:id', extractToken, validateToken,  async (req, res) => {
   const statusCode = await checkTokens(req, res) 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
@@ -223,7 +259,7 @@ app.get('/getInvoice/:id', extractToken,  async (req, res) => {
     console.log(`getInvoice/:id: ${error}`);
   }
 });
-app.post('/saveInvoice', extractToken, async (req, res) => {
+app.post('/saveInvoice', extractToken, validateToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
@@ -264,7 +300,7 @@ app.post('/saveInvoice', extractToken, async (req, res) => {
     console.log(`saveInvoice: ${error}`);
   }
 });
-app.put('/updateStatus/:id', extractToken, async (req, res) => {
+app.put('/updateStatus/:id', extractToken, validateToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
@@ -280,7 +316,7 @@ app.put('/updateStatus/:id', extractToken, async (req, res) => {
     console.error(`updateStatus: ${error}`)
   }
 });
-app.post('/updateInvoice/:id', extractToken, async (req, res) => {
+app.post('/updateInvoice/:id', extractToken,validateToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
@@ -371,8 +407,9 @@ app.post('/loginUser', async (req, res) => {
 app.post('/logout', async (req, res) => {
 
   const refreshToken = req.signedCookies['refresh_token'];
-  if (!refreshToken) return res.status(204);
+  if (!refreshToken) return res.status(204).send('Refresh token invalid');
   const hashToken = hashPassword(refreshToken);
+  const blackListed = await blacklistToken(refreshToken);
   const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ?';
   await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
   res.clearCookie('refresh_token', {
@@ -382,9 +419,9 @@ app.post('/logout', async (req, res) => {
     sameSite: 'strict',
     path: '/' ,
   });
-  res.send("Logged out successfully");
+  res.send(`Logged out successfully and token black listed: ${blackListed}`);
 })
-app.delete('/deleteInvoice/:id', extractToken, async (req, res) => {
+app.delete('/deleteInvoice/:id', extractToken, validateToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
@@ -450,7 +487,9 @@ const task = cron.schedule('0 0 * * * *', async () => {
   try {
     const now = new Date();
     const [result] = await poolPromise.query({ sql: 'DELETE FROM refresh_tokens WHERE expires_at < ?', values: [now] });
+    const [blackListResult] = await poolPromise.query({ sql: 'DELETE FROM blacklist_tokens WHERE ttl < ?', values: [now]});
     console.log(`Deleted ${result.affectedRows} expired refresh tokens at ${now}`);
+    console.log(`Deleted ${blackListResult.affectedRows} expired refresh tokens at ${now}`);
   } catch (error) {
     console.error(`$ cron job : ${error}`);
   }
