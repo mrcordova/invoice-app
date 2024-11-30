@@ -483,7 +483,7 @@ app.listen(PORT, () => {
   console.log(`Server is running of ${PORT}`);
 });
 
-const task = cron.schedule('0 0 * * * *', async () => {
+const task = cron.schedule('0 0 * * *', async () => {
   try {
     const now = new Date();
     const [result] = await poolPromise.query({ sql: 'DELETE FROM refresh_tokens WHERE expires_at < ?', values: [now] });
