@@ -1,4 +1,4 @@
-export const URL = "https://invoice-backend.noahprojects.work";
+export const URL_WEBSITE = "https://invoice-backend.noahprojects.work";
 export const perferredColorScheme = "perferredColorScheme";
 
 function generateCustomId() {

@@ -2,11 +2,12 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql2");
 const cors = require("cors");
-const data = require("../frontend/data.json");
+// const data = require("../frontend/data.json"); uncomment to refill database
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
+const fs = require('fs');
 
 
 
@@ -231,6 +232,21 @@ app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
 })
 
+app.post('/upload',   (req, res) => {
+
+  const { profilePic } = req.body;
+  fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
+    if (err) throw err;
+    console.log('File witten successfully');
+    res.send('picture successfully saved');
+  } )
+  // fs.readFile(profilePic, 'utf8', (err, data) => {
+  //   if (err) throw err;
+  //   console.log(data);
+  // });
+
+})
+
 app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
   
   const statusCode = await checkTokens(req, res);
@@ -377,6 +393,8 @@ app.post('/loginUser', async (req, res) => {
     }
     const refreshToken = await generateRefreshToken(user);
     const accessToken = await generateAccessToken(user);
+
+
   
     // res.cookie('refresh_token', refreshToken, {
     //   httpOnly: true,
@@ -489,7 +507,7 @@ const task = cron.schedule('0 0 * * *', async () => {
     const [result] = await poolPromise.query({ sql: 'DELETE FROM refresh_tokens WHERE expires_at < ?', values: [now] });
     const [blackListResult] = await poolPromise.query({ sql: 'DELETE FROM blacklist_tokens WHERE ttl < ?', values: [now]});
     console.log(`Deleted ${result.affectedRows} expired refresh tokens at ${now}`);
-    console.log(`Deleted ${blackListResult.affectedRows} expired refresh tokens at ${now}`);
+    console.log(`Deleted ${blackListResult.affectedRows} expired blacklisted tokens at ${now}`);
   } catch (error) {
     console.error(`$ cron job : ${error}`);
   }

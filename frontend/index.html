@@ -45,9 +45,28 @@
               fill-rule="nonzero" />
           </svg>
         </label>
-        <div class="profile-pic-cont">
-          <img src="./assets/image-avatar.jpg" alt="profile picture" />
-        </div>
+        <button class="profile-pic-cont" data-show-profile-dialog>
+          <img src="./assets/image-avatar.jpg"  alt="profile picture" />
+        </button>
+        <dialog id="profile-dialog" class="league-spartan-bold" >
+          <!-- <p>Profile info</p> -->
+           <div class="profile-header">
+             <h3>Profile info</h3>
+             <button data-close class="close-btn">
+              X
+             </button>
+            </div>
+          <img data-preview src="./assets/image-avatar.jpg" height="80" width="80" alt="profile pic">
+          <form id="profile-form" method="post" enctype="multipart/form-data">
+            <label data-file >
+              Click here to upload (PNG, JPG, JPEG, SVG)
+              <input type="file" id="profile_pic" required name="profile_pic" accept=".jpg, .png, .jpeg, .svg">
+            </label>
+            <button type="submit" data-profile-submit>
+              Upload picture
+            </button>
+          </form>
+        </dialog>
       </header>
       <dialog id="new-invoice-dialog">
         <header class="header">

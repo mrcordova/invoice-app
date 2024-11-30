@@ -7,7 +7,7 @@ import {
   saveInvoice,
   themeUpdate,
   perferredColorScheme,
-  URL,
+  URL_WEBSITE,
   logout,
   refreshAccessToken,
 } from "./functions.js";
@@ -17,6 +17,7 @@ const accessToken = localStorage.getItem("accessToken");
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
+const profileDialog = document.getElementById('profile-dialog')
 const invoiceTotal = document.querySelector("[data-invoice-total]");
 
 const main = document.querySelector("main");
@@ -25,9 +26,11 @@ const currencyOptions = { style: "currency", currency: "GBP" };
 const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
 
+const fileInput = document.getElementById("profile_pic");
+
 window.addEventListener("DOMContentLoaded", async (e) => {
   let response;
-  response = await fetch(`${URL}/getInvoices`, {
+  response = await fetch(`${URL_WEBSITE}/getInvoices`, {
     method: "GET",
     headers: {
       "Content-type": "application/json",
@@ -42,7 +45,7 @@ window.addEventListener("DOMContentLoaded", async (e) => {
     // console.log("here");
     const newAccessToken = await refreshAccessToken();
     localStorage.setItem("accessToken", newAccessToken);
-    response = await fetch(`${URL}/getInvoices`, {
+    response = await fetch(`${URL_WEBSITE}/getInvoices`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -116,7 +119,7 @@ function searchInvoices() {
 async function saveInvoiceToDB(invoice) {
   let response;
   try {
-    response = await fetch(`${URL}/saveInvoice`, {
+    response = await fetch(`${URL_WEBSITE}/saveInvoice`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -131,7 +134,7 @@ async function saveInvoiceToDB(invoice) {
       const newAccessToken = await refreshAccessToken();
       localStorage.setItem("accessToken", newAccessToken);
       saveInvoiceToDB(invoice);
-      //  response = await fetch(`${URL}/getInvoices`, {
+      //  response = await fetch(`${URL_WEBSITE}/getInvoices`, {
       //    method: "GET",
       //    headers: {
       //      "Content-type": "application/json",
@@ -187,22 +190,81 @@ function addInvoice(invoice) {
   );
   invoiceTotal.textContent = parseInt(invoiceTotal.textContent) + 1;
 }
-
+const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg'];
 header.addEventListener("click", (e) => {
-  e.preventDefault();
+   e.stopImmediatePropagation();
   const themeBtn = e.target.closest("[data-theme]");
+  const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
+  const fileLabel = e.target.closest('[data-file]');
+  const closeBtn = e.target.closest('[data-close]');
+  const submtiBtn = e.target.closest('[data-profile-submit]');
   if (themeBtn) {
+    e.preventDefault();
     themeUpdate(e, themeInputs);
   }
+  else if (profileDialogAttr) {
+    // console.log('here');
+    profileDialog.showModal();
+  } else if (fileLabel) {
+    // console.log("header" , e.target);
+    // console.log(fileLabel);
+  } else if (closeBtn) {
+    profileDialog.close();
+  } else if (submtiBtn) {
+    e.preventDefault();
+    if (fileInput.files.length == 1 && acceptedFileTypes.includes(fileInput.files[0].type)) {
+      console.log(fileInput.files[0]);
+      submtiBtn.parentElement.requestSubmit();
+    }
+  }
+
 });
+// fileInput.addEventListener('input', (e) => {
+//   console.log(e.target.files[0]);
+
+// })
+fileInput.addEventListener('change', (e) => {
+  // console.log(e.target.files[0]);
+  if (e.target.files.length === 1  && acceptedFileTypes.includes(fileInput.files[0].type)) {
+    const file = e.target.files[0];
+    const thumbUrl = URL.createObjectURL(file);
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.setAttribute('src', thumbUrl);
+    imgPreview.setAttribute('title', file.name);
+    imgPreview.setAttribute('alt', file.name);
+  }
+
+})
+// fileInput.addEventListener('click', (e) => {
+//   // e.preventDefault();
+//   e.stopImmediatePropagation();
+//   // e.target.click();
+//   console.log('here');
+// })
+// profileDialog.addEventListener('click', (e) => {
+//   e.preventDefault();
+//   e.stopImmediatePropagation();
+//   const fileInput = e.target.closest('[data-file]');
+//   // console.log()
+//   if (fileInput) {
+//     console.log(e.target);
+//      fileInput.click();
+//     // e.target.click();
+
+//     // fileInput.value = true;
+//   //  fileInput.showModal();
+//   }
+  
+// })
 
 main.addEventListener("click", (e) => {
   e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
+  
   const invoiceEle = e.target.closest("[data-invoice]");
-  const themeBtn = e.target.closest("[data-theme]");
+  // const themeBtn = e.target.closest("[data-theme]");
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -220,7 +282,8 @@ main.addEventListener("click", (e) => {
     newInvoiceDialog.showModal();
   } else if (invoiceEle) {
     location.href = invoiceEle.getAttribute("href");
-  }
+  } 
+  
 });
 
 newInvoiceDialog.addEventListener("click", async (e) => {

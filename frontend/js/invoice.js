@@ -8,7 +8,7 @@ import {
   perferredColorScheme,
   themeUpdate,
   refreshAccessToken,
-  URL,
+  URL_WEBSITE,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
@@ -17,7 +17,7 @@ let invoice = await getInvoice(invoiceId);
 async function getInvoice(invoiceId) {
   let response;
   try {
-    response = await fetch(`${URL}/getInvoice/${invoiceId}`, {
+    response = await fetch(`${URL_WEBSITE}/getInvoice/${invoiceId}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json",
@@ -318,7 +318,7 @@ body.addEventListener("click", async (e) => {
       let response;
       try {
         response =
-         await fetch(`${URL}/updateStatus/${invoice.id}`, {
+         await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
            method: "PUT",
            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
            body: JSON.stringify({ status }),
@@ -329,7 +329,7 @@ body.addEventListener("click", async (e) => {
           const newAccessToken = await refreshAccessToken();
           localStorage.setItem('accessToken', newAccessToken);
           response =
-         await fetch(`${URL}/updateStatus/${invoice.id}`, {
+         await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
            method: "PUT",
            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
            body: JSON.stringify({ status }),
@@ -355,7 +355,7 @@ body.addEventListener("click", async (e) => {
   } else if (deleteInvoiceBtn) {
     let response;
     try {
-      response = await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
+      response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
         method: "DELETE",
         headers: {
           "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
@@ -368,7 +368,7 @@ body.addEventListener("click", async (e) => {
         const newAccessToken = await refreshAccessToken();
         localStorage.setItem("accessToken", newAccessToken);
         accessToken = localStorage.getItem("accessToken");
-        response = await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
+        response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
         method: "DELETE",
         headers: {
           "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
@@ -419,7 +419,7 @@ body.addEventListener("click", async (e) => {
         invoiceEle.childNodes[0].remove();
         invoiceItemsTable.replaceChildren();
         response = 
-          await fetch(`${URL}/updateInvoice/${invoice.id}`, {
+          await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
             method: "POST",
             headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
             body: JSON.stringify(tempInvoice),
@@ -432,7 +432,7 @@ body.addEventListener("click", async (e) => {
         localStorage.setItem("accessToken", newAccessToken);
         accessToken = localStorage.getItem("accessToken");
         response = 
-          await fetch(`${URL}/updateInvoice/${invoice.id}`, {
+          await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
             method: "POST",
             headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
             body: JSON.stringify(tempInvoice),

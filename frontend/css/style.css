@@ -146,7 +146,7 @@ body {
   }
 }
 
-#delete-dialog {
+#delete-dialog, #profile-dialog  {
   border: 0;
   margin: auto;
   top: 0;
@@ -165,6 +165,58 @@ body {
     background-color: hsl(from black h s l / 0.5);
   }
 
+  & .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    & .close-btn {
+      background-color: transparent;
+    }
+  }
+
+  & #profile-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* gap: 1rem; */
+
+    /* min-width: 0; */
+    & label {
+      cursor: pointer;
+    
+      &:hover {
+
+        color: var(--venetian-nights);
+      }
+     
+
+      & input {
+        width: 100%;
+      opacity: 0;
+      }
+  }
+  }
+
+  & img {
+    border-radius: 50%;
+    margin-inline: auto;
+    margin-block-end: 1rem;
+  }
+  & button{
+    line-height: 1;
+    font-size: 0.938rem;
+    letter-spacing: -0.016rem;
+    border-radius: 1.5rem;
+    padding-inline: 1.5rem;
+    padding-block: 1.125rem 0.938rem;
+    color: white;
+    background-color: var(--venetian-nights);
+   
+    &:hover {
+      cursor: pointer;
+    }
+  }
   & h1 {
     font-size: 1.5rem;
     letter-spacing: -0.031rem;
@@ -371,6 +423,7 @@ div.edit-btns {
   background-color: var(--carbon-blue);
   display: flex;
 
+  
   & .logo-cont {
     background-color: var(--venetian-nights);
 
@@ -421,10 +474,16 @@ div.edit-btns {
       width: 2rem;
       border-radius: 50%;
     }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
   & input[type="checkbox"] {
     display: none;
   }
+  
+  
 }
 
 .header-cont {
@@ -1290,6 +1349,7 @@ main {
       & img {
         width: clamp(2rem, calc(1.429rem + 1.19vw), 2.5rem);
       }
+    
     }
 
     & .theme-toggle {

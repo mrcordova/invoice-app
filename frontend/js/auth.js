@@ -1,4 +1,4 @@
-import { showFormErrors, URL } from "./functions.js";
+import { showFormErrors, URL_WEBSITE  } from "./functions.js";
 
 document.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -12,7 +12,7 @@ document.addEventListener("click", async (e) => {
       const formDataObj = Object.fromEntries(formData.entries());
 
       try {
-        const response = await fetch(`${URL}/registerUser`, {
+        const response = await fetch(`${URL_WEBSITE}/registerUser`, {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formDataObj),
@@ -35,7 +35,7 @@ document.addEventListener("click", async (e) => {
       const formData = new FormData(login.parentElement);
       const formObj = Object.fromEntries(formData.entries());
       try {
-        const response = await fetch(`${URL}/loginUser`, {
+        const response = await fetch(`${URL_WEBSITE}/loginUser`, {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formObj),
