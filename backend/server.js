@@ -80,7 +80,7 @@ async function generateAccessToken(user) {
 }
 async function blacklistToken(token) {
   const { exp, id } = jwt.decode(token);
-  console.log(exp);
+  // console.log(exp);
   const now = Math.floor(Date.now() / 1000);
   const ttl = exp - now;
   const expirDate = new Date(Date.now() + ttl * 1000);
