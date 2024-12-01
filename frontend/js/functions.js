@@ -327,7 +327,7 @@ export function updatePaymentTerms(paymentTermsBtn) {
 
 export async function logout() {
   const token = localStorage.getItem("accessToken");
-  const response = await fetch(`${URL}/logout`, {
+  const response = await fetch(`${URL_WEBSITE}/logout`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -342,7 +342,7 @@ export async function logout() {
 
 export async function refreshAccessToken() {
   try {
-    const tokenResponse = await fetch(`${URL}/refresh-token`, {
+    const tokenResponse = await fetch(`${URL_WEBSITE}/refresh-token`, {
       method: "POST",
       credentials: "include",
     });

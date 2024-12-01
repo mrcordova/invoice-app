@@ -257,6 +257,7 @@ header.addEventListener("click", async (e) => {
           img.setAttribute('src', `${filename}`);
           img.setAttribute('title', title);
           img.setAttribute('alt', alt);
+          img.setAttribute('dafds', true)
         }
         
       } catch (error) {
