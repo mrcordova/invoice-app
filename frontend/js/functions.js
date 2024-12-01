@@ -9,7 +9,7 @@ function generateCustomId() {
   const randomNumbers = Math.floor(1000 + Math.random() * 9000).toString();
   return `${randomLetters}${randomNumbers}`;
 }
-export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 // const dataResponse = await fetch(`${URL}/health-check`);
 // console.log(await dataResponse.json());
 
