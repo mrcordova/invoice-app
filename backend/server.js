@@ -9,7 +9,7 @@ const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
 // const fs = require('fs');
 const multer = require('multer');
-const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', 'image/jpg': 'jpg', 'image/svg': 'svg'};
+const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', 'image/jpg': 'jpg'};
 
 const storage = multer.diskStorage({
   destination: (res, file, cb) => {
