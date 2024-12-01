@@ -10,6 +10,7 @@ import {
   URL_WEBSITE,
   logout,
   refreshAccessToken,
+  acceptedFileTypes
 } from "./functions.js";
 
 const accessToken = localStorage.getItem("accessToken");
@@ -127,7 +128,7 @@ async function saveInvoiceToDB(invoice) {
         "Access-Control-Allow-Origin": true,
       },
       body: JSON.stringify(invoice),
-      credentials: "include",
+      credentials: "same-origin",
     });
     if (response.status === 403) {
       //  console.log("here");
@@ -190,8 +191,8 @@ function addInvoice(invoice) {
   );
   invoiceTotal.textContent = parseInt(invoiceTotal.textContent) + 1;
 }
-const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg'];
-header.addEventListener("click", (e) => {
+
+header.addEventListener("click", async (e) => {
    e.stopImmediatePropagation();
   const themeBtn = e.target.closest("[data-theme]");
   const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
@@ -212,9 +213,47 @@ header.addEventListener("click", (e) => {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
+    console.log('here');
     if (fileInput.files.length == 1 && acceptedFileTypes.includes(fileInput.files[0].type)) {
-      console.log(fileInput.files[0]);
-      submtiBtn.parentElement.requestSubmit();
+      // console.log(fileInput.files[0]);
+      // const formData = new FormData();
+      const formData = new FormData(document.querySelector('#profile-form'));
+      // formData.append('file', fileInput.files[0]);
+
+      // console.log(form.get('file'), "here");
+      // console.log(formData.get('file'));
+      let response;
+      try {
+        response = await fetch(`${URL_WEBSITE}/upload`, {
+          method: "POST",
+          headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": true,
+          },
+          body: formData,
+          credentials: 'same-origin'
+        })
+        if (response.status === 403) {
+          const newAccessToken = await refreshAccessToken();
+          localStorage.setItem('accessToken', newAccessToken);
+           response = await fetch(`${URL_WEBSITE}/upload`, {
+          method: "POST",
+          headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": true,
+             },
+          body: formData,
+          credentials: 'same-origin'
+        })
+        }
+
+        const result = await response.json();
+        console.log(result);
+        
+      } catch (error) {
+        
+      }
+      // submtiBtn.parentElement.requestSubmit();
     }
   }
 

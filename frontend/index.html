@@ -46,7 +46,8 @@
           </svg>
         </label>
         <button class="profile-pic-cont" data-show-profile-dialog>
-          <img src="./assets/image-avatar.jpg"  alt="profile picture" />
+          <!-- <img src="./assets/image-avatar.jpg"  alt="profile picture" /> -->
+          <img src="./profilePic" alt="profile picture" />
         </button>
         <dialog id="profile-dialog" class="league-spartan-bold" >
           <!-- <p>Profile info</p> -->
@@ -56,11 +57,12 @@
               X
              </button>
             </div>
-          <img data-preview src="./assets/image-avatar.jpg" height="80" width="80" alt="profile pic">
-          <form id="profile-form" method="post" enctype="multipart/form-data">
-            <label data-file >
+          <img data-preview src="./profilePic" height="80" width="80" alt="profile pic">
+          <form id="profile-form" >
+              <input type="text" name="username" placeholder="Enter your username">
+            <label  data-file >
+              <input type="file" id="profile_pic" name="file" accept=".jpg, .png, .jpeg, .svg">
               Click here to upload (PNG, JPG, JPEG, SVG)
-              <input type="file" id="profile_pic" required name="profile_pic" accept=".jpg, .png, .jpeg, .svg">
             </label>
             <button type="submit" data-profile-submit>
               Upload picture

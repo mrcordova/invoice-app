@@ -7,9 +7,24 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
-const fs = require('fs');
+// const fs = require('fs');
+const multer = require('multer');
+const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', 'image/jpg': 'jpg', 'image/svg': 'svg'};
 
+const storage = multer.diskStorage({
+  destination: (res, file, cb) => {
+    cb(null, path.join(__dirname, "/uploads/"));
+  },
+  filename: async (req, file, cb) => {
+    const { username, id } = jwt.decode(req.token);
+    // console.log(id);
+    const fileName = `${ username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
+  
+    cb(null, `${fileName}`);
+  }
+});
 
+const upload = multer({ storage, limits: {fileSize: 2 * 1024 * 1024} });
 
 require("dotenv").config();
 
@@ -160,7 +175,7 @@ app.options("*", cors(corsOptions));
 app.use(express.static(path.join(__dirname, "../frontend/")));
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ type: "*/*" }));
+app.use(express.json());
 
 async function setUpDb() {
   for (const invoice of data) {
@@ -232,19 +247,54 @@ app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
 })
 
-app.post('/upload',   (req, res) => {
+app.post('/upload', extractToken, validateToken, upload.single('file'), async (req, res) => {
+  const statusCode = await checkTokens(req, res);
+  if (statusCode === 403) {
+    return res.status(statusCode).json({ message: 'tokens are invalid' });
+  }
+  console.log(req.file);
+  const { filename } = req.file;
+  // console.log(req.filename);
 
-  const { profilePic } = req.body;
-  fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
-    if (err) throw err;
-    console.log('File witten successfully');
-    res.send('picture successfully saved');
-  } )
+  try {
+    const { username, id } = jwt.decode(req.token);
+    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ?';
+    const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
+    res.status(200).json({ file: `${filename}`, success: result.affectedRows > 0 });
+  } catch (error) {
+    console.error(`upload: ${error}`);
+  }
+  // const { profilePic } = req.body;
+  // fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
+  //   if (err) throw err;
+  //   console.log('File witten successfully');
+  //   res.send('picture successfully saved');
+  // } )
   // fs.readFile(profilePic, 'utf8', (err, data) => {
   //   if (err) throw err;
   //   console.log(data);
   // });
 
+});
+app.get('/profilePic', async (req, res) => {
+  //  const statusCode = await checkTokens(req, res);
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  // console.log('heer');
+
+  try {
+    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    
+    const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+    const img = result[0].img;
+    console.log(img);
+    res.sendFile(path.join(__dirname, `/uploads/${img}`));
+  } catch (error) {
+    
+  }
+  // const img = profile_img ?? '../frontend/assets/image-avatar.jpg';
 })
 
 app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
@@ -362,6 +412,7 @@ app.post('/updateInvoice/:id', extractToken,validateToken, async (req, res) => {
 app.post('/registerUser', async (req, res) => {
   const { username, email, password, "repeat-password":repeatPassword } = req.body;
   const password_hash = hashPassword(password);
+  const defaultProfileImg = path.join(__dirname, `../frontend/assets/image-avatar.jpg`);
 
   if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
     return res.status(401).json({message: 'some creditionals are missing'});
@@ -370,8 +421,8 @@ app.post('/registerUser', async (req, res) => {
     return res.status(409).json({ message: 'User already exists' });
   }
 try {
-  const insertQuery = 'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)';
-  const [results, error] = await poolPromise.query({ sql: insertQuery, values: [username, password_hash, email] });
+  const insertQuery = 'INSERT INTO users (username, password_hash, email, img) VALUES (?, ?, ?, ?)';
+  const [results, error] = await poolPromise.query({ sql: insertQuery, values: [username, password_hash, email, defaultProfileImg] });
   res.json({ success: true });
 
 } catch (error) {
