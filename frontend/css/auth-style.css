@@ -13,6 +13,8 @@
   --ruined-smores: #0c0e16;
   background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
   color-scheme: light dark;
+  scrollbar-color: light-dark(var(--stotic-white), var(--royal-curtsy))
+      transparent;
 }
 .league-spartan-medium {
   font-family: "League Spartan", sans-serif;

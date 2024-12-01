@@ -9,11 +9,13 @@
       type="image/png"
       sizes="32x32"
       href="./assets/favicon-32x32.png" />
-    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/reset.css"  />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="preload"  as="fetch" href="./assets/illustration-empty.svg" type="image/svg+xml" />
     <script src="js/script.js" type="module"></script>
 
     <title>Frontend Mentor | Invoice app</title>
+   
   </head>
   <body>
     <div class="header-cont">
@@ -47,7 +49,7 @@
         </label>
         <button class="profile-pic-cont" data-show-profile-dialog>
           <!-- <img src="./assets/image-avatar.jpg"  alt="profile picture" /> -->
-          <img src="./profilePic" class="profile_img" width="32" height="32" alt="profile picture" />
+          <img  fetchpriority="high" src="./profilePic"  class="profile_img" width="32" height="32" alt="profile picture" />
         </button>
         <dialog id="profile-dialog" class="league-spartan-bold" >
           <!-- <p>Profile info</p> -->
@@ -102,7 +104,7 @@
             </svg>
           </label>
           <div class="profile-pic-cont">
-            <img src="./assets/image-avatar.jpg" alt="profile picture" />
+            <img src="/profilePic" alt="profile picture" />
           </div>
         </header>
         <div class="form-cont league-spartan-bold">
@@ -599,7 +601,7 @@
         </a> -->
       </div>
       <div class="no-invoices-con">
-        <img src="./assets/illustration-empty.svg" alt="no invoices imgge" />
+        <img fetchpriority="high" src="./assets/illustration-empty.svg" width="242" height="200" alt="no invoices imgge" />
         <div>
           <!-- No invoices -->
           <h2>There is nothing here</h2>

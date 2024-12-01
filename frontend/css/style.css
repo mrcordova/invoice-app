@@ -37,6 +37,8 @@
       display: block;
     }
   }
+  scrollbar-color: light-dark(var(--stotic-white), var(--royal-curtsy))
+      transparent;
   @media (prefers-color-scheme: dark) {
     &:has(input[name="theme"]:checked) {
       --color-scheme: dark;

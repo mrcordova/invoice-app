@@ -43,7 +43,7 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Origin"],
+  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Origin", 'Cache-Control'],
 };
 const app = express();
 // console.log(randomBytes(32).toString("hex"))
@@ -171,6 +171,12 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.options("*", cors(corsOptions));
 
+app.use('/assets', express.static(path.join(__dirname, "../frontend/assets"), {
+    setHeaders: (res, path) => {
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+}));
+
 app.use(express.static(path.join(__dirname, "../frontend/")));
 
 app.use(express.urlencoded({ extended: true }));
@@ -296,6 +302,7 @@ app.get('/profilePic', async (req, res) => {
     const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
     const img = result[0].img;
     // console.log(img);
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
     res.sendFile(path.join(__dirname, `/uploads/${img}`));
   } catch (error) {
     

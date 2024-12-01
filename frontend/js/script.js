@@ -100,6 +100,7 @@ function createInvoices(data) {
               </div>
               <img
                 class="hide-mobile"
+                loading="lazy"
                 src="./assets/icon-arrow-right.svg"
                 alt="right arrow" />
             </div>
