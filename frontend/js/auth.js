@@ -30,7 +30,7 @@ document.addEventListener("click", async (e) => {
       }
     }
   } else if (login) {
-    console.log("login pressed");
+    // console.log("login pressed");
     if (showFormErrors(login)) {
       const formData = new FormData(login.parentElement);
       const formObj = Object.fromEntries(formData.entries());
@@ -43,7 +43,8 @@ document.addEventListener("click", async (e) => {
         });
         if (response.ok) {
           login.parentElement.reset();
-          const { accessToken } = await response.json();
+          const { accessToken, username } = await response.json();
+          localStorage.setItem('username', username);
           localStorage.setItem("accessToken", accessToken);
 
           location.href = "/index.html";

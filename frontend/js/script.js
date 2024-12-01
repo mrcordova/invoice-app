@@ -26,6 +26,7 @@ const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
+const  username = localStorage.getItem('username');
 
 const fileInput = document.getElementById("profile_pic");
 
@@ -206,6 +207,7 @@ header.addEventListener("click", async (e) => {
   else if (profileDialogAttr) {
     // console.log('here');
     profileDialog.showModal();
+    profileDialog.querySelector('input[name="username"]').value = username;
   } else if (fileLabel) {
     // console.log("header" , e.target);
     // console.log(fileLabel);
