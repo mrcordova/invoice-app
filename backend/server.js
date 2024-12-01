@@ -17,7 +17,6 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const { username, id } = jwt.decode(req.token);
-    // console.log(id);
     const fileName = `${ username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
   
     cb(null, `${fileName}`);

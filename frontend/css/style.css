@@ -197,7 +197,26 @@ body {
       padding-block: 0;
 
       }
+
+      &:has(input[name='username']) {
+        display: flex;
+        /* flex: 1; */
+        align-items: center;
+        width: 100%;
+
+        &::after {
+          content: "X";
+          padding-inline-start: 0.5rem;
+        }
+      }
+     
   }
+   & input[name='username'] {
+        /* width: 100%; */
+        /* display: flex; */
+        flex: 1;
+        
+      }
   }
 
   & img {
