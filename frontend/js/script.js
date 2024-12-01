@@ -253,11 +253,12 @@ header.addEventListener("click", async (e) => {
         // console.log(result);
         if (result['success']) {
           const img = document.querySelector('.profile_img');
+          const imgPreview = profileDialog.querySelector('img[data-preview]');
           const { filename, alt, title} = result['file'];
-          img.setAttribute('src', `${filename}`);
+          // img.setAttribute('src', `${filename}`);
+          img.setAttribute('src', imgPreview.getAttribute('src'));
           img.setAttribute('title', title);
           img.setAttribute('alt', alt);
-          img.setAttribute('dafds', true)
         }
         
       } catch (error) {
