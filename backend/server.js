@@ -470,7 +470,7 @@ app.post('/loginUser', async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     
-    res.json({ accessToken });
+    res.json({ accessToken, username});
     // res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
 
   } catch (error) {
