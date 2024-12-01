@@ -1,5 +1,6 @@
 export const URL_WEBSITE = "https://invoice-backend.noahprojects.work";
 export const perferredColorScheme = "perferredColorScheme";
+// export const accessToken = localStorage.getItem('accessToken');
 
 function generateCustomId() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -17,7 +18,20 @@ function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
-
+export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
+  const accessToken = localStorage.getItem('accessToken');
+  return await fetch(`${URL_WEBSITE}${path}`, {
+    method,
+    headers: {
+       ...headers,
+      Authorization: `Bearer ${accessToken}`,
+      "Access-Control-Allow-Origin": true,
+    },
+    body,
+    credentials: 'same-origin',
+    cache: 'reload'
+  });
+}
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
   // console.log(checked);
@@ -273,39 +287,6 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     paymentDue: `${paymentDue}T00:00:00`,
   };
 
-  // console.log(invoice);
-
-  // const invoice = {
-  //   id: id ?? generateCustomId(),
-  //   senderAddress: {
-  //     street: invoiceDialog.querySelector("form label > input#addy").value,
-  //     city: invoiceDialog.querySelector("form label > input#city").value,
-  //     postCode: invoiceDialog.querySelector("form label > input#zipcode").value,
-  //     country: invoiceDialog.querySelector("form label > input#country").value,
-  //   },
-  //   clientName: invoiceDialog.querySelector("form label > input#name").value,
-  //   clientEmail: invoiceDialog.querySelector("form label > input#email").value,
-  //   clientAddress: {
-  //     street: invoiceDialog.querySelector("form label > input#client-addy")
-  //       .value,
-  //     city: invoiceDialog.querySelector("form label > input#client-city").value,
-  //     postCode: invoiceDialog.querySelector("form label > input#client-zipcode")
-  //       .value,
-  //     country: invoiceDialog.querySelector("form label > input#client-country")
-  //       .value,
-  //   },
-  //   createdAt: `${createdAtVal}T00:00:00`,
-  //   description: invoiceDialog.querySelector("form label > input#description")
-  //     .value,
-  //   paymentTerms: paymentTerms,
-  //   status: status,
-  //   items: invoiceItemsArry,
-  //   total,
-  //   paymentDue: `${paymentDue}T00:00:00`,
-  // };
-
-  // console.log(invoice);
-
   resetForm(invoiceDialog);
   return invoice;
 }
@@ -344,13 +325,13 @@ export async function refreshAccessToken() {
   try {
     const tokenResponse = await fetch(`${URL_WEBSITE}/refresh-token`, {
       method: "POST",
-      credentials: "include",
+      credentials: "same-origin",
     });
 
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
-      // localStorage.setItem("accessToken",  await accessToken);
-      return accessToken;
+      localStorage.setItem("accessToken", accessToken);
+      // return accessToken;
     } else {
       // await logout();
       // console.error(tokenResponse.ok);

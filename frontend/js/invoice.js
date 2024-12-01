@@ -9,28 +9,31 @@ import {
   themeUpdate,
   refreshAccessToken,
   URL_WEBSITE,
+  fetchWithAuth,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-let accessToken = localStorage.getItem("accessToken");
+// let accessToken = localStorage.getItem("accessToken");
 let invoice = await getInvoice(invoiceId);
 async function getInvoice(invoiceId) {
   let response;
   try {
-    response = await fetch(`${URL_WEBSITE}/getInvoice/${invoiceId}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-        "Access-Control-Allow-Origin": true,
-      },
-      cache: "reload",
-      credentials: "same-origin",
-    });
+    // response = await fetch(`${URL_WEBSITE}/getInvoice/${invoiceId}`, {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-type": "application/json",
+    //     Authorization: `Bearer ${accessToken}`,
+    //     "Access-Control-Allow-Origin": true,
+    //   },
+    //   cache: "reload",
+    //   credentials: "same-origin",
+    // });
+    response = await fetchWithAuth(`/getInvoice/${invoiceId}`, 'GET');
     if (response.status === 403) {
-      const newAccessToken = await refreshAccessToken();
-      localStorage.setItem("accessToken", newAccessToken);
-      accessToken = localStorage.getItem("accessToken");
+      // const newAccessToken = await refreshAccessToken();
+       await refreshAccessToken();
+      // localStorage.setItem("accessToken", newAccessToken);
+      // accessToken = localStorage.getItem("accessToken");
       // console.log(newAccessToken);
       return await getInvoice(invoiceId);
     } else {
@@ -317,25 +320,31 @@ body.addEventListener("click", async (e) => {
     if (status !== statusEle.dataset.status) {
       let response;
       try {
+        // response =
+        //  await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
+        //    method: "PUT",
+        //    headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
+        //    body: JSON.stringify({ status }),
+        //    cache: 'reload',
+        //    credentials: 'same-origin'
+        //  });
+        const jsonStatus = JSON.stringify({ status });
         response =
-         await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
-           method: "PUT",
-           headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
-           body: JSON.stringify({ status }),
-           cache: 'reload',
-           credentials: 'same-origin'
-         });
+          await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
         if (response.status === 403) {
-          const newAccessToken = await refreshAccessToken();
-          localStorage.setItem('accessToken', newAccessToken);
+          // const newAccessToken = await refreshAccessToken();
+           await refreshAccessToken();
+          // localStorage.setItem('accessToken', newAccessToken);
+        //   response =
+        //  await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
+        //    method: "PUT",
+        //    headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
+        //    body: JSON.stringify({ status }),
+        //    cache: 'reload',
+        //    credentials: 'same-origin'
+        //  });
           response =
-         await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
-           method: "PUT",
-           headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
-           body: JSON.stringify({ status }),
-           cache: 'reload',
-           credentials: 'same-origin'
-         });
+          await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
         }
        invoice.status = status;
         
@@ -355,28 +364,32 @@ body.addEventListener("click", async (e) => {
   } else if (deleteInvoiceBtn) {
     let response;
     try {
-      response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
-          "Access-Control-Allow-Origin": true
-        },
-        cache: "reload",
-        credentials: 'same-origin'
-      });
+      // response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
+      //   method: "DELETE",
+      //   headers: {
+      //     "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
+      //     "Access-Control-Allow-Origin": true
+      //   },
+      //   cache: "reload",
+      //   credentials: 'same-origin'
+      // });
+      response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
       if (response.status === 403) {
-        const newAccessToken = await refreshAccessToken();
-        localStorage.setItem("accessToken", newAccessToken);
-        accessToken = localStorage.getItem("accessToken");
-        response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
-          "Access-Control-Allow-Origin": true
-        },
-        cache: "reload",
-        credentials: 'same-origin'
-      });
+        // const newAccessToken = await refreshAccessToken();
+        await refreshAccessToken();
+        // localStorage.setItem("accessToken", newAccessToken);
+        // accessToken = localStorage.getItem("accessToken");
+      //   response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
+      //   method: "DELETE",
+      //   headers: {
+      //     "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
+      //     "Access-Control-Allow-Origin": true
+      //   },
+      //   cache: "reload",
+      //   credentials: 'same-origin'
+        // });
+        response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
+       
       }
       const {success} = await response.json();
       if (response.ok && success) {
@@ -418,27 +431,33 @@ body.addEventListener("click", async (e) => {
         statusBarEle.replaceChildren();
         invoiceEle.childNodes[0].remove();
         invoiceItemsTable.replaceChildren();
-        response = 
-          await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
-            method: "POST",
-            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
-            body: JSON.stringify(tempInvoice),
-            cache: 'reload',
-            credentials: 'same-origin'
-          });
+        // response = 
+        //   await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
+        //     method: "POST",
+        //     headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true },
+        //     body: JSON.stringify(tempInvoice),
+        //     cache: 'reload',
+        //     credentials: 'same-origin'
+        //   });
+        const jsonInvoice = JSON.stringify(tempInvoice);
+        response =
+          await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
         if (response.status === 403) {
           
-        const newAccessToken = await refreshAccessToken();
-        localStorage.setItem("accessToken", newAccessToken);
-        accessToken = localStorage.getItem("accessToken");
-        response = 
-          await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
-            method: "POST",
-            headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
-            body: JSON.stringify(tempInvoice),
-            cache: 'reload',
-            credentials: 'same-origin'
-          });
+         await refreshAccessToken();
+        // const newAccessToken = await refreshAccessToken();
+        // localStorage.setItem("accessToken", newAccessToken);
+        // accessToken = localStorage.getItem("accessToken");
+        // response = 
+        //   await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
+        //     method: "POST",
+        //     headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
+        //     body: JSON.stringify(tempInvoice),
+        //     cache: 'reload',
+        //     credentials: 'same-origin'
+        //   });
+        response =
+          await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
         }
         tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
         tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
