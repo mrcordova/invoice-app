@@ -8,7 +8,6 @@ import {
   perferredColorScheme,
   themeUpdate,
   refreshAccessToken,
-  URL_WEBSITE,
   fetchWithAuth,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);

@@ -19,12 +19,12 @@ function createdAt() {
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
 export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
-  const accessToken = localStorage.getItem('accessToken');
+  // const accessToken = localStorage.getItem('accessToken');
   return await fetch(`${URL_WEBSITE}${path}`, {
     method,
     headers: {
        ...headers,
-      Authorization: `Bearer ${accessToken}`,
+      // Authorization: `Bearer ${accessToken}`,
       "Access-Control-Allow-Origin": true,
     },
     body,
@@ -307,17 +307,17 @@ export function updatePaymentTerms(paymentTermsBtn) {
 }
 
 export async function logout() {
-  const token = localStorage.getItem("accessToken");
+  // const token = localStorage.getItem("accessToken");
   const response = await fetch(`${URL_WEBSITE}/logout`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      // Authorization: `Bearer ${token}`,
       "Access-Control-Allow-Origin": true,
     },
     cache: 'reload',
     credentials: "include",
   });
-  localStorage.removeItem("accessToken");
+  // localStorage.removeItem("accessToken");
   location.href = '/login.html';
 }
 
@@ -330,7 +330,8 @@ export async function refreshAccessToken() {
 
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
-      localStorage.setItem("accessToken", accessToken);
+      console.log(accessToken);
+      // localStorage.setItem("accessToken", accessToken);
       // return accessToken;
     } else {
       // await logout();

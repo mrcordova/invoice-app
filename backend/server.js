@@ -132,15 +132,24 @@ async function isTokenBlacklisted(token) {
 }
 const extractToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
+  const token  = req.signedCookies['access_token'];
+  // if (authHeader && authHeader.startsWith('Bearer ')) {
+  //   const token = authHeader.split(' ')[1];
+    
+  //   req.token =  token == 'null' ? null : token;
+  
+  // } else {
+  //   req.token = undefined;
+  // }
+  if (token) {
+    // const token = authHeader.split(' ')[1];
     
     req.token =  token == 'null' ? null : token;
   
-    next();
   } else {
     req.token = undefined;
   }
+  next();
 }
 async function validateToken(req, res, next) {
   const refreshToken = req.signedCookies['refresh_token'];
@@ -337,6 +346,7 @@ app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
+  // console.log('getInvoices', req.token);
   try {
     const selectQuery = "SELECT * FROM invoices";
     const [results] = await poolPromise.query(selectQuery);
@@ -497,8 +507,18 @@ app.post('/loginUser', async (req, res) => {
       path: '/' ,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/' ,
+      maxAge: (1 * 60) * (60 * 1000),
+    });
+   
     
-    res.json({ accessToken, username});
+    // res.json({ accessToken, username});
+    res.json({username});
     // res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
 
   } catch (error) {
@@ -521,6 +541,13 @@ app.post('/logout', async (req, res) => {
     secure: true,
     sameSite: 'strict',
     path: '/' ,
+  });
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    signed: true,
+    secure: true,
+    sameSite: 'strict',
+    path: '/',
   });
   res.send(`Logged out successfully and token black listed: ${blackListed}`);
 })
@@ -568,7 +595,16 @@ app.post('/refresh-token', async (req, res) => {
 
     const newAccessToken = await generateAccessToken(user);
 
-    res.json({ accessToken: newAccessToken });
+    res.cookie('access_token', newAccessToken, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/' ,
+      maxAge: (1 * 60) * (60 * 1000),
+    });
+    // res.json({ accessToken: newAccessToken });
+    res.json({ accessToken: 'created new token' });
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       const hashToken = hashPassword(refreshToken);

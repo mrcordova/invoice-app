@@ -43,9 +43,9 @@ document.addEventListener("click", async (e) => {
         });
         if (response.ok) {
           login.parentElement.reset();
-          const { accessToken, username } = await response.json();
+          const { username } = await response.json();
           localStorage.setItem('username', username);
-          localStorage.setItem("accessToken", accessToken);
+          // localStorage.setItem("accessToken", accessToken);
 
           location.href = "/index.html";
         } else {

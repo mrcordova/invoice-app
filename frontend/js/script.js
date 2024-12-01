@@ -7,7 +7,6 @@ import {
   saveInvoice,
   themeUpdate,
   perferredColorScheme,
-  URL_WEBSITE,
   logout,
   refreshAccessToken,
   acceptedFileTypes,
