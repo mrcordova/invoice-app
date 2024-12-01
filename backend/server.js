@@ -260,7 +260,7 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     const { username, id } = jwt.decode(req.token);
     const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ?';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
-    res.status(200).json({ file: {filename:`/uploads/${filename}`, "alt": filename, title: "filename" }, success: result.affectedRows > 0 });
+    res.status(200).json({ file: {filename:`./uploads/${filename}`, "alt": filename, title: "filename" }, success: result.affectedRows > 0 });
   } catch (error) {
     console.error(`upload: ${error}`);
   }

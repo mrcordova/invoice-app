@@ -252,7 +252,7 @@ header.addEventListener("click", async (e) => {
         if (result['success']) {
           const img = document.querySelector('.profile_img');
           const { filename, alt, title} = result['file'];
-          img.setAttribute('src', `.${filename}`);
+          img.setAttribute('src', `${filename}`);
           img.setAttribute('title', title);
           img.setAttribute('alt', alt);
         }
