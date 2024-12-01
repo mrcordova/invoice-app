@@ -213,7 +213,7 @@ header.addEventListener("click", async (e) => {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
-    console.log('here');
+    // console.log('here');
     if (fileInput.files.length == 1 && acceptedFileTypes.includes(fileInput.files[0].type)) {
       // console.log(fileInput.files[0]);
       // const formData = new FormData();
@@ -227,12 +227,12 @@ header.addEventListener("click", async (e) => {
         response = await fetch(`${URL_WEBSITE}/upload`, {
           method: "POST",
           headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Access-Control-Allow-Origin": true,
+            Authorization: `Bearer ${accessToken}`,
+            "Access-Control-Allow-Origin": true,
           },
           body: formData,
           credentials: 'same-origin'
-        })
+        });
         if (response.status === 403) {
           const newAccessToken = await refreshAccessToken();
           localStorage.setItem('accessToken', newAccessToken);
@@ -248,7 +248,14 @@ header.addEventListener("click", async (e) => {
         }
 
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
+        if (result['success']) {
+          const img = document.querySelector('.profile_img');
+          const { filename, alt, title} = result['file'];
+          img.setAttribute('src', `.${filename}`);
+          img.setAttribute('title', title);
+          img.setAttribute('alt', alt);
+        }
         
       } catch (error) {
         
@@ -268,6 +275,7 @@ fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     const thumbUrl = URL.createObjectURL(file);
     const imgPreview = profileDialog.querySelector('img[data-preview]');
+ 
     imgPreview.setAttribute('src', thumbUrl);
     imgPreview.setAttribute('title', file.name);
     imgPreview.setAttribute('alt', file.name);

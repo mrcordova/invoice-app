@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   destination: (res, file, cb) => {
     cb(null, path.join(__dirname, "/uploads/"));
   },
-  filename: async (req, file, cb) => {
+  filename: (req, file, cb) => {
     const { username, id } = jwt.decode(req.token);
     // console.log(id);
     const fileName = `${ username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
@@ -252,7 +252,7 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
-  console.log(req.file);
+  // console.log(req.file);
   const { filename } = req.file;
   // console.log(req.filename);
 
@@ -260,7 +260,7 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     const { username, id } = jwt.decode(req.token);
     const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ?';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
-    res.status(200).json({ file: `${filename}`, success: result.affectedRows > 0 });
+    res.status(200).json({ file: {filename:`/uploads/${filename}`, "alt": filename, title: "filename" }, success: result.affectedRows > 0 });
   } catch (error) {
     console.error(`upload: ${error}`);
   }
@@ -276,6 +276,12 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   // });
 
 });
+app.get('/uploads/:filename', (req, res) => {
+// should I check for refresh token here?
+  const { filename } = req.params;
+  // console.log(filename);
+  res.sendFile(path.join(__dirname, `/uploads/${filename}`));
+});
 app.get('/profilePic', async (req, res) => {
   //  const statusCode = await checkTokens(req, res);
   // if (statusCode === 403) {
@@ -285,11 +291,11 @@ app.get('/profilePic', async (req, res) => {
 
   try {
     const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    
+  
     const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
     const img = result[0].img;
-    console.log(img);
+    // console.log(img);
     res.sendFile(path.join(__dirname, `/uploads/${img}`));
   } catch (error) {
     
@@ -363,7 +369,7 @@ app.post('/saveInvoice', extractToken, validateToken, async (req, res) => {
     });
     res.json({ success: true, result });
   } catch (error) {
-    console.log(`saveInvoice: ${error}`);
+    console.error(`saveInvoice: ${error}`);
   }
 });
 app.put('/updateStatus/:id', extractToken, validateToken, async (req, res) => {
