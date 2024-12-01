@@ -221,6 +221,7 @@ header.addEventListener("click", async (e) => {
       // console.log(fileInput.files[0]);
       // const formData = new FormData();
       const formData = new FormData(document.querySelector('#profile-form'));
+      // formData.append('prevFilePath', )
       // formData.append('file', fileInput.files[0]);
 
       // console.log(form.get('file'), "here");

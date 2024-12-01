@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
-// const fs = require('fs');
+const fs = require('fs/promises');
 const multer = require('multer');
 const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', 'image/jpg': 'jpg', "image/webp": 'webp'};
 
@@ -15,10 +15,19 @@ const storage = multer.diskStorage({
   destination: (res, file, cb) => {
     cb(null, path.join(__dirname, "/uploads/"));
   },
-  filename: (req, file, cb) => {
+  filename: async (req, file, cb) => {
     const { username, id } = jwt.decode(req.token);
-    const fileName = `${ username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
-  
+    const fileName = `${username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
+    try {
+      const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
+      const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+      const prevFilePath = path.join(__dirname, `/uploads/${selectResult[0].img}`);
+      await fs.access(prevFilePath);
+      await fs.unlink(prevFilePath);
+    } catch (error) {
+      console.error(` mutler filename: ${error}`);
+    }
+    
     cb(null, `${fileName}`);
   }
 });
@@ -266,11 +275,17 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   }
   // console.log(req.file);
   const { filename } = req.file;
-  // console.log(req.filename);
+  if (!filename) {
+    return res.status(400).send({ message: 'no file uploaded' });
+  }
 
+  
+  // console.log(req.filename);
+  
+  
   try {
     const { username, id } = jwt.decode(req.token);
-    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ?';
+    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
     res.status(200).json({ file: {filename:`./uploads/${filename}`, "alt": filename, title: filename }, success: result.affectedRows > 0 });
   } catch (error) {
