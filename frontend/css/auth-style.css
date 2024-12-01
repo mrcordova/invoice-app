@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap"); */
 :root {
   --venetian-nights: #7c5dfa;
   --forgotten-purple: #9277ff;
@@ -15,6 +15,21 @@
   color-scheme: light dark;
   scrollbar-color: light-dark(var(--stotic-white), var(--royal-curtsy))
       transparent;
+}
+@font-face {
+    font-family: 'League Spartan';
+    src:  url('../assets/fonts/league-spartan-v11-latin-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+     font-display: swap;
+}
+
+@font-face {
+    font-family: 'League Spartan';
+    src: url('../assets/fonts/league-spartan-v11-latin-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 .league-spartan-medium {
   font-family: "League Spartan", sans-serif;

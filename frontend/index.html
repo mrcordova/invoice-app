@@ -10,8 +10,10 @@
       sizes="32x32"
       href="./assets/favicon-32x32.png" />
     <link rel="stylesheet" href="css/reset.css"  />
+    <link href="./assets/fonts/league-spartan-v11-latin-500.woff2" as="font" type="font/woff2" >
+    <link href="./assets/fonts/league-spartan-v11-latin-700.woff2" as="font" type="font/woff2" >
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="preload"  as="fetch" href="./assets/illustration-empty.svg" type="image/svg+xml" />
+    <link rel="preload"  as="image" href="./assets/illustration-empty.svg" type="image/svg+xml" />
     <script src="js/script.js" type="module"></script>
 
     <title>Frontend Mentor | Invoice app</title>
@@ -49,7 +51,7 @@
         </label>
         <button class="profile-pic-cont" data-show-profile-dialog>
           <!-- <img src="./assets/image-avatar.jpg"  alt="profile picture" /> -->
-          <img  fetchpriority="high" src="./profilePic"  class="profile_img" width="32" height="32" alt="profile picture" />
+          <img   src="./profilePic"  class="profile_img" width="32" height="32" alt="profile picture" />
         </button>
         <dialog id="profile-dialog" class="league-spartan-bold" >
           <!-- <p>Profile info</p> -->
@@ -337,112 +339,7 @@
                 <div class="delete"></div>
               </div>
               <div class="invoice-items">
-                <!-- <div class="invoice-item">
-                  <label class="name">
-                    <span class="label-name">
-                      Item name
-                      <span class="error-text" aria-live="polite"></span>
-                    </span>
-
-                    <input
-                      type="text"
-                      name="items"
-                      id="item-name"
-                      required
-                      autocomplete="off" />
-                  </label>
-                  <label class="qty">
-                    <span class="label-name">Qty.</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="qty"
-                      required
-                      inputmode="numeric" />
-                  </label>
-                  <label class="price">
-                    <span class="label-name">Price</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="price"
-                      required
-                      placeholder="0.00"
-                      inputmode="numeric" />
-                  </label>
-                  <label class="total">
-                    <span class="label-name">Total</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="total"
-                      required
-                      readonly
-                      placeholder="0.00" />
-                  </label>
-                  <button class="delete">
-                    <svg
-                      width="13"
-                      height="16"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
-                        fill="currentColor"
-                        fill-rule="nonzero" />
-                    </svg>
-                  </button>
-                </div>
-                <div class="invoice-item">
-                  <label class="name">
-                    <span class="label-name">Item name</span>
-                    <input
-                      type="text"
-                      name="items"
-                      id="item2-name"
-                      required
-                      autocomplete="off" />
-                  </label>
-                  <label class="qty">
-                    <span class="label-name">Qty.</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="qty2"
-                      required
-                      inputmode="numeric" />
-                  </label>
-                  <label class="price">
-                    <span class="label-name">Price</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="price2"
-                      required
-                      placeholder="0.00"
-                      inputmode="numeric" />
-                  </label>
-                  <label class="total">
-                    <span class="label-name">Total</span>
-                    <input
-                      type="number"
-                      name="items"
-                      id="total2"
-                      required
-                      readonly
-                      placeholder="0.00" />
-                  </label>
-                  <button class="delete">
-                    <svg
-                      width="13"
-                      height="16"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
-                        fill="currentColor"
-                        fill-rule="nonzero" />
-                    </svg>
-                  </button>
-                </div> -->
+              
 
                 <button
                   type="button"
@@ -533,92 +430,18 @@
       </div>
 
       <div class="invoices">
-        <!-- <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
-          <div class="invoice league-spartan-bold">
-            <div class="invoice-id">
-              <span>#</span>
-              RT3080
-            </div>
-            <div class="invoice-user league-spartan-medium">Jensen Huana</div>
-            <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
-
-            <div class="amount">£ 1,800.90</div>
-            <div class="status-cont">
-              <div class="status-token" data-status="paid">
-                <div class="status"></div>
-                Paid
-              </div>
-              <img
-                class="hide-mobile"
-                src="./assets/icon-arrow-right.svg"
-                alt="right arrow" />
-            </div>
-          </div>
-        </a>
-        <a href="./invoice.html?invoicd-id=rt3080" tabindex="0">
-          <div class="invoice league-spartan-bold">
-            <div class="invoice-id">
-              <span>#</span>
-              RT3080
-            </div>
-            <div class="invoice-user league-spartan-medium">Alex Grim</div>
-            <div class="due-date league-spartan-medium">Due 19 Aug 2021</div>
-
-            <div class="amount">£ 556.00</div>
-            <div class="status-cont">
-              <div class="status-token" data-status="pending">
-                <div class="status"></div>
-                Pending
-              </div>
-              <img
-                class="hide-mobile"
-                src="./assets/icon-arrow-right.svg"
-                alt="right arrow" />
-            </div>
-          </div>
-        </a>
-        <a href="./invoice.html?invoicd-id=rg0314å" tabindex="0">
-          <div class="invoice league-spartan-bold">
-            <div class="invoice-id">
-              <span>#</span>
-              RG0314
-            </div>
-            <div class="invoice-user league-spartan-medium">John Morrison</div>
-            <div class="due-date league-spartan-medium">Due 01 Oct 2021</div>
-
-            <div class="amount">£ 14,002.33</div>
-            <div class="status-cont">
-              <div class="status-token" data-status="draft">
-                <div class="status"></div>
-                Draft
-              </div>
-              <img
-                class="hide-mobile"
-                src="./assets/icon-arrow-right.svg"
-                alt="right arrow" />
-            </div>
-          </div>
-        </a> -->
+      
       </div>
       <div class="no-invoices-con">
-        <img fetchpriority="high" src="./assets/illustration-empty.svg" width="242" height="200" alt="no invoices imgge" />
-        <div>
-          <!-- No invoices -->
+        <img  src="./assets/illustration-empty.svg" width="242" height="200" alt="no invoices imgge" />
+        <div class="league-spartan-medium">
           <h2>There is nothing here</h2>
           <p>
             Create an invoice by clicking the New Invoice button and get started
-            <!-- No invoices end -->
           </p>
         </div>
       </div>
 
-      <!-- Create new invoice form -->
-      <!-- Go back New Invoice Bill From Street Address City Post Code Country Bill
-      To Client's Name Client's Email e.g. email@example.com Street Address City
-      Post Code Country Invoice Date Payment Terms Net 1 day Net 7 days Net 14
-      days Net 30 days Project Description e.g. Graphic Design Service Item List
-      Item Name Qty. Price Total Add New Item Discard Save as Draft Save & Send -->
-      <!-- Create new invoice end -->
     </main>
   </body>
 </html>

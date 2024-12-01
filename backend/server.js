@@ -177,6 +177,12 @@ app.use('/assets', express.static(path.join(__dirname, "../frontend/assets"), {
     }
 }));
 
+// app.use('/css/reset.css', express.static(path.join(__dirname, "../frontend/css/reset.css"), {
+//     setHeaders: (res, path) => {
+//         res.set('Cache-Control', 'public, max-age=31536000, immutable');
+//     }
+// }));
+
 app.use(express.static(path.join(__dirname, "../frontend/")));
 
 app.use(express.urlencoded({ extended: true }));

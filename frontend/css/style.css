@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap"); */
 :root {
   --venetian-nights: #7c5dfa;
   --forgotten-purple: #9277ff;
@@ -64,6 +64,22 @@
   to {
     --animated-color: hsl(from black h s l / 0.1);
   }
+}
+
+@font-face {
+    font-family: 'League Spartan';
+    src:  url('../assets/fonts/league-spartan-v11-latin-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+     font-display: swap;
+}
+
+@font-face {
+    font-family: 'League Spartan';
+    src: url('../assets/fonts/league-spartan-v11-latin-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 .league-spartan-medium {
@@ -183,7 +199,6 @@ body {
     align-items: center;
     gap: 1rem;
 
-    /* min-width: 0; */
     & label {
       cursor: pointer;
       position: relative;
@@ -208,7 +223,6 @@ body {
 
       &:has(input[name='username']) {
         display: flex;
-        /* flex: 1; */
         align-items: center;
         width: 100%;
 
@@ -220,8 +234,7 @@ body {
      
   }
    & input[name='username'] {
-        /* width: 100%; */
-        /* display: flex; */
+     
         flex: 1;
 
         
