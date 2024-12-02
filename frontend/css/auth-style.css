@@ -105,6 +105,8 @@ label {
     &::placeholder {
       color: light-dark(var(--ruined-smores), white);
     }
+
+   
   }
 }
 

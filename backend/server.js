@@ -499,7 +499,7 @@ app.post('/registerUser', async (req, res) => {
   if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
     return res.status(401).json({message: 'some creditionals are missing'});
   }
-  if (username.test("^[^\s]+$")) {
+  if (username.includes(" ")) {
     return res.status(401).json({ message: 'username contains spaces' });
   }
   if ( await checkUserExists(username, email)) {
