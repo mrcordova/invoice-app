@@ -314,8 +314,8 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   
   try {
     const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
-    const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+    const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
+    const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
    
     // console.log(selectResult);
     if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img) {
@@ -326,8 +326,8 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
       await fs.unlink(prevFilePath);
     } 
     // const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
+    const updateQuery = 'UPDATE users SET img = ? WHERE id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, id] });
     // console.log('new file', newFileName);
     // const filePath = path.join(__dirname, newFileName);
     // await fs.access(filePath);
@@ -366,8 +366,8 @@ app.get('/profilePic', async (req, res) => {
   try {
     const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
   
-    const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+    const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [id] });
     const img = result[0].img;
     // console.log(img);
     // res.set('Cache-Control', 'public, max-age=31536000, immutable');
