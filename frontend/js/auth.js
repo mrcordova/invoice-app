@@ -30,7 +30,6 @@ document.addEventListener("click", async (e) => {
       }
     }
   } else if (login) {
-    // console.log("login pressed");
     if (showFormErrors(login)) {
       const formData = new FormData(login.parentElement);
       const formObj = Object.fromEntries(formData.entries());
@@ -45,7 +44,6 @@ document.addEventListener("click", async (e) => {
           login.parentElement.reset();
           const { username } = await response.json();
           localStorage.setItem('username', username);
-          // localStorage.setItem("accessToken", accessToken);
 
           location.href = "/index.html";
         } else {

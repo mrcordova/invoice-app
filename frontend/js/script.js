@@ -13,7 +13,6 @@ import {
   fetchWithAuth
 } from "./functions.js";
 
-// const accessToken = localStorage.getItem("accessToken");
 
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const invoices = document.querySelector(".invoices");
@@ -32,33 +31,12 @@ const fileInput = document.getElementById("profile_pic");
 
 window.addEventListener("DOMContentLoaded", async (e) => {
   let response;
-  // response = await fetch(`${URL_WEBSITE}/getInvoices`, {
-  //   method: "GET",
-  //   headers: {
-  //     "Content-type": "application/json",
-  //     Authorization: `Bearer ${accessToken}`,
-  //     "Access-Control-Allow-Origin": true,
-  //   },
-  //   cache: "reload",
-  //   credentials: "same-origin",
-  // });
+ 
   response = await fetchWithAuth('/getInvoices', 'GET');
-  // console.log(response.status);
   if (response.status === 403) {
-    // console.log("here");
-    // const newAccessToken = await refreshAccessToken();
+  
     await refreshAccessToken();
-    // localStorage.setItem("accessToken", newAccessToken);
-    // response = await fetch(`${URL_WEBSITE}/getInvoices`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //     Authorization: `Bearer ${newAccessToken}`,
-    //     "Access-Control-Allow-Origin": true,
-    //   },
-    //   cache: "reload",
-    //   credentials: "same-origin",
-    // });
+  
     response = await fetchWithAuth('/getInvoices', 'GET');
   }
   const { invoices } = await response.json();
@@ -115,7 +93,6 @@ function createInvoices(data) {
 
 function searchInvoices() {
   for (const invoice of invoices.children) {
-    // console.log(invoice);
     invoice.classList.toggle(
       "hide",
       !filterOptions.has(invoice.dataset.status) && filterOptions.size != 0
@@ -125,33 +102,13 @@ function searchInvoices() {
 async function saveInvoiceToDB(invoice) {
   let response;
   try {
-    // response = await fetch(`${URL_WEBSITE}/saveInvoice`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //     Authorization: `Bearer ${accessToken}`,
-    //     "Access-Control-Allow-Origin": true,
-    //   },
-    //   body: JSON.stringify(invoice),
-    //   credentials: "same-origin",
-    // });
+
     response = await fetchWithAuth('/saveInvoice', "POST", JSON.stringify(invoice));
     if (response.status === 403) {
-      //  console.log("here");
       await refreshAccessToken();
-      // const newAccessToken = await refreshAccessToken();
-      // localStorage.setItem("accessToken", newAccessToken);
+    
       saveInvoiceToDB(invoice);
-      //  response = await fetch(`${URL_WEBSITE}/getInvoices`, {
-      //    method: "GET",
-      //    headers: {
-      //      "Content-type": "application/json",
-      //      Authorization: `Bearer ${newAccessToken}`,
-      //      "Access-Control-Allow-Origin": true,
-      //    },
-      //    cache: "reload",
-      //    credentials: "include",
-      //  });
+    
     }
   } catch (error) {
     console.error(`saveInvoiceToDB: ${error}`);
@@ -211,61 +168,33 @@ header.addEventListener("click", async (e) => {
     themeUpdate(e, themeInputs);
   }
   else if (profileDialogAttr) {
-    // console.log('here');
     profileDialog.showModal();
     profileDialog.querySelector('input[name="username"]').value = username;
   } else if (fileLabel) {
-    // console.log("header" , e.target);
-    // console.log(fileLabel);
+ 
   } else if (closeBtn) {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
-    // console.log('here');
     if (fileInput.files.length == 1 && acceptedFileTypes.includes(fileInput.files[0].type)) {
-      // console.log(fileInput.files[0]);
-      // const formData = new FormData();
+     
       const formData = new FormData(document.querySelector('#profile-form'));
-      // formData.append('prevFilePath', )
-      // formData.append('file', fileInput.files[0]);
-
-      // console.log(form.get('file'), "here");
-      // console.log(formData.get('file'));
+   
       let response;
       try {
-        // response = await fetch(`${URL_WEBSITE}/upload`, {
-        //   method: "POST",
-        //   headers: {
-        //     Authorization: `Bearer ${accessToken}`,
-        //     "Access-Control-Allow-Origin": true,
-        //   },
-        //   body: formData,
-        //   credentials: 'same-origin'
-        // });
+       
         response = await fetchWithAuth('/upload', 'POST', formData, {});
         if (response.status === 403) {
-          // const newAccessToken = await refreshAccessToken();
           await refreshAccessToken();
-          // localStorage.setItem('accessToken', newAccessToken);
-          // response = await fetch(`${URL_WEBSITE}/upload`, {
-          //   method: "POST",
-          //   headers: {
-          //     Authorization: `Bearer ${accessToken}`,
-          //     "Access-Control-Allow-Origin": true,
-          //   },
-          //   body: formData,
-          //   credentials: 'same-origin'
-          // });
+         
           response = await fetchWithAuth('/upload', 'POST', formData, {});
         }
 
         const result = await response.json();
-        // console.log(result);
         if (result['success']) {
           const img = document.querySelector('.profile_img');
           const imgPreview = profileDialog.querySelector('img[data-preview]');
           const { filename, alt, title} = result['file'];
-          // img.setAttribute('src', `${filename}`);
           img.setAttribute('src', imgPreview.getAttribute('src'));
           img.setAttribute('title', title);
           img.setAttribute('alt', alt);
@@ -274,17 +203,12 @@ header.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`upload on frontend: ${error}`);
       }
-      // submtiBtn.parentElement.requestSubmit();
     }
   }
 
 });
-// fileInput.addEventListener('input', (e) => {
-//   console.log(e.target.files[0]);
 
-// })
 fileInput.addEventListener('change', (e) => {
-  // console.log(e.target.files[0]);
   if (e.target.files.length === 1  && acceptedFileTypes.includes(fileInput.files[0].type)) {
     const file = e.target.files[0];
     const thumbUrl = URL.createObjectURL(file);
@@ -296,27 +220,7 @@ fileInput.addEventListener('change', (e) => {
   }
 
 })
-// fileInput.addEventListener('click', (e) => {
-//   // e.preventDefault();
-//   e.stopImmediatePropagation();
-//   // e.target.click();
-//   console.log('here');
-// })
-// profileDialog.addEventListener('click', (e) => {
-//   e.preventDefault();
-//   e.stopImmediatePropagation();
-//   const fileInput = e.target.closest('[data-file]');
-//   // console.log()
-//   if (fileInput) {
-//     console.log(e.target);
-//      fileInput.click();
-//     // e.target.click();
 
-//     // fileInput.value = true;
-//   //  fileInput.showModal();
-//   }
-  
-// })
 
 main.addEventListener("click", (e) => {
   e.preventDefault();
@@ -325,7 +229,6 @@ main.addEventListener("click", (e) => {
   const dialog = e.target.closest("[data-show-dialog]");
   
   const invoiceEle = e.target.closest("[data-invoice]");
-  // const themeBtn = e.target.closest("[data-theme]");
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -362,8 +265,7 @@ newInvoiceDialog.addEventListener("click", async (e) => {
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
     // const response = await logout();
-    // console.log(response);
-    // location.href = "/frontend/login.html";
+   
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {

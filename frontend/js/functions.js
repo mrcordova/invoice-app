@@ -11,20 +11,17 @@ function generateCustomId() {
   return `${randomLetters}${randomNumbers}`;
 }
 export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-// const dataResponse = await fetch(`${URL}/health-check`);
-// console.log(await dataResponse.json());
+
 
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
 export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
-  // const accessToken = localStorage.getItem('accessToken');
   return await fetch(`${URL_WEBSITE}${path}`, {
     method,
     headers: {
        ...headers,
-      // Authorization: `Bearer ${accessToken}`,
       "Access-Control-Allow-Origin": true,
     },
     body,
@@ -34,11 +31,9 @@ export async function fetchWithAuth(path, method, body = null, headers = { "Cont
 }
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
-  // console.log(checked);
   for (const themeInput of themeInputs) {
     const input = themeInput.querySelector("input");
     input.checked = checked;
-    // console.log(input);
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
 }
@@ -70,7 +65,6 @@ export function resetForm(invoiceDialog) {
   invoiceForm.reset();
 }
 function updateTotalWithQty(e) {
-  //   console.log(e.target.value);
   const invoiceItem = e.target.closest("div.invoice-item");
   const total = invoiceItem.querySelector(".total  input");
   const price = invoiceItem.querySelector(".price  input");
@@ -235,7 +229,6 @@ export function saveInvoice(invoiceDialog, status, id = null) {
   const form = invoiceDialog.querySelector("form");
   const formData = new FormData(form);
   const formObj = Object.fromEntries(formData);
-  // const date = invoiceDialog.querySelector("form label > input#date").value;
   const {
     date,
     city,
@@ -266,7 +259,6 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     day: "numeric",
   });
 
-  // console.log(formObj);
   const invoice = {
     id: id ?? generateCustomId(),
     senderAddress: { street, city, postCode, country },
@@ -307,17 +299,14 @@ export function updatePaymentTerms(paymentTermsBtn) {
 }
 
 export async function logout() {
-  // const token = localStorage.getItem("accessToken");
   const response = await fetch(`${URL_WEBSITE}/logout`, {
     method: "POST",
     headers: {
-      // Authorization: `Bearer ${token}`,
       "Access-Control-Allow-Origin": true,
     },
     cache: 'reload',
     credentials: "include",
   });
-  // localStorage.removeItem("accessToken");
   location.href = '/login.html';
 }
 
@@ -331,11 +320,9 @@ export async function refreshAccessToken() {
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
       console.log(accessToken);
-      // localStorage.setItem("accessToken", accessToken);
-      // return accessToken;
+    
     } else {
-      // await logout();
-      // console.error(tokenResponse.ok);
+
       console.error(await tokenResponse.text());
       location.href = "/login.html";
     }

@@ -12,28 +12,15 @@ import {
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-// let accessToken = localStorage.getItem("accessToken");
 let invoice = await getInvoice(invoiceId);
 async function getInvoice(invoiceId) {
   let response;
   try {
-    // response = await fetch(`${URL_WEBSITE}/getInvoice/${invoiceId}`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-type": "application/json",
-    //     Authorization: `Bearer ${accessToken}`,
-    //     "Access-Control-Allow-Origin": true,
-    //   },
-    //   cache: "reload",
-    //   credentials: "same-origin",
-    // });
+   
     response = await fetchWithAuth(`/getInvoice/${invoiceId}`, 'GET');
     if (response.status === 403) {
-      // const newAccessToken = await refreshAccessToken();
        await refreshAccessToken();
-      // localStorage.setItem("accessToken", newAccessToken);
-      // accessToken = localStorage.getItem("accessToken");
-      // console.log(newAccessToken);
+    
       return await getInvoice(invoiceId);
     } else {
       return await response.json();
@@ -42,7 +29,6 @@ async function getInvoice(invoiceId) {
     console.error(error);
   }
 }
-// console.log(invoice);
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
@@ -50,8 +36,7 @@ const statusBarEle = document.querySelector("[data-status-bar]");
 const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
-// const themeInput = document.querySelector("#theme");
-// const perferredColorScheme = "perferredColorScheme";
+
 const currencyOptions = { style: "currency", currency: "GBP" };
 const homePage = "/index.html";
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
@@ -89,12 +74,10 @@ function updateStatus({ status }) {
   );
 }
 function updateInvoice(invoice) {
-  // console.log(invoice);
   const senderAddress = JSON.parse(invoice.senderAddress);
   const clientAddress = JSON.parse(invoice.clientAddress);
   const items = JSON.parse(invoice.items);
-  // console.log(invoice.items);
-  // console.log(invoice);
+ 
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
     `<div class="invoice-info league-spartan-medium">
@@ -141,7 +124,6 @@ function updateInvoice(invoice) {
   );
 
   for (const item of items) {
-    // console.log(item);
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
@@ -166,7 +148,6 @@ function updateInvoice(invoice) {
 updateStatus(invoice);
 updateInvoice(invoice);
 body.addEventListener("click", async (e) => {
-  //   console.log(e.target);
   e.preventDefault();
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
   const editDialogTarget = e.target.closest("[data-show-edit-dialog]");
@@ -181,8 +162,7 @@ body.addEventListener("click", async (e) => {
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const saveChangesBtn = e.target.closest("[data-save]");
-  // const themeBtn = e.target.closest('[data-theme]');
-  //   console.log(goBackBtn);
+
   if (deleteDialogTarget) {
     deleteDialog.showModal();
     const deleteId = deleteDialog.querySelector("[data-invoice-id]");
@@ -211,7 +191,6 @@ body.addEventListener("click", async (e) => {
     } = JSON.parse(clientAddress);
 
     const itemsArry = JSON.parse(items).entries();
-    // console.log(editDialog.querySelector("form label > input#addy"));
     const netEle = editDialog.querySelector("form [data-payment-terms-value]");
     netEle.setAttribute("data-payment-terms-value", paymentTerms);
 
@@ -319,29 +298,13 @@ body.addEventListener("click", async (e) => {
     if (status !== statusEle.dataset.status) {
       let response;
       try {
-        // response =
-        //  await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
-        //    method: "PUT",
-        //    headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
-        //    body: JSON.stringify({ status }),
-        //    cache: 'reload',
-        //    credentials: 'same-origin'
-        //  });
+       
         const jsonStatus = JSON.stringify({ status });
         response =
           await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
         if (response.status === 403) {
-          // const newAccessToken = await refreshAccessToken();
            await refreshAccessToken();
-          // localStorage.setItem('accessToken', newAccessToken);
-        //   response =
-        //  await fetch(`${URL_WEBSITE}/updateStatus/${invoice.id}`, {
-        //    method: "PUT",
-        //    headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": true },
-        //    body: JSON.stringify({ status }),
-        //    cache: 'reload',
-        //    credentials: 'same-origin'
-        //  });
+        
           response =
           await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
         }
@@ -358,35 +321,15 @@ body.addEventListener("click", async (e) => {
   } else if (closeDeleteDialog) {
     deleteDialog.close();
   } else if (goBackPageBtn) {
-    //   editDialog.close();
     resetForm(editDialog);
   } else if (deleteInvoiceBtn) {
     let response;
     try {
-      // response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
-      //   method: "DELETE",
-      //   headers: {
-      //     "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
-      //     "Access-Control-Allow-Origin": true
-      //   },
-      //   cache: "reload",
-      //   credentials: 'same-origin'
-      // });
+      
       response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
       if (response.status === 403) {
-        // const newAccessToken = await refreshAccessToken();
         await refreshAccessToken();
-        // localStorage.setItem("accessToken", newAccessToken);
-        // accessToken = localStorage.getItem("accessToken");
-      //   response = await fetch(`${URL_WEBSITE}/deleteInvoice/${invoiceId}`, {
-      //   method: "DELETE",
-      //   headers: {
-      //     "Content-type": "application/json", 'Authorization': `Bearer ${accessToken}`,
-      //     "Access-Control-Allow-Origin": true
-      //   },
-      //   cache: "reload",
-      //   credentials: 'same-origin'
-        // });
+       
         response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
        
       }
@@ -394,21 +337,13 @@ body.addEventListener("click", async (e) => {
       if (response.ok && success) {
         history.back();
       }
-      // alert(`Invoice found: ${success}`);
     } catch (error) {
       console.error(`Delete Invoice: ${error}`);
     }
     
-    // console.log(response);
-    // const idxOfInvoice = data
-    //   .map((invoice) => invoice.id)
-    //   .indexOf(`${invoiceId}`);
-    // data.splice(idxOfInvoice, 1);
-    // console.log(data);
-    // location.href = homePage;
+   
   } else if (deleteItemBtn) {
-    // const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
-    // invoice.items.splice(deleteItemIndx, 1);
+   
 
     deleteItemBtn.parentElement.remove();
   } else if (addItemBtn) {
@@ -430,31 +365,14 @@ body.addEventListener("click", async (e) => {
         statusBarEle.replaceChildren();
         invoiceEle.childNodes[0].remove();
         invoiceItemsTable.replaceChildren();
-        // response = 
-        //   await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
-        //     method: "POST",
-        //     headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true },
-        //     body: JSON.stringify(tempInvoice),
-        //     cache: 'reload',
-        //     credentials: 'same-origin'
-        //   });
+       
         const jsonInvoice = JSON.stringify(tempInvoice);
         response =
           await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
         if (response.status === 403) {
           
          await refreshAccessToken();
-        // const newAccessToken = await refreshAccessToken();
-        // localStorage.setItem("accessToken", newAccessToken);
-        // accessToken = localStorage.getItem("accessToken");
-        // response = 
-        //   await fetch(`${URL_WEBSITE}/updateInvoice/${invoice.id}`, {
-        //     method: "POST",
-        //     headers: { "Content-type": "application/json", Authorization: `Bearer ${accessToken}`,  "Access-Control-Allow-Origin": true }, 
-        //     body: JSON.stringify(tempInvoice),
-        //     cache: 'reload',
-        //     credentials: 'same-origin'
-        //   });
+       
         response =
           await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
         }
