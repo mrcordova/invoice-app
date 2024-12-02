@@ -9,7 +9,7 @@ const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
 const fs = require('fs/promises');
 const multer = require('multer');
-const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', 'image/jpg': 'jpg', "image/webp": 'webp'};
+const acceptedFileTypes = {'image/jpeg': 'jpg', 'image/png': 'png', 'image/jpg': 'jpg', "image/webp": 'webp'};
 
 const storage = multer.diskStorage({
   destination: (res, file, cb) => {
@@ -18,21 +18,16 @@ const storage = multer.diskStorage({
   filename: async (req, file, cb) => {
     const { username, id } = jwt.decode(req.token);
     const fileName = `${username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
-    try {
-      const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
-      const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
-      const prevFilePath = path.join(__dirname, `/uploads/${selectResult[0].img}`);
-      await fs.access(prevFilePath);
-      await fs.unlink(prevFilePath);
-    } catch (error) {
-      console.error(` mutler filename: ${error}`);
-    }
-    
     cb(null, `${fileName}`);
   }
 });
 
-const upload = multer({ storage, limits: {fileSize: 2 * 1024 * 1024} });
+const upload = multer({ storage, limits: {fileSize: 2 * 1024 * 1024},  fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+            return cb(new Error('Only images are allowed!'), false);
+        }
+        cb(null, true); // Accept the file
+    } });
 
 require("dotenv").config();
 
@@ -206,6 +201,17 @@ app.use(express.static(path.join(__dirname, "../frontend/")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).send('File too large. Maximum size is 2MB.');
+        }
+    } else if (err) {
+        return res.status(400).send(err.message);
+    }
+    next();
+});
+
 async function setUpDb() {
   for (const invoice of data) {
     const {
@@ -290,15 +296,32 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
 
   
   // console.log(req.filename);
-  
+ 
   
   try {
-    const { username, id } = jwt.decode(req.token);
+    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
+    const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+   
+    if (selectResult.length > 0 && selectResult[0].img !== filename) {
+      console.log('upload filename the same: ', selectResult[0].img !== filename);
+
+      const prevFilePath = path.join(__dirname, `/uploads/${selectResult[0].img}`);
+      await fs.access(prevFilePath);
+      await fs.unlink(prevFilePath);
+    }
+  } catch (error) {
+    console.error(` upload filename: ${error}`);
+    res.status(400).json({ message: 'upload failed' });
+    }
+  try {
+    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
     const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
     res.status(200).json({ file: {filename:`./uploads/${filename}`, "alt": filename, title: filename }, success: result.affectedRows > 0 });
   } catch (error) {
     console.error(`upload: ${error}`);
+      res.status(400).json({ message: 'failed in upload' });
   }
   // const { profilePic } = req.body;
   // fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
@@ -332,7 +355,7 @@ app.get('/profilePic', async (req, res) => {
     const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
     const img = result[0].img;
     // console.log(img);
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    // res.set('Cache-Control', 'public, max-age=31536000, immutable');
     res.sendFile(path.join(__dirname, `/uploads/${img}`));
   } catch (error) {
     

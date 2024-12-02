@@ -176,7 +176,7 @@ header.addEventListener("click", async (e) => {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
-    if (fileInput.files.length == 1 && acceptedFileTypes.includes(fileInput.files[0].type)) {
+    if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
      
       const formData = new FormData(document.querySelector('#profile-form'));
    
@@ -192,12 +192,16 @@ header.addEventListener("click", async (e) => {
 
         const result = await response.json();
         if (result['success']) {
+          console.log(result, "update img")
           const img = document.querySelector('.profile_img');
           const imgPreview = profileDialog.querySelector('img[data-preview]');
           const { filename, alt, title} = result['file'];
           img.setAttribute('src', imgPreview.getAttribute('src'));
           img.setAttribute('title', title);
           img.setAttribute('alt', alt);
+          img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
+        } else {
+          console.error(result);
         }
         
       } catch (error) {
@@ -209,14 +213,16 @@ header.addEventListener("click", async (e) => {
 });
 
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length === 1  && acceptedFileTypes.includes(fileInput.files[0].type)) {
+  if (e.target.files.length === 1  && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
     const file = e.target.files[0];
     const thumbUrl = URL.createObjectURL(file);
     const imgPreview = profileDialog.querySelector('img[data-preview]');
- 
     imgPreview.setAttribute('src', thumbUrl);
     imgPreview.setAttribute('title', file.name);
     imgPreview.setAttribute('alt', file.name);
+  } else {
+    console.log('file does not meet requirements');
+    console.error(e.target.files);
   }
 
 })
