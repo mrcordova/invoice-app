@@ -10,7 +10,7 @@ function generateCustomId() {
   const randomNumbers = Math.floor(1000 + Math.random() * 9000).toString();
   return `${randomLetters}${randomNumbers}`;
 }
-export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 
 function createdAt() {
@@ -22,7 +22,7 @@ export async function fetchWithAuth(path, method, body = null, headers = { "Cont
     method,
     headers: {
        ...headers,
-      "Access-Control-Allow-Origin": true,
+      // "Access-Control-Allow-Origin": true,
     },
     body,
     credentials: 'same-origin',

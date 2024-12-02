@@ -42,8 +42,9 @@ document.addEventListener("click", async (e) => {
         });
         if (response.ok) {
           login.parentElement.reset();
-          const { username } = await response.json();
+          const { username, img} = await response.json();
           localStorage.setItem('username', username);
+          localStorage.setItem('img', img);
 
           location.href = "/index.html";
         } else {

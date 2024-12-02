@@ -25,8 +25,10 @@ const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
-const  username = localStorage.getItem('username');
-
+const username = localStorage.getItem('username');
+let img = localStorage.getItem('img');
+const profileImg = document.getElementById('profile_img');
+profileImg.src = img;
 const fileInput = document.getElementById("profile_pic");
 
 window.addEventListener("DOMContentLoaded", async (e) => {
@@ -170,38 +172,59 @@ header.addEventListener("click", async (e) => {
   else if (profileDialogAttr) {
     profileDialog.showModal();
     profileDialog.querySelector('input[name="username"]').value = username;
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = img;
   } else if (fileLabel) {
  
   } else if (closeBtn) {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
+    // console.log(acceptedFileTypes.includes(fileInput.files[0].type) );
     if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
-     
-      const formData = new FormData(document.querySelector('#profile-form'));
+     console.log(fileInput.files[0]);
+      // const formData = new FormData(document.querySelector('#profile-form'));
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
    
+      // console.log(formData.entries());
+      // for (const [key, val] of formData.entries()) {
+      //   console.log(key, val);
+      // }
       let response;
       try {
        
         response = await fetchWithAuth('/upload', 'POST', formData, {});
         if (response.status === 403) {
           await refreshAccessToken();
-         
           response = await fetchWithAuth('/upload', 'POST', formData, {});
         }
 
-        const result = await response.json();
-        if (result['success']) {
-          console.log(result, "update img")
-          const img = document.querySelector('.profile_img');
-          const imgPreview = profileDialog.querySelector('img[data-preview]');
-          const { filename, alt, title} = result['file'];
-          img.setAttribute('src', imgPreview.getAttribute('src'));
-          img.setAttribute('title', title);
-          img.setAttribute('alt', alt);
-          img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
-        } else {
-          console.error(result);
+        if (response.ok) {
+          console.log(response);
+          const result = await response.json();
+
+          if (result['success']) {
+            console.log(result, "update img")
+            // const img = document.querySelector('.profile_img');
+            const imgPreview = profileDialog.querySelector('img[data-preview]');
+            const { filename, alt, title} = result['file'];
+            // img.setAttribute('src',  `${imgPreview.getAttribute('src')}?${new Date().getTime()}`);
+            // profileImg.src = `${filename}`;
+            profileImg.src = `${imgPreview.getAttribute('src')}`;
+            // img.setAttribute('src',  `${result.file.filename}?time=${new Date().getTime()}`);
+            profileImg.setAttribute('title', title);
+            profileImg.setAttribute('alt', alt);
+            // formData.reset();
+            document.querySelector('#profile-form').reset();
+            fileInput.value = '';
+            localStorage.setItem('img', filename);
+            img = filename;
+            // location.reload();
+            // img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
+          } else {
+            console.error(result);
+          }
         }
         
       } catch (error) {

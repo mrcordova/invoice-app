@@ -9,15 +9,16 @@ const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
 const fs = require('fs/promises');
 const multer = require('multer');
-const acceptedFileTypes = {'image/jpeg': 'jpg', 'image/png': 'png', 'image/jpg': 'jpg', "image/webp": 'webp'};
+const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', "image/webp": 'webp'};
 
 const storage = multer.diskStorage({
   destination: (res, file, cb) => {
-    cb(null, path.join(__dirname, "/uploads/"));
+    cb(null, path.join(__dirname, "uploads/"));
   },
   filename: async (req, file, cb) => {
-    const { username, id } = jwt.decode(req.token);
-    const fileName = `${username.split(' ').join('_')}_profile_pic.${ acceptedFileTypes[file.mimetype]}`;
+    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    // console.log(file)
+    const fileName = `user_${id}_${Date.now()}.${acceptedFileTypes[file.mimetype]}`;
     cb(null, `${fileName}`);
   }
 });
@@ -81,7 +82,7 @@ async function generateRefreshToken(user) {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   // const expiresAt = new Date(Date.now() +  15 * 1000);
   // const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
-  const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
+  const refreshToken = jwt.sign({ id: user.id, username: user.username, img: user.img }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
   const hashToken = hashPassword(refreshToken);
   const insertQuery = 'INSERT INTO refresh_tokens(user_id, token, expires_at) VALUES (?, ?, ?)';
   
@@ -95,7 +96,7 @@ async function generateRefreshToken(user) {
   // return jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
 }
 async function generateAccessToken(user) {
-  return jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ id: user.id, username: user.username, img: user.img }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 async function blacklistToken(token) {
   const { exp, id } = jwt.decode(token);
@@ -126,7 +127,7 @@ async function isTokenBlacklisted(token) {
   }
 }
 const extractToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
+  // const authHeader = req.headers['authorization'];
   const token  = req.signedCookies['access_token'];
   // if (authHeader && authHeader.startsWith('Bearer ')) {
   //   const token = authHeader.split(' ')[1];
@@ -190,6 +191,7 @@ app.use('/assets', express.static(path.join(__dirname, "../frontend/assets"), {
     }
 }));
 
+app.use('/uploads', express.static('uploads'));
 // app.use('/css/reset.css', express.static(path.join(__dirname, "../frontend/css/reset.css"), {
 //     setHeaders: (res, path) => {
 //         res.set('Cache-Control', 'public, max-age=31536000, immutable');
@@ -290,9 +292,13 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   }
   // console.log(req.file);
   const { filename } = req.file;
+  const newFileName = `/uploads/${filename}`;
+
   if (!filename) {
     return res.status(400).send({ message: 'no file uploaded' });
   }
+
+  console.log(newFileName);
 
   
   // console.log(req.filename);
@@ -303,26 +309,26 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
    
+    // console.log(selectResult);
     if (selectResult.length > 0 && selectResult[0].img !== filename) {
-      console.log('upload filename the same: ', selectResult[0].img !== filename);
+      console.log('upload filename different: ', selectResult[0].img !== filename);
 
-      const prevFilePath = path.join(__dirname, `/uploads/${selectResult[0].img}`);
+      const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
       await fs.access(prevFilePath);
       await fs.unlink(prevFilePath);
-    }
+    } 
+    // const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
+    console.log('new file', newFileName);
+    const filePath = path.join(__dirname, newFileName);
+    await fs.access(filePath);
+    res.status(200).json({ file: {filename: newFileName, "alt": filename, title: filename }, success: true });
   } catch (error) {
     console.error(` upload filename: ${error}`);
     res.status(400).json({ message: 'upload failed' });
     }
-  try {
-    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: updateQuery, values: [filename, username, id] });
-    res.status(200).json({ file: {filename:`./uploads/${filename}`, "alt": filename, title: filename }, success: result.affectedRows > 0 });
-  } catch (error) {
-    console.error(`upload: ${error}`);
-      res.status(400).json({ message: 'failed in upload' });
-  }
+
   // const { profilePic } = req.body;
   // fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
   //   if (err) throw err;
@@ -335,12 +341,13 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   // });
 
 });
-app.get('/uploads/:filename', (req, res) => {
-// should I check for refresh token here?
-  const { filename } = req.params;
-  // console.log(filename);
-  res.sendFile(path.join(__dirname, `/uploads/${filename}`));
-});
+
+// app.get('/uploads/:filename', (req, res) => {
+// // should I check for refresh token here?
+//   const { filename } = req.params;
+//   // console.log(filename);
+//   res.sendFile(path.join(__dirname, `/uploads/${filename}`));
+// });
 app.get('/profilePic', async (req, res) => {
   //  const statusCode = await checkTokens(req, res);
   // if (statusCode === 403) {
@@ -349,19 +356,19 @@ app.get('/profilePic', async (req, res) => {
   // console.log('heer');
 
   try {
-    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
   
     const selectQuery = 'SELECT img FROM users WHERE username = ? AND id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
     const img = result[0].img;
     // console.log(img);
     // res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    res.sendFile(path.join(__dirname, `/uploads/${img}`));
+    res.sendFile(path.join(__dirname, `${img}`));
   } catch (error) {
     
   }
   // const img = profile_img ?? '../frontend/assets/image-avatar.jpg';
-})
+});
 
 app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
   
@@ -479,7 +486,7 @@ app.post('/updateInvoice/:id', extractToken,validateToken, async (req, res) => {
 app.post('/registerUser', async (req, res) => {
   const { username, email, password, "repeat-password":repeatPassword } = req.body;
   const password_hash = hashPassword(password);
-  const defaultProfileImg = path.join(__dirname, `../frontend/assets/image-avatar.jpg`);
+  const defaultProfileImg = `/uploads/image-avatar.jpg`;
 
   if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
     return res.status(401).json({message: 'some creditionals are missing'});
@@ -541,7 +548,7 @@ app.post('/loginUser', async (req, res) => {
    
     
     // res.json({ accessToken, username});
-    res.json({username});
+    res.json({username, img: user.img});
     // res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
 
   } catch (error) {
