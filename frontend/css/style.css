@@ -189,7 +189,13 @@ body {
     align-items: center;
 
     & .close-btn {
-      background-color: transparent;
+     background-color: transparent;
+     padding: 0;
+
+     &:hover > svg {
+      color: var(--venetian-nights);
+     }
+     
     }
   }
 
@@ -226,18 +232,34 @@ body {
         align-items: center;
         width: 100%;
 
-        &::after {
-          content: "X";
-          padding-inline-start: 0.5rem;
-        }
+       
       }
-     
-  }
+
+      
+    }
+
+    & .profile-btn-cont {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    & .logout {
+      background-color: var(--khmer-curry);
+    }
    & input[name='username'] {
-     
         flex: 1;
 
-        
+        &:user-invalid {
+          outline: var(--khmer-curry) solid 1px;
+        /* ::after {
+          content: "X";
+          padding-inline-start: 0.5rem;
+        } */
+        }
+
+        &:user-valid {
+          outline: green solid 1px;
+        }
       }
   }
 
@@ -259,6 +281,7 @@ body {
     &:hover {
       cursor: pointer;
     }
+    
   }
   & h1 {
     font-size: 1.5rem;

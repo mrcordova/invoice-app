@@ -173,19 +173,22 @@ header.addEventListener("click", async (e) => {
     profileDialog.showModal();
     profileDialog.querySelector('input[name="username"]').value = username;
     const imgPreview = profileDialog.querySelector('img[data-preview]');
-    imgPreview.src = img;
+    imgPreview.src = localStorage.getItem('img');
   } else if (fileLabel) {
  
   } else if (closeBtn) {
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    document.querySelector('#profile-form').reset();
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
     // console.log(acceptedFileTypes.includes(fileInput.files[0].type) );
     if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
-     console.log(fileInput.files[0]);
-      // const formData = new FormData(document.querySelector('#profile-form'));
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+    //  console.log(fileInput.files[0]);
+      const formData = new FormData(document.querySelector('#profile-form'));
+      // const formData = new FormData();
+      // formData.append('file', fileInput.files[0]);
    
       // console.log(formData.entries());
       // for (const [key, val] of formData.entries()) {
@@ -201,25 +204,25 @@ header.addEventListener("click", async (e) => {
         }
 
         if (response.ok) {
-          console.log(response);
+          // console.log(response);
           const result = await response.json();
 
           if (result['success']) {
-            console.log(result, "update img")
+            // console.log(result, "update img")
             // const img = document.querySelector('.profile_img');
             const imgPreview = profileDialog.querySelector('img[data-preview]');
             const { filename, alt, title} = result['file'];
             // img.setAttribute('src',  `${imgPreview.getAttribute('src')}?${new Date().getTime()}`);
-            // profileImg.src = `${filename}`;
-            profileImg.src = `${imgPreview.getAttribute('src')}`;
+            profileImg.src = `${filename}`;
+            // profileImg.src = `${imgPreview.getAttribute('src')}`;
             // img.setAttribute('src',  `${result.file.filename}?time=${new Date().getTime()}`);
             profileImg.setAttribute('title', title);
             profileImg.setAttribute('alt', alt);
             // formData.reset();
-            document.querySelector('#profile-form').reset();
+            // document.querySelector('#profile-form').reset();
             fileInput.value = '';
             localStorage.setItem('img', filename);
-            img = filename;
+            // img = filename;
             // location.reload();
             // img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
           } else {

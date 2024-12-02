@@ -9,7 +9,8 @@ const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
 const fs = require('fs/promises');
 const multer = require('multer');
-const acceptedFileTypes = {'image/jpeg': 'jpeg', 'image/png': 'png', "image/webp": 'webp'};
+const acceptedFileTypes = { 'image/jpeg': 'jpeg', 'image/png': 'png', "image/webp": 'webp', 'image/svg+xml': 'svg'};
+const defaultProfilePic = 'uploads/image-avatar.jpg';
 
 const storage = multer.diskStorage({
   destination: (res, file, cb) => {
@@ -185,20 +186,26 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.options("*", cors(corsOptions));
 
-app.use('/assets', express.static(path.join(__dirname, "../frontend/assets"), {
-    setHeaders: (res, path) => {
-        res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    }
-}));
-
-app.use('/uploads', express.static('uploads'));
-// app.use('/css/reset.css', express.static(path.join(__dirname, "../frontend/css/reset.css"), {
+// app.use('/assets', express.static(path.join(__dirname, "../frontend/assets"), {
 //     setHeaders: (res, path) => {
 //         res.set('Cache-Control', 'public, max-age=31536000, immutable');
 //     }
 // }));
 
-app.use(express.static(path.join(__dirname, "../frontend/")));
+app.use('/uploads', express.static('uploads'));
+// app.use('/css/style.css', express.static(path.join(__dirname, "../frontend/css/style.css"), {
+//     setHeaders: (res, path) => {
+//         res.set('Cache-Control', 'public, max-age=0');
+//     }
+// }));
+
+app.use(express.static(path.join(__dirname, "../frontend/"), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.css')) {
+            res.setHeader('Cache-Control', 'no-cache');
+        }
+    }
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -292,16 +299,17 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   }
   // console.log(req.file);
   const { filename } = req.file;
+  const { username } = req.body;
   const newFileName = `/uploads/${filename}`;
 
   if (!filename) {
     return res.status(400).send({ message: 'no file uploaded' });
   }
 
-  console.log(newFileName);
+  // console.log(newFileName);
 
   
-  // console.log(req.filename);
+  // console.log(username);
  
   
   try {
@@ -310,8 +318,8 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
    
     // console.log(selectResult);
-    if (selectResult.length > 0 && selectResult[0].img !== filename) {
-      console.log('upload filename different: ', selectResult[0].img !== filename);
+    if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img) {
+      // console.log('upload filename different: ', selectResult[0].img !== filename);
 
       const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
       await fs.access(prevFilePath);
@@ -320,9 +328,9 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     // const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
     const updateQuery = 'UPDATE users SET img = ? WHERE username = ? AND id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
-    console.log('new file', newFileName);
-    const filePath = path.join(__dirname, newFileName);
-    await fs.access(filePath);
+    // console.log('new file', newFileName);
+    // const filePath = path.join(__dirname, newFileName);
+    // await fs.access(filePath);
     res.status(200).json({ file: {filename: newFileName, "alt": filename, title: filename }, success: true });
   } catch (error) {
     console.error(` upload filename: ${error}`);
@@ -486,17 +494,20 @@ app.post('/updateInvoice/:id', extractToken,validateToken, async (req, res) => {
 app.post('/registerUser', async (req, res) => {
   const { username, email, password, "repeat-password":repeatPassword } = req.body;
   const password_hash = hashPassword(password);
-  const defaultProfileImg = `/uploads/image-avatar.jpg`;
+  // const defaultProfileImg = `/uploads/image-avatar.jpg`;
 
   if (!username || !email || !password || !matchPassword(repeatPassword, password_hash)) {
     return res.status(401).json({message: 'some creditionals are missing'});
+  }
+  if (username.test("^[^\s]+$")) {
+    return res.status(401).json({ message: 'username contains spaces' });
   }
   if ( await checkUserExists(username, email)) {
     return res.status(409).json({ message: 'User already exists' });
   }
 try {
   const insertQuery = 'INSERT INTO users (username, password_hash, email, img) VALUES (?, ?, ?, ?)';
-  const [results, error] = await poolPromise.query({ sql: insertQuery, values: [username, password_hash, email, defaultProfileImg] });
+  const [results, error] = await poolPromise.query({ sql: insertQuery, values: [username, password_hash, email, defaultProfilePic] });
   res.json({ success: true });
 
 } catch (error) {
