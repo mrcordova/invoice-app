@@ -10,7 +10,8 @@ import {
   logout,
   refreshAccessToken,
   acceptedFileTypes,
-  fetchWithAuth
+  fetchWithAuth,
+  showFormErrors
 } from "./functions.js";
 
 
@@ -174,6 +175,7 @@ header.addEventListener("click", async (e) => {
     profileDialog.querySelector('input[name="username"]').value = username;
     const imgPreview = profileDialog.querySelector('img[data-preview]');
     imgPreview.src = localStorage.getItem('img');
+    
   } else if (fileLabel) {
  
   } else if (closeBtn) {
@@ -184,11 +186,26 @@ header.addEventListener("click", async (e) => {
   } else if (submtiBtn) {
     e.preventDefault();
     // console.log(acceptedFileTypes.includes(fileInput.files[0].type) );
-    if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
+    // console.log(fileInput.value);
+   
+    // const form = document.querySelector('#profile-form');
+    // console.log(fileInput.validity);
+    const input = profileDialog.querySelector('input[name="username"]');
+ console.log((fileInput.files.length === 1 || input.value !== username));
+
+    if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
+      // const imgPreview = profileDialog.querySelector('img[data-preview]');
+    // }
+    
+    // if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
     //  console.log(fileInput.files[0]);
       const formData = new FormData(document.querySelector('#profile-form'));
+      
+      // if (!fileInput.files.length) {
+      //   formData.append('file', imgPreview.src);
+      //   console.log(formData.get('file'));
+      // }
       // const formData = new FormData();
-      // formData.append('file', fileInput.files[0]);
    
       // console.log(formData.entries());
       // for (const [key, val] of formData.entries()) {
@@ -210,7 +227,7 @@ header.addEventListener("click", async (e) => {
           if (result['success']) {
             // console.log(result, "update img")
             // const img = document.querySelector('.profile_img');
-            const imgPreview = profileDialog.querySelector('img[data-preview]');
+            
             const { filename, alt, title } = result['file'];
             const { username: newUsername } = result;
             // img.setAttribute('src',  `${imgPreview.getAttribute('src')}?${new Date().getTime()}`);

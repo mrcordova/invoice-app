@@ -224,6 +224,9 @@ body {
       left: 0;
       right: 0;
       padding-block: 0;
+      &:user-invalid {
+        background-color: red;
+      }
 
       }
 

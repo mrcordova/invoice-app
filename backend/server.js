@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "uploads/"));
   },
   filename: async (req, file, cb) => {
-    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
+    const { id } = jwt.decode(req.signedCookies['refresh_token']);
     // console.log(file)
     const fileName = `user_${id}_${Date.now()}.${acceptedFileTypes[file.mimetype]}`;
     cb(null, `${fileName}`);
@@ -298,13 +298,15 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
   // console.log(req.file);
-  const { filename } = req.file;
+ 
+  
+ 
   const { username } = req.body;
-  const newFileName = `/uploads/${filename}`;
 
-  if (!filename) {
-    return res.status(400).send({ message: 'no file uploaded' });
-  }
+
+  // if (!filename) {
+  //   return res.status(400).send({ message: 'no file uploaded' });
+  // }
 
   // console.log(newFileName);
 
@@ -316,9 +318,15 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     const {id } = jwt.decode(req.signedCookies['refresh_token']);
     const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
+    const newFileName = req.file ? `/uploads/${ req.file?.filename }` : selectResult[0].img;
+    // let newFileName = ;
+    
     // let newUsername = username === selectResult[0].username ? ;
     // console.log(selectResult);
-    if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img) {
+    // if (!filename) {
+    //   newFileName = selectResult[0].img;
+    // };
+    if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img && newFileName !== selectResult[0].img) {
       // console.log('upload filename different: ', selectResult[0].img !== filename);
 
       const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
@@ -332,7 +340,7 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
     // console.log('new file', newFileName);
     // const filePath = path.join(__dirname, newFileName);
     // await fs.access(filePath);
-    res.status(200).json({ file: {filename: newFileName, "alt": filename, title: filename }, username, success: true });
+    res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: true });
   } catch (error) {
     console.error(` upload filename: ${error}`);
     res.status(400).json({ message: 'upload failed' });
