@@ -313,10 +313,10 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
  
   
   try {
-    const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
+    const {id } = jwt.decode(req.signedCookies['refresh_token']);
+    const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
-   
+    // let newUsername = username === selectResult[0].username ? ;
     // console.log(selectResult);
     if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img) {
       // console.log('upload filename different: ', selectResult[0].img !== filename);
@@ -324,14 +324,15 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
       const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
       await fs.access(prevFilePath);
       await fs.unlink(prevFilePath);
-    } 
+    }
+    
     // const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
-    const updateQuery = 'UPDATE users SET img = ? WHERE id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, id] });
+    const updateQuery = 'UPDATE users SET img = ?, username = ? WHERE id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
     // console.log('new file', newFileName);
     // const filePath = path.join(__dirname, newFileName);
     // await fs.access(filePath);
-    res.status(200).json({ file: {filename: newFileName, "alt": filename, title: filename }, success: true });
+    res.status(200).json({ file: {filename: newFileName, "alt": filename, title: filename }, username, success: true });
   } catch (error) {
     console.error(` upload filename: ${error}`);
     res.status(400).json({ message: 'upload failed' });

@@ -25,7 +25,7 @@ const header = document.querySelector("header");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
-const username = localStorage.getItem('username');
+let username = localStorage.getItem('username');
 let img = localStorage.getItem('img');
 const profileImg = document.getElementById('profile_img');
 profileImg.src = img;
@@ -211,7 +211,8 @@ header.addEventListener("click", async (e) => {
             // console.log(result, "update img")
             // const img = document.querySelector('.profile_img');
             const imgPreview = profileDialog.querySelector('img[data-preview]');
-            const { filename, alt, title} = result['file'];
+            const { filename, alt, title } = result['file'];
+            const { username: newUsername } = result;
             // img.setAttribute('src',  `${imgPreview.getAttribute('src')}?${new Date().getTime()}`);
             profileImg.src = `${filename}`;
             // profileImg.src = `${imgPreview.getAttribute('src')}`;
@@ -222,6 +223,8 @@ header.addEventListener("click", async (e) => {
             // document.querySelector('#profile-form').reset();
             fileInput.value = '';
             localStorage.setItem('img', filename);
+            localStorage.setItem('username', newUsername);
+            username = newUsername;
             // img = filename;
             // location.reload();
             // img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
