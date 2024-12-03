@@ -302,13 +302,22 @@ export async function logout() {
   const response = await fetch(`${URL_WEBSITE}/logout`, {
     method: "POST",
     headers: {
-      "Access-Control-Allow-Origin": true,
+      // "Access-Control-Allow-Origin": true,
     },
     cache: 'reload',
-    credentials: "include",
+    credentials: "same-origin",
   });
-  location.href = '/login.html';
+  // console.log(response);
+  const result = await response.json();
+  // console.log(result);
+  if (result['success']) {
+    localStorage.removeItem('img');
+    localStorage.removeItem('username');
+    location.href = '/';
+  }
 }
+
+
 
 export async function refreshAccessToken() {
   try {
@@ -319,7 +328,7 @@ export async function refreshAccessToken() {
 
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
-      console.log(accessToken);
+      // console.log(accessToken);
     
     } else {
 

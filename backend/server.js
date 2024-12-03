@@ -581,25 +581,32 @@ app.post('/logout', async (req, res) => {
 
   const refreshToken = req.signedCookies['refresh_token'];
   if (!refreshToken) return res.status(204).send('Refresh token invalid');
-  const hashToken = hashPassword(refreshToken);
-  const blackListed = await blacklistToken(refreshToken);
-  const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ?';
-  await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
-  res.clearCookie('refresh_token', {
-    httpOnly: true,
-    signed: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/' ,
-  });
-  res.clearCookie('access_token', {
-    httpOnly: true,
-    signed: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/',
-  });
-  res.send(`Logged out successfully and token black listed: ${blackListed}`);
+  try {
+    const hashToken = hashPassword(refreshToken);
+    const blackListed = await blacklistToken(refreshToken);
+    if (!blackListed) console.log('failed to blacklist token');
+    const deleteQuery = 'DELETE FROM refresh_tokens WHERE token = ?';
+    await poolPromise.query({ sql: deleteQuery, values: [hashToken] });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/' ,
+    });
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
+    // console.log('here');
+    return res.json({ success: true });
+    
+  } catch (error) {
+    return res.json({ success: false });
+  }
 })
 app.delete('/deleteInvoice/:id', extractToken, validateToken, async (req, res) => {
   const statusCode = await checkTokens(req, res) 

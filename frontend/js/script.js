@@ -11,7 +11,8 @@ import {
   refreshAccessToken,
   acceptedFileTypes,
   fetchWithAuth,
-  showFormErrors
+  showFormErrors,
+
 } from "./functions.js";
 
 
@@ -39,8 +40,8 @@ window.addEventListener("DOMContentLoaded", async (e) => {
   if (response.status === 403) {
   
     await refreshAccessToken();
-  
     response = await fetchWithAuth('/getInvoices', 'GET');
+    // console.log(response);
   }
   const { invoices } = await response.json();
   createInvoices(invoices);
@@ -166,6 +167,8 @@ header.addEventListener("click", async (e) => {
   const fileLabel = e.target.closest('[data-file]');
   const closeBtn = e.target.closest('[data-close]');
   const submtiBtn = e.target.closest('[data-profile-submit]');
+  const logoutBtn = e.target.closest('[data-logout]');
+  // console.log(logoutBtn);
   if (themeBtn) {
     e.preventDefault();
     themeUpdate(e, themeInputs);
@@ -185,75 +188,55 @@ header.addEventListener("click", async (e) => {
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
-    // console.log(acceptedFileTypes.includes(fileInput.files[0].type) );
-    // console.log(fileInput.value);
-   
-    // const form = document.querySelector('#profile-form');
-    // console.log(fileInput.validity);
+
     const input = profileDialog.querySelector('input[name="username"]');
- console.log((fileInput.files.length === 1 || input.value !== username));
 
     if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
-      // const imgPreview = profileDialog.querySelector('img[data-preview]');
-    // }
-    
-    // if (fileInput.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && fileInput.files[0].size < 2097152) {
-    //  console.log(fileInput.files[0]);
       const formData = new FormData(document.querySelector('#profile-form'));
-      
-      // if (!fileInput.files.length) {
-      //   formData.append('file', imgPreview.src);
-      //   console.log(formData.get('file'));
-      // }
-      // const formData = new FormData();
-   
-      // console.log(formData.entries());
-      // for (const [key, val] of formData.entries()) {
-      //   console.log(key, val);
-      // }
       let response;
       try {
-       
         response = await fetchWithAuth('/upload', 'POST', formData, {});
         if (response.status === 403) {
           await refreshAccessToken();
           response = await fetchWithAuth('/upload', 'POST', formData, {});
         }
-
         if (response.ok) {
-          // console.log(response);
           const result = await response.json();
-
           if (result['success']) {
-            // console.log(result, "update img")
-            // const img = document.querySelector('.profile_img');
-            
             const { filename, alt, title } = result['file'];
             const { username: newUsername } = result;
-            // img.setAttribute('src',  `${imgPreview.getAttribute('src')}?${new Date().getTime()}`);
             profileImg.src = `${filename}`;
-            // profileImg.src = `${imgPreview.getAttribute('src')}`;
-            // img.setAttribute('src',  `${result.file.filename}?time=${new Date().getTime()}`);
+           
             profileImg.setAttribute('title', title);
             profileImg.setAttribute('alt', alt);
-            // formData.reset();
-            // document.querySelector('#profile-form').reset();
+          
             fileInput.value = '';
             localStorage.setItem('img', filename);
             localStorage.setItem('username', newUsername);
             username = newUsername;
-            // img = filename;
-            // location.reload();
-            // img.setAttribute('data-change', img.getAttribute('data-change') == "true" ? "false" : 'true');
+          
           } else {
             console.error(result);
           }
         }
-        
       } catch (error) {
         console.error(`upload on frontend: ${error}`);
       }
+    } else {
+      const form = submtiBtn.closest('form');
+      form.requestSubmit();
     }
+  } else if (logoutBtn) {
+    // console.log('here');
+    e.preventDefault();
+    // localStorage.removeItem('img');
+    // localStorage.removeItem('username');
+    const result = await logout();
+    if (result.success) {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    }
+    
   }
 
 });

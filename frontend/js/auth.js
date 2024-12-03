@@ -16,6 +16,7 @@ document.addEventListener("click", async (e) => {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formDataObj),
+          cache: 'reload'
         });
         if (response.ok) {
           signUp.parentElement.reset();
@@ -38,7 +39,7 @@ document.addEventListener("click", async (e) => {
           method: "POST",
           headers: { "Content-type": "application/json" },
           body: JSON.stringify(formObj),
-          credentials: "same-origin",
+          cache: 'reload'
         });
         if (response.ok) {
           login.parentElement.reset();

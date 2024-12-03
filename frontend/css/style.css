@@ -254,10 +254,6 @@ body {
 
         &:user-invalid {
           outline: var(--khmer-curry) solid 1px;
-        /* ::after {
-          content: "X";
-          padding-inline-start: 0.5rem;
-        } */
         }
 
         &:user-valid {
