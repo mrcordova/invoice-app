@@ -9,6 +9,9 @@ import {
   themeUpdate,
   refreshAccessToken,
   fetchWithAuth,
+  logout,
+  showFormErrors, 
+  acceptedFileTypes
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
@@ -36,7 +39,12 @@ const statusBarEle = document.querySelector("[data-status-bar]");
 const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
-
+const profileDialog = document.getElementById('profile-dialog');
+let username = localStorage.getItem('username');
+let img = localStorage.getItem('img');
+const profileImg = document.getElementById('profile_img');
+profileImg.src = img;
+const fileInput = document.getElementById("profile_pic");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const homePage = "/index.html";
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
@@ -147,8 +155,21 @@ function updateInvoice(invoice) {
 }
 updateStatus(invoice);
 updateInvoice(invoice);
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
+    const file = e.target.files[0];
+    const thumbUrl = URL.createObjectURL(file);
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.setAttribute('src', thumbUrl);
+    imgPreview.setAttribute('title', file.name);
+    imgPreview.setAttribute('alt', file.name);
+  } else {
+    console.log('file does not meet requirements');
+    console.error(e.target.files);
+  }
+});
 body.addEventListener("click", async (e) => {
-  e.preventDefault();
+ 
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
   const editDialogTarget = e.target.closest("[data-show-edit-dialog]");
   const goBackBtn = e.target.closest("[data-go-back]");
@@ -162,6 +183,11 @@ body.addEventListener("click", async (e) => {
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const saveChangesBtn = e.target.closest("[data-save]");
+
+  const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
+  const closeBtn = e.target.closest('[data-close]');
+  const submtiBtn = e.target.closest('[data-profile-submit]');
+  const logoutBtn = e.target.closest('[data-logout]');
 
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -291,6 +317,7 @@ body.addEventListener("click", async (e) => {
   } else if (goBackBtn) {
     history.back();
   } else if (markAsPaidBtn) {
+    e.preventDefault();
     const statusEle = statusBarEle.querySelector("[data-status]");
     const statusText = statusEle.querySelector("[data-status-text]");
     const status =
@@ -317,12 +344,15 @@ body.addEventListener("click", async (e) => {
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;
   } else if (themeBtn) {
+    e.preventDefault();
     themeUpdate(e, themeInputs);
   } else if (closeDeleteDialog) {
     deleteDialog.close();
   } else if (goBackPageBtn) {
+    e.preventDefault();
     resetForm(editDialog);
   } else if (deleteInvoiceBtn) {
+    e.preventDefault();
     let response;
     try {
       
@@ -343,16 +373,19 @@ body.addEventListener("click", async (e) => {
     
    
   } else if (deleteItemBtn) {
-   
-
+    e.preventDefault();
     deleteItemBtn.parentElement.remove();
   } else if (addItemBtn) {
+      e.preventDefault();
     addItemRow(addItemBtn);
   } else if (paymentTermsBtn) {
+      e.preventDefault();
     updatePaymentTerms(paymentTermsBtn);
   } else if (paymentTermInput) {
+      e.preventDefault();
     showPaymentTermsMenu(paymentTermInput);
   } else if (saveChangesBtn) {
+      e.preventDefault();
     const invoiceForm = editDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
       let response;
@@ -389,5 +422,66 @@ body.addEventListener("click", async (e) => {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveChangesBtn);
     }
+  } 
+  else if (profileDialogAttr) {
+    profileDialog.showModal();
+    profileDialog.querySelector('input[name="username"]').value = username;
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    
+  }  else if (closeBtn) {
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    document.querySelector('#profile-form').reset();
+    profileDialog.close();
+  } else if (submtiBtn) {
+    e.preventDefault();
+
+    const input = profileDialog.querySelector('input[name="username"]');
+
+    if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
+      const formData = new FormData(document.querySelector('#profile-form'));
+      let response;
+      try {
+        response = await fetchWithAuth('/upload', 'POST', formData, {});
+        if (response.status === 403) {
+          await refreshAccessToken();
+          response = await fetchWithAuth('/upload', 'POST', formData, {});
+        }
+        if (response.ok) {
+          const result = await response.json();
+          if (result['success']) {
+            const { filename, alt, title } = result['file'];
+            const { username: newUsername } = result;
+            profileImg.src = `${filename}`;
+           
+            profileImg.setAttribute('title', title);
+            profileImg.setAttribute('alt', alt);
+          
+            fileInput.value = '';
+            localStorage.setItem('img', filename);
+            localStorage.setItem('username', newUsername);
+            username = newUsername;
+          
+          } else {
+            console.error(result);
+          }
+        }
+      } catch (error) {
+        console.error(`upload on frontend: ${error}`);
+      }
+    } else {
+      const form = submtiBtn.closest('form');
+      form.requestSubmit(submtiBtn);
+    }
+  } else if (logoutBtn) {
+    e.preventDefault();
+   
+    const result = await logout();
+    if (result.success) {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    }
+    
   }
 });

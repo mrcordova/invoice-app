@@ -19,7 +19,7 @@ import {
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
-const profileDialog = document.getElementById('profile-dialog')
+const profileDialog = document.getElementById('profile-dialog');
 const invoiceTotal = document.querySelector("[data-invoice-total]");
 
 const main = document.querySelector("main");
@@ -164,7 +164,6 @@ header.addEventListener("click", async (e) => {
    e.stopImmediatePropagation();
   const themeBtn = e.target.closest("[data-theme]");
   const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
-  const fileLabel = e.target.closest('[data-file]');
   const closeBtn = e.target.closest('[data-close]');
   const submtiBtn = e.target.closest('[data-profile-submit]');
   const logoutBtn = e.target.closest('[data-logout]');
@@ -179,9 +178,7 @@ header.addEventListener("click", async (e) => {
     const imgPreview = profileDialog.querySelector('img[data-preview]');
     imgPreview.src = localStorage.getItem('img');
     
-  } else if (fileLabel) {
- 
-  } else if (closeBtn) {
+  }  else if (closeBtn) {
     const imgPreview = profileDialog.querySelector('img[data-preview]');
     imgPreview.src = localStorage.getItem('img');
     document.querySelector('#profile-form').reset();
@@ -224,13 +221,11 @@ header.addEventListener("click", async (e) => {
       }
     } else {
       const form = submtiBtn.closest('form');
-      form.requestSubmit();
+      form.requestSubmit(submtiBtn);
     }
   } else if (logoutBtn) {
-    // console.log('here');
     e.preventDefault();
-    // localStorage.removeItem('img');
-    // localStorage.removeItem('username');
+   
     const result = await logout();
     if (result.success) {
       document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
@@ -242,7 +237,7 @@ header.addEventListener("click", async (e) => {
 });
 
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length === 1  && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
+  if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
     const file = e.target.files[0];
     const thumbUrl = URL.createObjectURL(file);
     const imgPreview = profileDialog.querySelector('img[data-preview]');
@@ -254,7 +249,7 @@ fileInput.addEventListener('change', (e) => {
     console.error(e.target.files);
   }
 
-})
+});
 
 
 main.addEventListener("click", (e) => {
@@ -299,7 +294,6 @@ newInvoiceDialog.addEventListener("click", async (e) => {
 
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
-    // const response = await logout();
    
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);

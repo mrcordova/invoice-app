@@ -18,7 +18,6 @@ const storage = multer.diskStorage({
   },
   filename: async (req, file, cb) => {
     const { id } = jwt.decode(req.signedCookies['refresh_token']);
-    // console.log(file)
     const fileName = `user_${id}_${Date.now()}.${acceptedFileTypes[file.mimetype]}`;
     cb(null, `${fileName}`);
   }
@@ -81,8 +80,7 @@ async function checkUserExists(username, email) {
 
 async function generateRefreshToken(user) {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  // const expiresAt = new Date(Date.now() +  15 * 1000);
-  // const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
+ 
   const refreshToken = jwt.sign({ id: user.id, username: user.username, img: user.img }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
   const hashToken = hashPassword(refreshToken);
   const insertQuery = 'INSERT INTO refresh_tokens(user_id, token, expires_at) VALUES (?, ?, ?)';
@@ -94,14 +92,12 @@ async function generateRefreshToken(user) {
     console.error(`generateRefreshToken: ${error}`);
   }
 
-  // return jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_SECRET, { expiresIn: "30d" });
 }
 async function generateAccessToken(user) {
   return jwt.sign({ id: user.id, username: user.username, img: user.img }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 async function blacklistToken(token) {
   const { exp, id } = jwt.decode(token);
-  // console.log(exp);
   const now = Math.floor(Date.now() / 1000);
   const ttl = exp - now;
   const expirDate = new Date(Date.now() + ttl * 1000);
@@ -128,18 +124,9 @@ async function isTokenBlacklisted(token) {
   }
 }
 const extractToken = async (req, res, next) => {
-  // const authHeader = req.headers['authorization'];
   const token  = req.signedCookies['access_token'];
-  // if (authHeader && authHeader.startsWith('Bearer ')) {
-  //   const token = authHeader.split(' ')[1];
-    
-  //   req.token =  token == 'null' ? null : token;
   
-  // } else {
-  //   req.token = undefined;
-  // }
   if (token) {
-    // const token = authHeader.split(' ')[1];
     
     req.token =  token == 'null' ? null : token;
   
@@ -266,23 +253,16 @@ async function setUpDb() {
 // setUpDb();
 
 async function checkTokens(req, res) {
-  // const refreshToken = req.signedCookies['refresh_token'];
   const token = req.token;
   if (!token) {
     return 403;
   };
-
   try {
-  
-
     const userForAccessToken = jwt.verify(token, process.env.JWT_SECRET);
-   
-    
   } catch (error) {  
     console.error(`checkTokens ${error}`);
     return 403;
   }
-
   return 200;
 }
 
@@ -297,65 +277,30 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
-  // console.log(req.file);
- 
-  
- 
   const { username } = req.body;
 
-
-  // if (!filename) {
-  //   return res.status(400).send({ message: 'no file uploaded' });
-  // }
-
-  // console.log(newFileName);
-
-  
-  // console.log(username);
- 
-  
   try {
     const {id } = jwt.decode(req.signedCookies['refresh_token']);
     const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
     const newFileName = req.file ? `/uploads/${ req.file?.filename }` : selectResult[0].img;
-    // let newFileName = ;
     
-    // let newUsername = username === selectResult[0].username ? ;
-    // console.log(selectResult);
-    // if (!filename) {
-    //   newFileName = selectResult[0].img;
-    // };
     if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img && newFileName !== selectResult[0].img) {
-      // console.log('upload filename different: ', selectResult[0].img !== filename);
 
       const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
       await fs.access(prevFilePath);
       await fs.unlink(prevFilePath);
     }
     
-    // const { username, id } = jwt.decode(req.signedCookies['refresh_token']);
     const updateQuery = 'UPDATE users SET img = ?, username = ? WHERE id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
-    // console.log('new file', newFileName);
-    // const filePath = path.join(__dirname, newFileName);
-    // await fs.access(filePath);
+   
     res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: true });
   } catch (error) {
     console.error(` upload filename: ${error}`);
     res.status(400).json({ message: 'upload failed' });
     }
 
-  // const { profilePic } = req.body;
-  // fs.writeFile(`${profilePic}.jpg`, profilePic, (err) => {
-  //   if (err) throw err;
-  //   console.log('File witten successfully');
-  //   res.send('picture successfully saved');
-  // } )
-  // fs.readFile(profilePic, 'utf8', (err, data) => {
-  //   if (err) throw err;
-  //   console.log(data);
-  // });
 
 });
 
@@ -366,11 +311,7 @@ app.post('/upload', extractToken, validateToken, upload.single('file'), async (r
 //   res.sendFile(path.join(__dirname, `/uploads/${filename}`));
 // });
 app.get('/profilePic', async (req, res) => {
-  //  const statusCode = await checkTokens(req, res);
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  // console.log('heer');
+ 
 
   try {
     const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
@@ -384,7 +325,6 @@ app.get('/profilePic', async (req, res) => {
   } catch (error) {
     
   }
-  // const img = profile_img ?? '../frontend/assets/image-avatar.jpg';
 });
 
 app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
@@ -393,7 +333,6 @@ app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
-  // console.log('getInvoices', req.token);
   try {
     const selectQuery = "SELECT * FROM invoices";
     const [results] = await poolPromise.query(selectQuery);
@@ -541,14 +480,7 @@ app.post('/loginUser', async (req, res) => {
 
 
   
-    // res.cookie('refresh_token', refreshToken, {
-    //   httpOnly: true,
-    //   signed: true,
-    //   secure: true,
-    //   sameSite: 'None',
-    //   path: '/' ,
-    //   maxAge: 30 * 24 * 60 * 60 * 1000,
-    // });
+   
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       signed: true,
