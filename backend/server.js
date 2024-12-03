@@ -669,7 +669,7 @@ app.post('/refresh-token', async (req, res) => {
       await poolPromise.query('DELETE FROM refresh_tokens WHERE token = ?', [hashToken]);
     }
    
-    res.status(403).send('Invalid refresh token');
+    res.status(403).json({message: 'Invalid refresh token'});
   }
 
 });

@@ -41,7 +41,7 @@ window.addEventListener("DOMContentLoaded", async (e) => {
   
     await refreshAccessToken();
     response = await fetchWithAuth('/getInvoices', 'GET');
-    // console.log(response);
+    
   }
   const { invoices } = await response.json();
   createInvoices(invoices);

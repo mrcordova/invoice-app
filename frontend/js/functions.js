@@ -313,7 +313,7 @@ export async function logout() {
   if (result['success']) {
     localStorage.removeItem('img');
     localStorage.removeItem('username');
-    location.href = '/';
+    location.href = "/login.html";
   }
 }
 
@@ -332,7 +332,7 @@ export async function refreshAccessToken() {
     
     } else {
 
-      console.error(await tokenResponse.text());
+      console.error(await tokenResponse.json());
       location.href = "/login.html";
     }
   } catch (error) {
