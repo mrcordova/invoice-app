@@ -219,7 +219,11 @@ app.options("*", cors(corsOptions));
 //     }
 // }));
 
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads', {
+  setHeaders: (res, path) => {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+}));
 // app.use('/css/style.css', express.static(path.join(__dirname, "../frontend/css/style.css"), {
 //     setHeaders: (res, path) => {
 //         res.set('Cache-Control', 'public, max-age=0');
@@ -359,23 +363,23 @@ app.post('/upload', extractToken, checkToken, validateToken, upload.single('file
 //   // console.log(filename);
 //   res.sendFile(path.join(__dirname, `/uploads/${filename}`));
 // });
-app.get('/profilePic', async (req, res) => {
+// app.get('/profilePic', async (req, res) => {
  
 
-  try {
-    // const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
-    const { user: { id } } = req;
+//   try {
+//     // const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
+//     const { user: { id } } = req;
   
-    const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: selectQuery, values: [id] });
-    const img = result[0].img;
-    // console.log(img);
-    // res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    res.sendFile(path.join(__dirname, `${img}`));
-  } catch (error) {
+//     const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
+//     const [result] = await poolPromise.query({ sql: selectQuery, values: [id] });
+//     const img = result[0].img;
+//     // console.log(img);
+//     // res.set('Cache-Control', 'public, max-age=31536000, immutable');
+//     res.sendFile(path.join(__dirname, `${img}`));
+//   } catch (error) {
     
-  }
-});
+//   }
+// });
 
 app.get("/getInvoices", extractToken, checkToken, validateToken, async (req, res) => {
   
