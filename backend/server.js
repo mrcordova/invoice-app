@@ -13,13 +13,15 @@ const acceptedFileTypes = { 'image/jpeg': 'jpeg', 'image/png': 'png', "image/web
 const defaultProfilePic = 'uploads/image-avatar.jpg';
 
 const storage = multer.diskStorage({
-  destination: (res, file, cb) => {
+  destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "uploads/"));
   },
   filename: async (req, file, cb) => {
-    const { id } = jwt.decode(req.signedCookies['refresh_token']);
-    const fileName = `user_${id}_${Date.now()}.${acceptedFileTypes[file.mimetype]}`;
-    cb(null, `${fileName}`);
+
+      const { id } = jwt.verify(req.signedCookies['refresh_token'], process.env.REFRESH_SECRET);
+      const fileName = `user_${id}_${Date.now()}.${acceptedFileTypes[file.mimetype]}`;
+      cb(null, `${fileName}`);
+   
   }
 });
 
@@ -75,6 +77,13 @@ async function checkUserExists(username) {
   const selectQuery = 'SELECT * FROM users WHERE username = ?';
   const [rows] = await poolPromise.query({ sql: selectQuery, values: [username] });
 
+  return rows.length > 0;
+};
+async function checkUserExists(username, id) {
+  const selectQuery = 'SELECT * FROM users WHERE username = ? AND NOT(id = ?)';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+
+  // console.log(rows);
   return rows.length > 0;
 };
 async function checkEmailExists(email) {
@@ -289,7 +298,7 @@ async function checkToken(req, res, next) {
     return res.status(403).json({ message: 'tokens are invalid' });
   };
   try {
-    const userForAccessToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userAccessToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {  
     console.error(`checkTokens ${error}`);
     return res.status(403).json({ message: 'tokens are invalid' });
@@ -310,16 +319,20 @@ app.post('/upload', extractToken, checkToken, validateToken, upload.single('file
   //   return res.status(statusCode).json({ message: 'tokens are invalid' });
   // }
   const { username } = req.body;
-  if (checkUserExists(username)) {
+  const { id } = req.user;
+  if (await checkUserExists(username, id)) {
+    // console.log('here');
     return res.status(403).json({ message: 'username exisits already!' });
-  }
+  };
 
   try {
     // const {id } = jwt.decode(req.signedCookies['refresh_token']);
     const { user: { id } } = req;
     const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
-    const newFileName = req.file ? `/uploads/${ req.file?.filename }` : selectResult[0].img;
+    const newFileName = req.file ? `/uploads/${req.file?.filename}` : selectResult[0].img;
+    
+    
     
     if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img && newFileName !== selectResult[0].img) {
 
@@ -331,7 +344,7 @@ app.post('/upload', extractToken, checkToken, validateToken, upload.single('file
     const updateQuery = 'UPDATE users SET img = ?, username = ? WHERE id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
    
-    res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: true });
+    res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: result.affectedRows > 0 });
   } catch (error) {
     console.error(` upload filename: ${error}`);
     res.status(400).json({ message: 'upload failed' });
@@ -350,7 +363,8 @@ app.get('/profilePic', async (req, res) => {
  
 
   try {
-    const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
+    // const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
+    const { user: { id } } = req;
   
     const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
     const [result] = await poolPromise.query({ sql: selectQuery, values: [id] });
