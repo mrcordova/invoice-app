@@ -1,3 +1,4 @@
+// import { socket } from "./auth.js";
 import {
   addItemRow,
   resetForm,
@@ -6,18 +7,46 @@ import {
   saveInvoice,
   themeUpdate,
   perferredColorScheme,
-  URL,
-} from "./functions.js";
-const { invoices: data } = await (
-  await fetch(`${URL}/getInvoices`, {
-    method: "GET",
-    headers: { "Content-type": "application/json" },
-    cache: "reload",
-  })
-).json();
+  logout,
+  refreshAccessToken,
+  acceptedFileTypes,
+  fetchWithAuth,
+  showFormErrors,
 
-console.log(data);
+} from "./functions.js";
+
+
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
+const invoices = document.querySelector(".invoices");
+const newInvoiceDialog = document.getElementById("new-invoice-dialog");
+const profileDialog = document.getElementById('profile-dialog');
+const invoiceTotal = document.querySelector("[data-invoice-total]");
+
+const main = document.querySelector("main");
+const header = document.querySelector("header");
+const currencyOptions = { style: "currency", currency: "GBP" };
+const dateOptions = { day: "numeric", month: "short", year: "numeric" };
+const filterOptions = new Set();
+let username = localStorage.getItem('username');
+let img = localStorage.getItem('img');
+const profileImg = document.getElementById('profile_img');
+profileImg.src = img;
+const fileInput = document.getElementById("profile_pic");
+
+window.addEventListener("DOMContentLoaded", async (e) => {
+  let response;
+ 
+  response = await fetchWithAuth('/getInvoices', 'GET');
+  if (response.status === 403) {
+  
+    await refreshAccessToken();
+    response = await fetchWithAuth('/getInvoices', 'GET');
+    
+  }
+  const { invoices } = await response.json();
+  createInvoices(invoices);
+  invoiceTotal.textContent = invoices.length;
+});
 
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
@@ -30,19 +59,8 @@ for (const themeInput of themeInputs) {
   input.checked = localStorage.getItem(perferredColorScheme);
 }
 
-const invoices = document.querySelector(".invoices");
-const newInvoiceDialog = document.getElementById("new-invoice-dialog");
-const invoiceTotal = document.querySelector("[data-invoice-total]");
-invoiceTotal.textContent = data.length;
-
-const main = document.querySelector("main");
-const header = document.querySelector("header");
-const currencyOptions = { style: "currency", currency: "GBP" };
-const dateOptions = { day: "numeric", month: "short", year: "numeric" };
-const filterOptions = new Set();
-function createInvoices() {
+function createInvoices(data) {
   for (const invoice of data) {
-    // console.log(invoice);
     const { id, paymentDue, clientName, total, status } = invoice;
     invoices.insertAdjacentHTML(
       "beforeend",
@@ -67,6 +85,7 @@ function createInvoices() {
               </div>
               <img
                 class="hide-mobile"
+                loading="lazy"
                 src="./assets/icon-arrow-right.svg"
                 alt="right arrow" />
             </div>
@@ -78,7 +97,6 @@ function createInvoices() {
 
 function searchInvoices() {
   for (const invoice of invoices.children) {
-    // console.log(invoice);
     invoice.classList.toggle(
       "hide",
       !filterOptions.has(invoice.dataset.status) && filterOptions.size != 0
@@ -86,26 +104,24 @@ function searchInvoices() {
   }
 }
 async function saveInvoiceToDB(invoice) {
+  let response;
   try {
-    const result = await (
-      await fetch(`${URL}/saveInvoice`, {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(invoice),
-      })
-    ).json();
 
-    // get date and payment due
-    // console.log(result);
+    response = await fetchWithAuth('/saveInvoice', "POST", JSON.stringify(invoice));
+    if (response.status === 403) {
+      await refreshAccessToken();
+    
+      saveInvoiceToDB(invoice);
+    
+    }
   } catch (error) {
-    console.error(error);
+    console.error(`saveInvoiceToDB: ${error}`);
   }
 }
 
 function formatDueDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-AU", { dateStyle: "medium" });
 }
-// console.log(createdAt());
 function formatCurrency(totalStr) {
   return parseFloat(totalStr).toLocaleString("en", currencyOptions);
 }
@@ -141,28 +157,108 @@ function addInvoice(invoice) {
           </div>
         </a>`
   );
+  invoiceTotal.textContent = parseInt(invoiceTotal.textContent) + 1;
 }
-// newInvoiceBtn.addEventListener("click", (e) => {
-//   newInvoiceDialog.showModal();
-// });
 
-header.addEventListener("click", (e) => {
-  e.preventDefault();
+header.addEventListener("click", async (e) => {
+   e.stopImmediatePropagation();
   const themeBtn = e.target.closest("[data-theme]");
+  const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
+  const closeBtn = e.target.closest('[data-close]');
+  const submtiBtn = e.target.closest('[data-profile-submit]');
+  const logoutBtn = e.target.closest('[data-logout]');
+  // console.log(logoutBtn);
   if (themeBtn) {
+    e.preventDefault();
     themeUpdate(e, themeInputs);
   }
+  else if (profileDialogAttr) {
+    profileDialog.showModal();
+    profileDialog.querySelector('input[name="username"]').value = username;
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    
+  }  else if (closeBtn) {
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    document.querySelector('#profile-form').reset();
+    profileDialog.close();
+  } else if (submtiBtn) {
+    e.preventDefault();
+
+    const input = profileDialog.querySelector('input[name="username"]');
+
+    if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
+      const formData = new FormData(document.querySelector('#profile-form'));
+      let response;
+      try {
+        response = await fetchWithAuth('/upload', 'POST', formData, {});
+        if (response.status === 403) {
+          await refreshAccessToken();
+          response = await fetchWithAuth('/upload', 'POST', formData, {});
+        }
+        if (response.ok) {
+          const result = await response.json();
+          if (result['success']) {
+            const { filename, alt, title } = result['file'];
+            const { username: newUsername } = result;
+            profileImg.src = `${filename}`;
+           
+            profileImg.setAttribute('title', title);
+            profileImg.setAttribute('alt', alt);
+          
+            fileInput.value = '';
+            localStorage.setItem('img', filename);
+            localStorage.setItem('username', newUsername);
+            username = newUsername;
+          
+          } else {
+            console.error(result);
+          }
+        }
+      } catch (error) {
+        console.error(`upload on frontend: ${error}`);
+      }
+    } else {
+      const form = submtiBtn.closest('form');
+      form.requestSubmit(submtiBtn);
+    }
+  } else if (logoutBtn) {
+    e.preventDefault();
+   
+    const result = await logout();
+    if (result.success) {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    }
+    
+  }
+
 });
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
+    const file = e.target.files[0];
+    const thumbUrl = URL.createObjectURL(file);
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.setAttribute('src', thumbUrl);
+    imgPreview.setAttribute('title', file.name);
+    imgPreview.setAttribute('alt', file.name);
+  } else {
+    console.log('file does not meet requirements');
+    console.error(e.target.files);
+  }
+
+});
+
 
 main.addEventListener("click", (e) => {
   e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
+  
   const invoiceEle = e.target.closest("[data-invoice]");
-  const themeBtn = e.target.closest("[data-theme]");
-  //   console.log(e.target);
-  //   console.log(e.target); console.log(invoiceEle);
 
   if (statusFilterOption) {
     const input = statusFilterOption.querySelector('[type="checkbox"]');
@@ -180,7 +276,8 @@ main.addEventListener("click", (e) => {
     newInvoiceDialog.showModal();
   } else if (invoiceEle) {
     location.href = invoiceEle.getAttribute("href");
-  }
+  } 
+  
 });
 
 newInvoiceDialog.addEventListener("click", async (e) => {
@@ -194,10 +291,10 @@ newInvoiceDialog.addEventListener("click", async (e) => {
   const draftBtn = e.target.closest("[data-draft]");
   const goBackBtn = e.target.closest("[data-go-back]");
   const themeBtn = e.target.closest("[data-theme]");
-  // console.log(themeBtn);
-  // console.log(e.target);
+
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
+   
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {
@@ -222,14 +319,8 @@ newInvoiceDialog.addEventListener("click", async (e) => {
     const draftInvoice = saveInvoice(newInvoiceDialog, "draft");
     await saveInvoiceToDB(draftInvoice);
 
-    // location.reload();
     addInvoice(draftInvoice);
-    // console.log(invoice);
   } else if (themeBtn) {
     themeUpdate(e, themeInputs);
   }
 });
-// newInvoiceDialog.addEventListener("input", (e) => {
-//     console.log(e.target.value);
-// });
-createInvoices();

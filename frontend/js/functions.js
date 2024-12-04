@@ -1,5 +1,6 @@
-export const URL = "https://invoice-backend.noahprojects.work";
+export const URL_WEBSITE = "https://invoice-backend.noahprojects.work";
 export const perferredColorScheme = "perferredColorScheme";
+// export const accessToken = localStorage.getItem('accessToken');
 
 function generateCustomId() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -9,22 +10,30 @@ function generateCustomId() {
   const randomNumbers = Math.floor(1000 + Math.random() * 9000).toString();
   return `${randomLetters}${randomNumbers}`;
 }
+export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
 
-// const dataResponse = await fetch(`${URL}/health-check`);
-// console.log(await dataResponse.json());
 
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
 }
-
+export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
+  return await fetch(`${URL_WEBSITE}${path}`, {
+    method,
+    headers: {
+       ...headers,
+      // "Access-Control-Allow-Origin": true,
+    },
+    body,
+    credentials: 'same-origin',
+    cache: 'reload'
+  });
+}
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
-  // console.log(checked);
   for (const themeInput of themeInputs) {
     const input = themeInput.querySelector("input");
     input.checked = checked;
-    // console.log(input);
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
 }
@@ -56,7 +65,6 @@ export function resetForm(invoiceDialog) {
   invoiceForm.reset();
 }
 function updateTotalWithQty(e) {
-  //   console.log(e.target.value);
   const invoiceItem = e.target.closest("div.invoice-item");
   const total = invoiceItem.querySelector(".total  input");
   const price = invoiceItem.querySelector(".price  input");
@@ -198,6 +206,7 @@ export function addItemRow(addItemBtn) {
     .querySelector(".price")
     .addEventListener("input", updateTotalWithPrice);
 }
+
 export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItems = invoiceDialog.querySelectorAll(
     ".invoice-items > .invoice-item"
@@ -205,7 +214,6 @@ export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItemsArry = [];
   let total = 0;
 
-  // console.log(invoiceItems);
   for (const invoiceItem of invoiceItems) {
     const invoiceTotal = parseFloat(
       invoiceItem.querySelector(".total > input").value
@@ -218,24 +226,27 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     });
     total += invoiceTotal;
   }
-  // const date = new Date(formInputs[10].value);
-  const date = invoiceDialog.querySelector("form label > input#date").value;
-  // console.log(date);
-  // date = new Date(`${date}T00:00:00`).toLocaleDateString("en-CA", {
-  //   year: "numeric",
-  //   month: "numeric",
-  //   day: "numeric",
-  // });
-  // console.log(date);
-  // console.log(new Intl.DateTimeFormat("en-CA").format(`${date}T00:00:00`));
+  const form = invoiceDialog.querySelector("form");
+  const formData = new FormData(form);
+  const formObj = Object.fromEntries(formData);
+  const {
+    date,
+    city,
+    "client-city": clientCity,
+    "client-country": clientCountry,
+    "client-street": clientStreet,
+    "client-postal-code": clientPostCode,
+    "client-email": clientEmail,
+    description,
+    "postal-code": postCode,
+    street,
+    country,
+    "client-name": clientName,
+  } = formObj;
 
-  // console.log(formatDate(date));
   const createdAtVal = date === "" ? createdAt() : date;
-  // console.log(date);
   let paymentDue = new Date(`${createdAtVal}T00:00:00`);
-  // let paymentDue =
-  //   date == "Invalid Date" ? "No Due Date" : new Date(`${date}T00:00:00`);
-  // console.log(paymentDue);
+
   const paymentTerms = parseInt(
     invoiceDialog
       .querySelector("[data-payment-terms-value")
@@ -247,46 +258,26 @@ export function saveInvoice(invoiceDialog, status, id = null) {
     month: "numeric",
     day: "numeric",
   });
-  // if (paymentDue != "No Due Date") {
-  //   paymentDue.setDate(paymentDue.getDate() + paymentTerms);
-
-  //   paymentDue = paymentDue.toLocaleDateString("en-CA", {
-  //     year: "numeric",
-  //     month: "numeric",
-  //     day: "numeric",
-  //   });
-  // }
 
   const invoice = {
     id: id ?? generateCustomId(),
-    senderAddress: {
-      street: invoiceDialog.querySelector("form label > input#addy").value,
-      city: invoiceDialog.querySelector("form label > input#city").value,
-      postCode: invoiceDialog.querySelector("form label > input#zipcode").value,
-      country: invoiceDialog.querySelector("form label > input#country").value,
-    },
-    clientName: invoiceDialog.querySelector("form label > input#name").value,
-    clientEmail: invoiceDialog.querySelector("form label > input#email").value,
+    senderAddress: { street, city, postCode, country },
+    clientName,
+    clientEmail,
     clientAddress: {
-      street: invoiceDialog.querySelector("form label > input#client-addy")
-        .value,
-      city: invoiceDialog.querySelector("form label > input#client-city").value,
-      postCode: invoiceDialog.querySelector("form label > input#client-zipcode")
-        .value,
-      country: invoiceDialog.querySelector("form label > input#client-country")
-        .value,
+      street: clientStreet,
+      city: clientCity,
+      country: clientCountry,
+      postCode: clientPostCode,
     },
-    createdAt: `${createdAtVal}T00:00:00`,
-    description: invoiceDialog.querySelector("form label > input#description")
-      .value,
-    paymentTerms: paymentTerms,
     status: status,
+    createdAt: `${createdAtVal}T00:00:00`,
+    description,
+    paymentTerms,
     items: invoiceItemsArry,
     total,
     paymentDue: `${paymentDue}T00:00:00`,
   };
-
-  // console.log(invoice);
 
   resetForm(invoiceDialog);
   return invoice;
@@ -307,7 +298,53 @@ export function updatePaymentTerms(paymentTermsBtn) {
   input.checked = !input.checked;
 }
 
+export async function logout() {
+  const response = await fetch(`${URL_WEBSITE}/logout`, {
+    method: "POST",
+    headers: {
+      // "Access-Control-Allow-Origin": true,
+    },
+    cache: 'reload',
+    credentials: "same-origin",
+  });
+  // console.log(response);
+  const result = await response.json();
+  // console.log(result);
+  if (result['success']) {
+    localStorage.removeItem('img');
+    localStorage.removeItem('username');
+    location.href = "/login.html";
+  }
+}
+
+
+
+export async function refreshAccessToken() {
+  try {
+    const tokenResponse = await fetch(`${URL_WEBSITE}/refresh-token`, {
+      method: "POST",
+      credentials: "same-origin",
+    });
+
+    if (tokenResponse.ok) {
+      const { accessToken } = await tokenResponse.json();
+      // console.log(accessToken);
+    
+    } else {
+
+      console.error(await tokenResponse.json());
+      location.href = "/login.html";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export function showPaymentTermsMenu(paymentTermInput) {
   const input = paymentTermInput.querySelector("input");
   input.checked = !input.checked;
+}
+export function showFormErrors(e) {
+  const form = e.closest("form");
+  return form.reportValidity();
 }

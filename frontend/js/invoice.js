@@ -7,20 +7,31 @@ import {
   updatePaymentTerms,
   perferredColorScheme,
   themeUpdate,
-  URL,
+  refreshAccessToken,
+  fetchWithAuth,
+  logout,
+  showFormErrors, 
+  acceptedFileTypes
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
-
-let invoice = await (
-  await fetch(`${URL}/getInvoice/${invoiceId}`, {
-    method: "GET",
-    headers: { "Content-type": "application/json" },
-    cache: "reload",
-  })
-).json();
-
-console.log(invoice);
+let invoice = await getInvoice(invoiceId);
+async function getInvoice(invoiceId) {
+  let response;
+  try {
+   
+    response = await fetchWithAuth(`/getInvoice/${invoiceId}`, 'GET');
+    if (response.status === 403) {
+       await refreshAccessToken();
+    
+      return await getInvoice(invoiceId);
+    } else {
+      return await response.json();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const body = document.querySelector("body");
@@ -28,10 +39,14 @@ const statusBarEle = document.querySelector("[data-status-bar]");
 const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
-// const themeInput = document.querySelector("#theme");
-// const perferredColorScheme = "perferredColorScheme";
+const profileDialog = document.getElementById('profile-dialog');
+let username = localStorage.getItem('username');
+let img = localStorage.getItem('img');
+const profileImg = document.getElementById('profile_img');
+profileImg.src = img;
+const fileInput = document.getElementById("profile_pic");
 const currencyOptions = { style: "currency", currency: "GBP" };
-const homePage = "index.html";
+const homePage = "/index.html";
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 
 if (!(perferredColorScheme in localStorage)) {
@@ -54,16 +69,23 @@ function updateStatus({ status }) {
     <div class="status"></div>
     <span data-status-text>${status}<span>
     </div>
-    </div>`
+    </div>
+     <button
+          class="edit-btn"
+          data-show-edit-dialog
+          aria-label="discard edit">
+          Edit
+        </button>
+        <button class="delete-btn" data-show-delete-dialog>Delete</button>
+        <button class="mark-btn" data-mark-status-paid="">Mark as Paid</button>
+    `
   );
 }
 function updateInvoice(invoice) {
-  // console.log(invoice);
   const senderAddress = JSON.parse(invoice.senderAddress);
   const clientAddress = JSON.parse(invoice.clientAddress);
   const items = JSON.parse(invoice.items);
-  // console.log(invoice.items);
-  // console.log(invoice);
+ 
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
     `<div class="invoice-info league-spartan-medium">
@@ -110,7 +132,6 @@ function updateInvoice(invoice) {
   );
 
   for (const item of items) {
-    // console.log(item);
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
@@ -134,9 +155,21 @@ function updateInvoice(invoice) {
 }
 updateStatus(invoice);
 updateInvoice(invoice);
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
+    const file = e.target.files[0];
+    const thumbUrl = URL.createObjectURL(file);
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.setAttribute('src', thumbUrl);
+    imgPreview.setAttribute('title', file.name);
+    imgPreview.setAttribute('alt', file.name);
+  } else {
+    console.log('file does not meet requirements');
+    console.error(e.target.files);
+  }
+});
 body.addEventListener("click", async (e) => {
-  //   console.log(e.target);
-  e.preventDefault();
+ 
   const deleteDialogTarget = e.target.closest("[data-show-delete-dialog]");
   const editDialogTarget = e.target.closest("[data-show-edit-dialog]");
   const goBackBtn = e.target.closest("[data-go-back]");
@@ -150,8 +183,12 @@ body.addEventListener("click", async (e) => {
   const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
   const paymentTermInput = e.target.closest("[data-payment-terms-input]");
   const saveChangesBtn = e.target.closest("[data-save]");
-  // const themeBtn = e.target.closest('[data-theme]');
-  //   console.log(goBackBtn);
+
+  const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
+  const closeBtn = e.target.closest('[data-close]');
+  const submtiBtn = e.target.closest('[data-profile-submit]');
+  const logoutBtn = e.target.closest('[data-logout]');
+
   if (deleteDialogTarget) {
     deleteDialog.showModal();
     const deleteId = deleteDialog.querySelector("[data-invoice-id]");
@@ -178,8 +215,8 @@ body.addEventListener("click", async (e) => {
       postCode: clientPostCode,
       country: clientCountry,
     } = JSON.parse(clientAddress);
+
     const itemsArry = JSON.parse(items).entries();
-    // console.log(editDialog.querySelector("form label > input#addy"));
     const netEle = editDialog.querySelector("form [data-payment-terms-value]");
     netEle.setAttribute("data-payment-terms-value", paymentTerms);
 
@@ -187,23 +224,23 @@ body.addEventListener("click", async (e) => {
       editDialog.querySelector(
         `form [data-payment-terms-option="${paymentTerms}"] > span`
       ).textContent;
-    editDialog.querySelector("form label > input#addy").value = street ?? "";
+    editDialog.querySelector("form label > input#street").value = street ?? "";
     editDialog.querySelector("form label > input#city").value = city ?? "";
-    editDialog.querySelector("form label > input#zipcode").value =
+    editDialog.querySelector("form label > input#postal-code").value =
       postCode ?? "";
     editDialog.querySelector("form label > input#country").value =
       country ?? "";
 
-    editDialog.querySelector("form label > input#name").value =
+    editDialog.querySelector("form label > input#client-name").value =
       clientName ?? "";
-    editDialog.querySelector("form label > input#email").value =
+    editDialog.querySelector("form label > input#client-email").value =
       clientEmail ?? "";
 
-    editDialog.querySelector("form label > input#client-addy").value =
+    editDialog.querySelector("form label > input#client-street").value =
       clientStreet ?? "";
     editDialog.querySelector("form label > input#client-city").value =
       clientCity ?? "";
-    editDialog.querySelector("form label > input#client-zipcode").value =
+    editDialog.querySelector("form label > input#client-postal-code").value =
       clientPostCode ?? "";
     editDialog.querySelector("form label > input#client-country").value =
       clientCountry ?? "";
@@ -280,85 +317,171 @@ body.addEventListener("click", async (e) => {
   } else if (goBackBtn) {
     history.back();
   } else if (markAsPaidBtn) {
+    e.preventDefault();
     const statusEle = statusBarEle.querySelector("[data-status]");
     const statusText = statusEle.querySelector("[data-status-text]");
     const status =
       statusEle.dataset.status == "pending" ? "paid" : statusEle.dataset.status;
     if (status !== statusEle.dataset.status) {
-      const response = await (
-        await fetch(`${URL}/updateStatus/${invoice.id}`, {
-          method: "PUT",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify({ status }),
-        })
-      ).json();
-      invoice.status = status;
-      // console.log(invoice);
+      let response;
+      try {
+       
+        const jsonStatus = JSON.stringify({ status });
+        response =
+          await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
+        if (response.status === 403) {
+           await refreshAccessToken();
+        
+          response =
+          await fetchWithAuth(`/updateStatus/${invoiceId}`, "PUT", jsonStatus);
+        }
+       invoice.status = status;
+        
+      } catch (error) {
+        console.error(`Status Update: ${error}`);
+      }
     }
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;
   } else if (themeBtn) {
+    e.preventDefault();
     themeUpdate(e, themeInputs);
   } else if (closeDeleteDialog) {
     deleteDialog.close();
   } else if (goBackPageBtn) {
-    //   editDialog.close();
+    e.preventDefault();
     resetForm(editDialog);
   } else if (deleteInvoiceBtn) {
-    const response = await (
-      await fetch(`${URL}/deleteInvoice/${invoiceId}`, {
-        method: "DELETE",
-        headers: { "Content-type": "application/json" },
-      })
-    ).json();
-    // console.log(response);
-    if (response.success) {
-      history.back();
+    e.preventDefault();
+    let response;
+    try {
+      
+      response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
+      if (response.status === 403) {
+        await refreshAccessToken();
+       
+        response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
+       
+      }
+      const {success} = await response.json();
+      if (response.ok && success) {
+        history.back();
+      }
+    } catch (error) {
+      console.error(`Delete Invoice: ${error}`);
     }
-    // const idxOfInvoice = data
-    //   .map((invoice) => invoice.id)
-    //   .indexOf(`${invoiceId}`);
-    // data.splice(idxOfInvoice, 1);
-    // console.log(data);
-    // location.href = homePage;
+    
+   
   } else if (deleteItemBtn) {
-    const deleteItemIndx = deleteItemBtn.dataset.itemIndex;
-    // invoice.items.splice(deleteItemIndx, 1);
-
+    e.preventDefault();
     deleteItemBtn.parentElement.remove();
   } else if (addItemBtn) {
+      e.preventDefault();
     addItemRow(addItemBtn);
   } else if (paymentTermsBtn) {
+      e.preventDefault();
     updatePaymentTerms(paymentTermsBtn);
   } else if (paymentTermInput) {
+      e.preventDefault();
     showPaymentTermsMenu(paymentTermInput);
   } else if (saveChangesBtn) {
+      e.preventDefault();
     const invoiceForm = editDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
-      const tempInvoice = saveInvoice(
-        editDialog,
-        invoice.status === "draft" ? "pending" : invoice.status,
-        invoice.id
-      );
-      statusBarEle.replaceChildren();
-      invoiceEle.childNodes[0].remove();
-      invoiceItemsTable.replaceChildren();
-      const response = await (
-        await fetch(`${URL}/updateInvoice/${invoice.id}`, {
-          method: "POST",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify(tempInvoice),
-        })
-      ).json();
-      tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
-      tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
-      tempInvoice.items = JSON.stringify(tempInvoice.items);
-      updateStatus(tempInvoice);
-      updateInvoice(tempInvoice);
-      invoice = tempInvoice;
+      let response;
+      try {  
+        const tempInvoice = saveInvoice(
+          editDialog,
+          invoice.status === "draft" ? "pending" : invoice.status,
+          invoice.id
+        );
+        statusBarEle.replaceChildren();
+        invoiceEle.childNodes[0].remove();
+        invoiceItemsTable.replaceChildren();
+       
+        const jsonInvoice = JSON.stringify(tempInvoice);
+        response =
+          await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
+        if (response.status === 403) {
+          
+         await refreshAccessToken();
+       
+        response =
+          await fetchWithAuth(`/updateInvoice/${invoiceId}`, "POST", jsonInvoice);
+        }
+        tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
+        tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+        tempInvoice.items = JSON.stringify(tempInvoice.items);
+        updateStatus(tempInvoice);
+        updateInvoice(tempInvoice);
+        invoice = tempInvoice;
+      } catch (error) {
+        console.error(`update invoice: ${error}`);
+      }
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveChangesBtn);
     }
+  } 
+  else if (profileDialogAttr) {
+    profileDialog.showModal();
+    profileDialog.querySelector('input[name="username"]').value = username;
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    
+  }  else if (closeBtn) {
+    const imgPreview = profileDialog.querySelector('img[data-preview]');
+    imgPreview.src = localStorage.getItem('img');
+    document.querySelector('#profile-form').reset();
+    profileDialog.close();
+  } else if (submtiBtn) {
+    e.preventDefault();
+
+    const input = profileDialog.querySelector('input[name="username"]');
+
+    if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
+      const formData = new FormData(document.querySelector('#profile-form'));
+      let response;
+      try {
+        response = await fetchWithAuth('/upload', 'POST', formData, {});
+        if (response.status === 403) {
+          await refreshAccessToken();
+          response = await fetchWithAuth('/upload', 'POST', formData, {});
+        }
+        if (response.ok) {
+          const result = await response.json();
+          if (result['success']) {
+            const { filename, alt, title } = result['file'];
+            const { username: newUsername } = result;
+            profileImg.src = `${filename}`;
+           
+            profileImg.setAttribute('title', title);
+            profileImg.setAttribute('alt', alt);
+          
+            fileInput.value = '';
+            localStorage.setItem('img', filename);
+            localStorage.setItem('username', newUsername);
+            username = newUsername;
+          
+          } else {
+            console.error(result);
+          }
+        }
+      } catch (error) {
+        console.error(`upload on frontend: ${error}`);
+      }
+    } else {
+      const form = submtiBtn.closest('form');
+      form.requestSubmit(submtiBtn);
+    }
+  } else if (logoutBtn) {
+    e.preventDefault();
+   
+    const result = await logout();
+    if (result.success) {
+      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    }
+    
   }
 });
