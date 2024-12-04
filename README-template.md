@@ -110,6 +110,7 @@ https://stackoverflow.com/questions/563406/how-to-add-days-to-date
 https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api
 https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js
 https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express
+https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table
 - [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
 - [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
 

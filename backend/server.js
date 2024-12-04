@@ -541,7 +541,7 @@ app.post('/logout', async (req, res) => {
   }
 })
 app.delete('/deleteInvoice/:id', extractToken, validateToken, async (req, res) => {
-  const statusCode = await checkTokens(req, res) 
+  const statusCode = await checkTokens(req, res); 
   if (statusCode === 403) {
     return res.status(statusCode).json({ message: 'tokens are invalid' });
   }
@@ -580,7 +580,7 @@ app.post('/refresh-token', async (req, res) => {
     const hashToken = hashPassword(refreshToken);
     const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
     const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
-    if (!token) return res.status(403).json({ message: 'invalid refresh token test' });
+    if (!token) return res.status(403).json({ message: 'invalid refresh token' });
 
     const newAccessToken = await generateAccessToken(user);
 
