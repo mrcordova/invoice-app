@@ -11,7 +11,9 @@ import {
   fetchWithAuth,
   logout,
   showFormErrors, 
-  acceptedFileTypes
+  acceptedFileTypes,
+  showProgressCircle,
+  hideProgressCircle
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const invoiceId = params.get("invoice-id");
@@ -324,6 +326,7 @@ body.addEventListener("click", async (e) => {
       statusEle.dataset.status == "pending" ? "paid" : statusEle.dataset.status;
     if (status !== statusEle.dataset.status) {
       let response;
+      const btnText = showProgressCircle(markAsPaidBtn);
       try {
        
         const jsonStatus = JSON.stringify({ status });
@@ -340,6 +343,7 @@ body.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`Status Update: ${error}`);
       }
+      hideProgressCircle(markAsPaidBtn, btnText);
     }
     statusEle.setAttribute("data-status", status);
     statusText.textContent = status;
@@ -354,6 +358,7 @@ body.addEventListener("click", async (e) => {
   } else if (deleteInvoiceBtn) {
     e.preventDefault();
     let response;
+    const btnText = showProgressCircle(deleteInvoiceBtn);
     try {
       
       response = await fetchWithAuth(`/deleteInvoice/${invoiceId}`, "DELETE");
@@ -370,7 +375,7 @@ body.addEventListener("click", async (e) => {
     } catch (error) {
       console.error(`Delete Invoice: ${error}`);
     }
-    
+    hideProgressCircle(deleteInvoiceBtn, btnText);
    
   } else if (deleteItemBtn) {
     e.preventDefault();
@@ -389,6 +394,7 @@ body.addEventListener("click", async (e) => {
     const invoiceForm = editDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
       let response;
+      const btnText = showProgressCircle(saveChangesBtn);
       try {  
         const tempInvoice = saveInvoice(
           editDialog,
@@ -418,6 +424,7 @@ body.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`update invoice: ${error}`);
       }
+      hideProgressCircle(saveChangesBtn, btnText);
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveChangesBtn);
@@ -442,6 +449,7 @@ body.addEventListener("click", async (e) => {
     if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
       const formData = new FormData(document.querySelector('#profile-form'));
       let response;
+      const btnText = showProgressCircle(submtiBtn);
       try {
         response = await fetchWithAuth('/upload', 'POST', formData, {});
         if (response.status === 403) {
@@ -470,6 +478,7 @@ body.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`upload on frontend: ${error}`);
       }
+      hideProgressCircle(submtiBtn, btnText);
     } else {
       const form = submtiBtn.closest('form');
       form.requestSubmit(submtiBtn);
@@ -477,7 +486,9 @@ body.addEventListener("click", async (e) => {
   } else if (logoutBtn) {
     e.preventDefault();
    
+    const btnText = showProgressCircle(logoutBtn);
     const result = await logout();
+    hideProgressCircle(logoutBtn, btnText);
     if (result.success) {
       document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
       document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';

@@ -14,6 +14,7 @@
   --river-styx: #141625;
   --carbon-blue: #373b53;
   --independence: #494e6e;
+    --sapphire-blue: #0057D9;
   --paid: #33d69f;
   --pending: #ff8f00;
   --draft: light-dark(var(--carbon-blue), var(--stotic-white));
@@ -54,6 +55,25 @@
 
   @media screen and (prefers-reduced-motion: reduce), (update: slow) {
     transition-duration: 0s;
+  }
+}
+
+.progress-circle {
+  display: block;
+  margin: auto;
+  width: 1.1725rem;
+  height: 1.1725rem;
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  border: 4.75px solid white; 
+  border-top: 4.75px solid var(--sapphire-blue);
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 

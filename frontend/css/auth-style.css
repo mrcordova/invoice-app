@@ -11,6 +11,7 @@
   --papilio-argeotus: #888eb0;
   --true-lavender: #7e88c3;
   --ruined-smores: #0c0e16;
+  --sapphire-blue: #0057D9;
   background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
   color-scheme: light dark;
   scrollbar-color: light-dark(var(--stotic-white), var(--royal-curtsy))
@@ -30,6 +31,24 @@
     font-weight: 700;
     font-style: normal;
     font-display: swap;
+}
+.progress-circle {
+  display: block;
+  margin: auto;
+  width: 1.1725rem;
+  height: 1.1725rem;
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  border: 4.75px solid white; 
+  border-top: 4.75px solid var(--sapphire-blue);
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 .league-spartan-medium {
   font-family: "League Spartan", sans-serif;

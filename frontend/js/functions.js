@@ -37,6 +37,17 @@ export function themeUpdate(e, themeInputs) {
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
 }
+export function showProgressCircle(btn) {
+  const btnText = btn.textContent;
+  btn.replaceChildren();
+  btn.insertAdjacentHTML('beforeend', `<span class="progress-circle"></span>`);
+  return btnText;
+}
+
+export function hideProgressCircle(btn, btnText) {
+  btn.replaceChildren();
+  btn.insertAdjacentText('beforeend', btnText);
+}
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));
 }

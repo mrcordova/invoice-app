@@ -12,7 +12,8 @@ import {
   acceptedFileTypes,
   fetchWithAuth,
   showFormErrors,
-
+  showProgressCircle,
+hideProgressCircle
 } from "./functions.js";
 
 
@@ -191,6 +192,7 @@ header.addEventListener("click", async (e) => {
     if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
       const formData = new FormData(document.querySelector('#profile-form'));
       let response;
+      const btnText = showProgressCircle(submtiBtn);
       try {
         response = await fetchWithAuth('/upload', 'POST', formData, {});
         if (response.status === 403) {
@@ -219,14 +221,20 @@ header.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`upload on frontend: ${error}`);
       }
+      hideProgressCircle(submtiBtn, btnText);
     } else {
-      const form = submtiBtn.closest('form');
-      form.requestSubmit(submtiBtn);
+ 
+      if ((fileInput.files.length === 1 || input.value !== username)) {
+        const form = submtiBtn.closest('form');
+        form.requestSubmit(submtiBtn);
+      }
     }
   } else if (logoutBtn) {
     e.preventDefault();
    
+    const btnText = showProgressCircle(logoutBtn);
     const result = await logout();
+    hideProgressCircle(logoutBtn, btnText);
     if (result.success) {
       document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
       document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
@@ -301,8 +309,10 @@ newInvoiceDialog.addEventListener("click", async (e) => {
     const invoiceForm = newInvoiceDialog.querySelector("#invoice-form");
     if (invoiceForm.checkValidity()) {
       const pendingInvoice = saveInvoice(newInvoiceDialog, "pending");
-      saveInvoiceToDB(pendingInvoice);
+      const btnText = showProgressCircle(saveBtn);
+      await saveInvoiceToDB(pendingInvoice);
       addInvoice(pendingInvoice);
+      hideProgressCircle(saveBtn, btnText);
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveBtn);
@@ -317,9 +327,10 @@ newInvoiceDialog.addEventListener("click", async (e) => {
     deleteItemBtn.parentElement.remove();
   } else if (draftBtn) {
     const draftInvoice = saveInvoice(newInvoiceDialog, "draft");
+    const btnText = showProgressCircle(draftBtn);
     await saveInvoiceToDB(draftInvoice);
-
     addInvoice(draftInvoice);
+    hideProgressCircle(draftBtn, btnText);
   } else if (themeBtn) {
     themeUpdate(e, themeInputs);
   }

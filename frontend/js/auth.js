@@ -1,16 +1,17 @@
-import { showFormErrors, URL_WEBSITE  } from "./functions.js";
+import { hideProgressCircle, showFormErrors, showProgressCircle, URL_WEBSITE  } from "./functions.js";
 
 document.addEventListener("click", async (e) => {
   e.preventDefault();
-  const login = e.target.closest("[data-login]");
-  const signUp = e.target.closest("[data-sign-up]");
+  const loginBtn = e.target.closest("[data-login]");
+  const signUpBtn = e.target.closest("[data-sign-up]");
   const goPage = e.target.closest("[data-page]");
 
-  if (signUp) {
-    if (showFormErrors(signUp)) {
-      const formData = new FormData(signUp.parentElement);
+  if (signUpBtn) {
+    if (showFormErrors(signUpBtn)) {
+      const formData = new FormData(signUpBtn.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
 
+     const btnText =showProgressCircle(signUpBtn);
       try {
         const response = await fetch(`${URL_WEBSITE}/registerUser`, {
           method: "POST",
@@ -19,7 +20,7 @@ document.addEventListener("click", async (e) => {
           cache: 'reload'
         });
         if (response.ok) {
-          signUp.parentElement.reset();
+          signUpBtn.parentElement.reset();
           alert("user successfully registerd");
           location.href = "login.html";
         } else {
@@ -29,12 +30,18 @@ document.addEventListener("click", async (e) => {
       } catch (error) {
         console.error(`Sign up: ${error}`);
       }
+      hideProgressCircle(signUpBtn, btnText);
     }
-  } else if (login) {
-    if (showFormErrors(login)) {
-      const formData = new FormData(login.parentElement);
+  } else if (loginBtn) {
+    if (showFormErrors(loginBtn)) {
+      const formData = new FormData(loginBtn.parentElement);
       const formObj = Object.fromEntries(formData.entries());
+      const btnText = showProgressCircle(loginBtn);
+      
       try {
+
+        // loginBtn.replaceChildren();
+        // loginBtn.insertAdjacentHTML('beforeend', `<span class="progress-circle"></span>`);
         const response = await fetch(`${URL_WEBSITE}/loginUser`, {
           method: "POST",
           headers: { "Content-type": "application/json" },
@@ -42,7 +49,7 @@ document.addEventListener("click", async (e) => {
           cache: 'reload'
         });
         if (response.ok) {
-          login.parentElement.reset();
+          loginBtn.parentElement.reset();
           const { username, img} = await response.json();
           localStorage.setItem('username', username);
           localStorage.setItem('img', img);
@@ -52,9 +59,14 @@ document.addEventListener("click", async (e) => {
           const { message } = await response.json();
           alert(`Error: ${message}`);
         }
+        
+        // loginBtn.replaceChildren();
+        // loginBtn.insertAdjacentText('beforeend', btnText);
+        
       } catch (error) {
         console.log(`Login: ${error}`);
       }
+      hideProgressCircle(loginBtn, btnText);
     }
   } else if (goPage) {
     location.href = goPage.href;
