@@ -56,27 +56,33 @@ const app = express();
 const PORT = process.env.PORT || 3004;
 const encryptPassword = (password, salt) => {
   return scryptSync(password, salt, 32).toString('hex');
-}
+};
 const hashPassword = (password) => {
   // const salt = randomBytes(16).toString("hex");
   // return encryptPassword(password, salt) + salt;
   return encryptPassword(password, process.env.SALT);
-}
+};
 const matchPassword = (password, hash) => {
   // const salt = hash.slice(64);
   const originalPassHash = hash.slice(0, 64);
   // const currentPassHash = encryptPassword(password, salt);
   const currentPassHash = encryptPassword(password, process.env.SALT);
   return originalPassHash === currentPassHash;
-}
+};
 
 
-async function checkUserExists(username, email) {
-  const selectQuery = 'SELECT * FROM users WHERE username = ? OR email = ?';
-  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username, email] });
+async function checkUserExists(username) {
+  const selectQuery = 'SELECT * FROM users WHERE username = ?';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username] });
 
   return rows.length > 0;
-}
+};
+async function checkEmailExists(email) {
+  const selectQuery = 'SELECT * FROM users WHERE email = ?';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [ email] });
+
+  return rows.length > 0;
+};
 
 async function generateRefreshToken(user) {
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -92,10 +98,10 @@ async function generateRefreshToken(user) {
     console.error(`generateRefreshToken: ${error}`);
   }
 
-}
+};
 async function generateAccessToken(user) {
   return jwt.sign({ id: user.id, username: user.username, img: user.img }, process.env.JWT_SECRET, { expiresIn: '1h' });
-}
+};
 async function blacklistToken(token) {
   const { exp, id } = jwt.decode(token);
   const now = Math.floor(Date.now() / 1000);
@@ -111,40 +117,65 @@ async function blacklistToken(token) {
     console.error(`blacklisted: ${error}`);
   }
   
-}
+};
 
 async function isTokenBlacklisted(token) {
   try {
     const hashToken = hashPassword(token);
     const selectQuery = 'SELECT * FROM blacklist_tokens WHERE token = ?';
-    const [result] = await poolPromise.query({ sql: selectQuery, values: [hashToken] });
-    return result.affectedRows > 0;
+    const [results] = await poolPromise.query({ sql: selectQuery, values: [hashToken] });
+    return results.length > 0;
   } catch (error) {
     console.error(`isTokenBlacked: ${error}`);
   }
-}
+};
 const extractToken = async (req, res, next) => {
-  const token  = req.signedCookies['access_token'];
+  const token = req.signedCookies['access_token'];
   
   if (token) {
     
-    req.token =  token == 'null' ? null : token;
+    req.token = token == 'null' ? null : token;
   
   } else {
     req.token = undefined;
   }
   next();
-}
+};
 async function validateToken(req, res, next) {
   const refreshToken = req.signedCookies['refresh_token'];
-  if (!refreshToken) return res.status(403).send('Token is invalid');
+  if (!refreshToken) {
+    return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
+  }
+  // console.log('here');
 
-  const blacklisted = await isTokenBlacklisted(refreshToken);
-  if (blacklisted) return res.status(403).send('Token is blacklisted');
-
-  next();
+  //  const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+  //   const hashToken = hashPassword(refreshToken);
+  //   const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
+  //   const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
+  //   if (!token) return res.status(403).json({ message: 'invalid refresh token' });
+  try {
+    // console.log('test')
+    
+    const { id, username, img } = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // console.log(id);
+    const hashRefreshToken = hashPassword(refreshToken);
+    // console.log(hashRefreshToken);
+    const selectQuery = 'SELECT token FROM refresh_tokens WHERE user_id = ? AND token = ?  AND expires_at > NOW()';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [id, hashRefreshToken] });
+    // console.log(result);
+    if (!result.length) return res.status(403).json({ message: 'Token is invalid' });
+    req.user = { id, username, img };
+    
+    next();
+  } catch (error) {
+    // const hashRefreshToken = hashPassword(refreshToken);
+    const blacklisted = await isTokenBlacklisted(refreshToken);
+    if (blacklisted) return res.status(403).send('Token is blacklisted');
+    return res.status(403).json({ message: 'Token is invalid' });
+  }
   
-}
+  
+};
  
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -249,38 +280,43 @@ async function setUpDb() {
       console.error(`setUpDb: ${error}`);
     }
   }
-}
+};
 // setUpDb();
 
-async function checkTokens(req, res) {
+async function checkToken(req, res, next) {
   const token = req.token;
   if (!token) {
-    return 403;
+    return res.status(403).json({ message: 'tokens are invalid' });
   };
   try {
     const userForAccessToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {  
     console.error(`checkTokens ${error}`);
-    return 403;
+    return res.status(403).json({ message: 'tokens are invalid' });
   }
-  return 200;
-}
+  // return 200;
+  next();
+};
 
 
 
 app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
-})
+});
 
-app.post('/upload', extractToken, validateToken, upload.single('file'), async (req, res) => {
-  const statusCode = await checkTokens(req, res);
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+app.post('/upload', extractToken, checkToken, validateToken, upload.single('file'), async (req, res) => {
+  // const statusCode = await checkTokens(req, res);
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   const { username } = req.body;
+  if (checkUserExists(username)) {
+    return res.status(403).json({ message: 'username exisits already!' });
+  }
 
   try {
-    const {id } = jwt.decode(req.signedCookies['refresh_token']);
+    // const {id } = jwt.decode(req.signedCookies['refresh_token']);
+    const { user: { id } } = req;
     const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
     const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
     const newFileName = req.file ? `/uploads/${ req.file?.filename }` : selectResult[0].img;
@@ -327,12 +363,12 @@ app.get('/profilePic', async (req, res) => {
   }
 });
 
-app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
+app.get("/getInvoices", extractToken, checkToken, validateToken, async (req, res) => {
   
-  const statusCode = await checkTokens(req, res);
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+  // const statusCode = await checkTokens(req, res);
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const selectQuery = "SELECT * FROM invoices";
     const [results] = await poolPromise.query(selectQuery);
@@ -341,11 +377,11 @@ app.get("/getInvoices", extractToken, validateToken, async (req, res) => {
     console.error(`getInvoices: ${error}`);
   }
 });
-app.get('/getInvoice/:id', extractToken, validateToken,  async (req, res) => {
-  const statusCode = await checkTokens(req, res) 
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+app.get('/getInvoice/:id', extractToken, checkToken, validateToken,  async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const { id } = req.params;
     const selectQuery = 'SELECT * FROM invoices WHERE id = ? LIMIT 1';
@@ -355,11 +391,11 @@ app.get('/getInvoice/:id', extractToken, validateToken,  async (req, res) => {
     console.log(`getInvoice/:id: ${error}`);
   }
 });
-app.post('/saveInvoice', extractToken, validateToken, async (req, res) => {
-  const statusCode = await checkTokens(req, res) 
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+app.post('/saveInvoice', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const {
       id,
@@ -396,11 +432,11 @@ app.post('/saveInvoice', extractToken, validateToken, async (req, res) => {
     console.error(`saveInvoice: ${error}`);
   }
 });
-app.put('/updateStatus/:id', extractToken, validateToken, async (req, res) => {
-  const statusCode = await checkTokens(req, res) 
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+app.put('/updateStatus/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -412,11 +448,11 @@ app.put('/updateStatus/:id', extractToken, validateToken, async (req, res) => {
     console.error(`updateStatus: ${error}`)
   }
 });
-app.post('/updateInvoice/:id', extractToken,validateToken, async (req, res) => {
-  const statusCode = await checkTokens(req, res) 
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+app.post('/updateInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const { id } = req.params;
      const {
@@ -450,8 +486,11 @@ app.post('/registerUser', async (req, res) => {
   if (username.includes(" ")) {
     return res.status(401).json({ message: 'username contains spaces' });
   }
-  if ( await checkUserExists(username, email)) {
+  if ( await checkUserExists(username)) {
     return res.status(409).json({ message: 'User already exists' });
+  }
+  if ( await checkEmailExists(email)) {
+    return res.status(409).json({ message: 'Email already exists' });
   }
 try {
   const insertQuery = 'INSERT INTO users (username, password_hash, email, img) VALUES (?, ?, ?, ?)';
@@ -486,7 +525,7 @@ app.post('/loginUser', async (req, res) => {
       signed: true,
       secure: true,
       sameSite: 'strict',
-      path: '/' ,
+      path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     res.cookie('access_token', accessToken, {
@@ -494,20 +533,20 @@ app.post('/loginUser', async (req, res) => {
       signed: true,
       secure: true,
       sameSite: 'strict',
-      path: '/' ,
+      path: '/',
       maxAge: (1 * 60) * (60 * 1000),
     });
    
     
     // res.json({ accessToken, username});
-    res.json({username, img: user.img});
+    res.json({ username, img: user.img });
     // res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"))
 
   } catch (error) {
     console.error(`loginUser: ${error}`);
   
- }
-})
+  }
+});
 
 app.post('/logout', async (req, res) => {
 
@@ -524,7 +563,7 @@ app.post('/logout', async (req, res) => {
       signed: true,
       secure: true,
       sameSite: 'strict',
-      path: '/' ,
+      path: '/',
     });
     res.clearCookie('access_token', {
       httpOnly: true,
@@ -539,12 +578,12 @@ app.post('/logout', async (req, res) => {
   } catch (error) {
     return res.json({ success: false });
   }
-})
-app.delete('/deleteInvoice/:id', extractToken, validateToken, async (req, res) => {
-  const statusCode = await checkTokens(req, res); 
-  if (statusCode === 403) {
-    return res.status(statusCode).json({ message: 'tokens are invalid' });
-  }
+});
+app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res); 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
   try {
     const { id } = req.params;
     const deleteQuery = 'DELETE FROM invoices WHERE id = ? LIMIT 1';
@@ -567,21 +606,22 @@ app.get("/health-check", async (req, res) => {
   }
 });
 
-app.post('/refresh-token', async (req, res) => {
-  const refreshToken = req.signedCookies['refresh_token'];
-  if (!refreshToken) {
-    // console.log(refreshToken);
-    return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
-  }
+app.post('/refresh-token', validateToken, async (req, res) => {
+  // const refreshToken = req.signedCookies['refresh_token'];
+  // if (!refreshToken) {
+  //   // console.log(refreshToken);
+  //   return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
+  // }
 
 
   try {
-    const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    const hashToken = hashPassword(refreshToken);
-    const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
-    const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
-    if (!token) return res.status(403).json({ message: 'invalid refresh token' });
-
+    // const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // const hashToken = hashPassword(refreshToken);
+    // const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
+    // const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
+    // if (!token) return res.status(403).json({ message: 'invalid refresh token' });
+    const { user } = req;
+   
     const newAccessToken = await generateAccessToken(user);
 
     res.cookie('access_token', newAccessToken, {
