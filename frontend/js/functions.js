@@ -50,10 +50,15 @@ export function hideProgressCircle(btn, btnText) {
 };
 
 export function showOverlayLoading(overlay) {
- overlay.style.visibility = 'visible';
+  overlay.style.visibility = 'visible';
+  // overlay.style.opacity = '1';
 };
 export function hideOverlayLoading(overlay) {
- overlay.style.visibility = 'hidden';
+  overlay.style.visibility = 'hidden';
+  // overlay.style.opacity = '0';
+  // setTimeout(() => {
+  //   overlay.style.visibility = 'hidden';
+  // }, 500); // Match the transition duration
 };
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));

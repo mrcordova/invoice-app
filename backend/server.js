@@ -11,6 +11,48 @@ const fs = require('fs/promises');
 const multer = require('multer');
 const acceptedFileTypes = { 'image/jpeg': 'jpeg', 'image/png': 'png', "image/webp": 'webp', 'image/svg+xml': 'svg'};
 const defaultProfilePic = 'uploads/image-avatar.jpg';
+const PORT = process.env.PORT || 3004;
+const allowedOrigins = [
+  "https://invoice-app-3705.onrender.com",
+  'https://invoice-backend.noahprojects.work',
+  "http://127.0.0.1:5500",
+  "chrome-extension://mpognobbkildjkofajifpdfhcoklimli"
+];
+
+const app = express();
+require("dotenv").config();
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Origin", 'Cache-Control'],
+};
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  typeCast: function (field, next) {
+    if (field.type === "NEWDECIMAL") {
+      return parseFloat(field.string());
+    } else if (field.type === "NEWDATE") {
+    }
+    return next();
+  },
+});
+const poolPromise = pool.promise();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -32,30 +74,51 @@ const upload = multer({ storage, limits: {fileSize: 2 * 1024 * 1024},  fileFilte
         cb(null, true); // Accept the file
     } });
 
-require("dotenv").config();
-
-const allowedOrigins = [
-  "https://invoice-app-3705.onrender.com",
-  'https://invoice-backend.noahprojects.work',
-  "http://127.0.0.1:5500",
-  "chrome-extension://mpognobbkildjkofajifpdfhcoklimli"
-];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-  allowedHeaders: ["Content-type", "Authorization", "Access-Control-Allow-Credentials", "Access-Control-Allow-Origin", 'Cache-Control'],
-};
-const app = express();
 // console.log(randomBytes(32).toString("hex"))
+async function setUpDb() {
+  for (const invoice of data) {
+    const {
+      id,
+      createdAt,
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      clientAddress,
+      status,
+      senderAddress,
+      items,
+      total,
+    } = invoice;
 
-const PORT = process.env.PORT || 3004;
+    const insertQuery =
+      "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
+    try {
+      await poolPromise.query({
+        sql: insertQuery,
+        values: [
+          id,
+          createdAt,
+          paymentDue,
+          description,
+          paymentTerms,
+          clientName,
+          clientEmail,
+          status,
+          JSON.stringify(clientAddress),
+          JSON.stringify(senderAddress),
+          JSON.stringify(items),
+          total,
+        ],
+      });
+    } catch (error) {
+      console.error(`setUpDb: ${error}`);
+    }
+  }
+};
+// setUpDb();
+
 const encryptPassword = (password, salt) => {
   return scryptSync(password, salt, 32).toString('hex');
 };
@@ -72,25 +135,65 @@ const matchPassword = (password, hash) => {
   return originalPassHash === currentPassHash;
 };
 
-
-async function checkUserExists(username) {
-  const selectQuery = 'SELECT * FROM users WHERE username = ?';
-  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username] });
-
-  return rows.length > 0;
+const extractToken = async (req, res, next) => {
+  const token = req.signedCookies['access_token'];
+  
+  if (token) {
+    req.token = token == 'null' ? null : token;
+  } else {
+    req.token = undefined;
+  }
+  next();
 };
-async function checkUserExists(username, id) {
-  const selectQuery = 'SELECT * FROM users WHERE username = ? AND NOT(id = ?)';
-  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
 
-  // console.log(rows);
-  return rows.length > 0;
+async function checkToken(req, res, next) {
+  const token = req.token;
+  if (!token) {
+    return res.status(403).json({ message: 'tokens are invalid' });
+  };
+  try {
+    const userAccessToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {  
+    console.error(`checkTokens ${error}`);
+    return res.status(403).json({ message: 'tokens are invalid' });
+  }
+  // return 200;
+  next();
 };
-async function checkEmailExists(email) {
-  const selectQuery = 'SELECT * FROM users WHERE email = ?';
-  const [rows] = await poolPromise.query({ sql: selectQuery, values: [ email] });
 
-  return rows.length > 0;
+async function validateToken(req, res, next) {
+  const refreshToken = req.signedCookies['refresh_token'];
+  if (!refreshToken) {
+    return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
+  }
+  // console.log('here');
+
+  //  const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+  //   const hashToken = hashPassword(refreshToken);
+  //   const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
+  //   const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
+  //   if (!token) return res.status(403).json({ message: 'invalid refresh token' });
+  try {
+    // console.log('test')
+    
+    const { id, username, img } = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // console.log(id);
+    const hashRefreshToken = hashPassword(refreshToken);
+    // console.log(hashRefreshToken);
+    const selectQuery = 'SELECT token FROM refresh_tokens WHERE user_id = ? AND token = ?  AND expires_at > NOW()';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [id, hashRefreshToken] });
+    // console.log(result);
+    if (!result.length) return res.status(403).json({ message: 'Token is invalid' });
+    req.user = { id, username, img };
+    
+    next();
+  } catch (error) {
+    // const hashRefreshToken = hashPassword(refreshToken);
+    const blacklisted = await isTokenBlacklisted(refreshToken);
+    if (blacklisted) return res.status(403).send('Token is blacklisted');
+    return res.status(403).json({ message: 'Token is invalid' });
+  }
+
 };
 
 async function generateRefreshToken(user) {
@@ -138,72 +241,28 @@ async function isTokenBlacklisted(token) {
     console.error(`isTokenBlacked: ${error}`);
   }
 };
-const extractToken = async (req, res, next) => {
-  const token = req.signedCookies['access_token'];
-  
-  if (token) {
-    
-    req.token = token == 'null' ? null : token;
-  
-  } else {
-    req.token = undefined;
-  }
-  next();
-};
-async function validateToken(req, res, next) {
-  const refreshToken = req.signedCookies['refresh_token'];
-  if (!refreshToken) {
-    return res.status(403).json({ message: 'refresh token not found, pleas log in agian' });
-  }
-  // console.log('here');
 
-  //  const user = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-  //   const hashToken = hashPassword(refreshToken);
-  //   const selectQuery = 'SELECT * FROM refresh_tokens WHERE token = ? AND user_id = ? AND expires_at > NOW()';
-  //   const [token] = await poolPromise.query({ sql: selectQuery, values: [hashToken, user.id] });
-  //   if (!token) return res.status(403).json({ message: 'invalid refresh token' });
-  try {
-    // console.log('test')
-    
-    const { id, username, img } = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    // console.log(id);
-    const hashRefreshToken = hashPassword(refreshToken);
-    // console.log(hashRefreshToken);
-    const selectQuery = 'SELECT token FROM refresh_tokens WHERE user_id = ? AND token = ?  AND expires_at > NOW()';
-    const [result] = await poolPromise.query({ sql: selectQuery, values: [id, hashRefreshToken] });
-    // console.log(result);
-    if (!result.length) return res.status(403).json({ message: 'Token is invalid' });
-    req.user = { id, username, img };
-    
-    next();
-  } catch (error) {
-    // const hashRefreshToken = hashPassword(refreshToken);
-    const blacklisted = await isTokenBlacklisted(refreshToken);
-    if (blacklisted) return res.status(403).send('Token is blacklisted');
-    return res.status(403).json({ message: 'Token is invalid' });
-  }
-  
-  
-};
+
  
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  typeCast: function (field, next) {
-    if (field.type === "NEWDECIMAL") {
-      return parseFloat(field.string());
-    } else if (field.type === "NEWDATE") {
-    }
-    return next();
-  },
-});
-const poolPromise = pool.promise();
+async function checkUserExists(username) {
+  const selectQuery = 'SELECT * FROM users WHERE username = ?';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username] });
+
+  return rows.length > 0;
+};
+async function checkUserExists(username, id) {
+  const selectQuery = 'SELECT * FROM users WHERE username = ? AND NOT(id = ?)';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [username, id] });
+
+  // console.log(rows);
+  return rows.length > 0;
+};
+async function checkEmailExists(email) {
+  const selectQuery = 'SELECT * FROM users WHERE email = ?';
+  const [rows] = await poolPromise.query({ sql: selectQuery, values: [ email] });
+
+  return rows.length > 0;
+};
 
 
 
@@ -252,249 +311,13 @@ app.use((err, req, res, next) => {
     next();
 });
 
-async function setUpDb() {
-  for (const invoice of data) {
-    const {
-      id,
-      createdAt,
-      paymentDue,
-      description,
-      paymentTerms,
-      clientName,
-      clientEmail,
-      clientAddress,
-      status,
-      senderAddress,
-      items,
-      total,
-    } = invoice;
-
-    const insertQuery =
-      "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
-    try {
-      await poolPromise.query({
-        sql: insertQuery,
-        values: [
-          id,
-          createdAt,
-          paymentDue,
-          description,
-          paymentTerms,
-          clientName,
-          clientEmail,
-          status,
-          JSON.stringify(clientAddress),
-          JSON.stringify(senderAddress),
-          JSON.stringify(items),
-          total,
-        ],
-      });
-    } catch (error) {
-      console.error(`setUpDb: ${error}`);
-    }
-  }
-};
-// setUpDb();
-
-async function checkToken(req, res, next) {
-  const token = req.token;
-  if (!token) {
-    return res.status(403).json({ message: 'tokens are invalid' });
-  };
-  try {
-    const userAccessToken = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {  
-    console.error(`checkTokens ${error}`);
-    return res.status(403).json({ message: 'tokens are invalid' });
-  }
-  // return 200;
-  next();
-};
-
-
-
 app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-app.post('/upload', extractToken, checkToken, validateToken, upload.single('file'), async (req, res) => {
-  // const statusCode = await checkTokens(req, res);
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  const { username } = req.body;
-  const { id } = req.user;
-  if (await checkUserExists(username, id)) {
-    // console.log('here');
-    return res.status(403).json({ message: 'username exisits already!' });
-  };
-
-  try {
-    // const {id } = jwt.decode(req.signedCookies['refresh_token']);
-    const { user: { id } } = req;
-    const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
-    const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
-    const newFileName = req.file ? `/uploads/${req.file?.filename}` : selectResult[0].img;
-    
-    
-    
-    if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img && newFileName !== selectResult[0].img) {
-
-      const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
-      await fs.access(prevFilePath);
-      await fs.unlink(prevFilePath);
-    }
-    
-    const updateQuery = 'UPDATE users SET img = ?, username = ? WHERE id = ? LIMIT 1';
-    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
-   
-    res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: result.affectedRows > 0 });
-  } catch (error) {
-    console.error(` upload filename: ${error}`);
-    res.status(400).json({ message: 'upload failed' });
-    }
-
-
-});
-
-// app.get('/uploads/:filename', (req, res) => {
-// // should I check for refresh token here?
-//   const { filename } = req.params;
-//   // console.log(filename);
-//   res.sendFile(path.join(__dirname, `/uploads/${filename}`));
-// });
-// app.get('/profilePic', async (req, res) => {
- 
-
-//   try {
-//     // const { username, id, } = jwt.decode(req.signedCookies['refresh_token']);
-//     const { user: { id } } = req;
-  
-//     const selectQuery = 'SELECT img FROM users WHERE id = ? LIMIT 1';
-//     const [result] = await poolPromise.query({ sql: selectQuery, values: [id] });
-//     const img = result[0].img;
-//     // console.log(img);
-//     // res.set('Cache-Control', 'public, max-age=31536000, immutable');
-//     res.sendFile(path.join(__dirname, `${img}`));
-//   } catch (error) {
-    
-//   }
-// });
-
-app.get("/getInvoices", extractToken, checkToken, validateToken, async (req, res) => {
-  
-  // const statusCode = await checkTokens(req, res);
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const selectQuery = "SELECT * FROM invoices";
-    const [results] = await poolPromise.query(selectQuery);
-    res.json({ invoices: results });
-  } catch (error) {
-    console.error(`getInvoices: ${error}`);
-  }
-});
-app.get('/getInvoice/:id', extractToken, checkToken, validateToken,  async (req, res) => {
-  // const statusCode = await checkTokens(req, res) 
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const { id } = req.params;
-    const selectQuery = 'SELECT * FROM invoices WHERE id = ? LIMIT 1';
-    const [invoice] = await poolPromise.query({ sql: selectQuery, values: [id] });
-    res.json(invoice[0]);
-  } catch (error) {
-    console.log(`getInvoice/:id: ${error}`);
-  }
-});
-app.post('/saveInvoice', extractToken, checkToken, validateToken, async (req, res) => {
-  // const statusCode = await checkTokens(req, res) 
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const {
-      id,
-      createdAt,
-      paymentDue,
-      description,
-      paymentTerms,
-      clientName,
-      clientEmail,
-      clientAddress,
-      status,
-      senderAddress,
-      items,
-      total,
-    } = req.body;
-    const insertQuery =
-      "INSERT INTO invoices(id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
-    const [result] = await poolPromise.query({
-      sql: insertQuery, values: [id,
-        createdAt,
-        paymentDue,
-        description,
-        paymentTerms,
-        clientName,
-        clientEmail,
-        status,
-        JSON.stringify(clientAddress),
-        JSON.stringify(senderAddress),
-        JSON.stringify(items),
-        total]
-    });
-    res.json({ success: true, result });
-  } catch (error) {
-    console.error(`saveInvoice: ${error}`);
-  }
-});
-app.put('/updateStatus/:id', extractToken, checkToken, validateToken, async (req, res) => {
-  // const statusCode = await checkTokens(req, res) 
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const updateQuery = `UPDATE invoices SET status = ? WHERE id = ?`;
-    const [result, error] = await poolPromise.query({ sql: updateQuery, values: [status, id] });
-    res.json({ success: true })
-    
-  } catch (error) {
-    console.error(`updateStatus: ${error}`)
-  }
-});
-app.post('/updateInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
-  // const statusCode = await checkTokens(req, res) 
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const { id } = req.params;
-     const {
-     createdAt,
-      paymentDue,
-      description,
-      paymentTerms,
-      clientName,
-      clientEmail,
-      status,
-      clientAddress,
-      senderAddress,
-      items,
-      total,
-    } = req.body;
-    const updateQuery = 'UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ?';
-    const [results, error] = await poolPromise.query({ sql: updateQuery, values: [ createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, JSON.stringify(clientAddress), JSON.stringify(senderAddress), JSON.stringify(items), total, id] });
-    res.json({ success: true });
-  } catch (error) {
-    console.error(`updateInvoice: ${error}`)
-  }
-});
+// POST API METHODS FOR  USER CREATION and MANANGMENT 
 app.post('/registerUser', async (req, res) => {
-  const { username, email, password, "repeat-password":repeatPassword } = req.body;
+  const { username, email, password, "repeat-password": repeatPassword } = req.body;
   const password_hash = hashPassword(password);
   // const defaultProfileImg = `/uploads/image-avatar.jpg`;
 
@@ -523,7 +346,7 @@ try {
 app.post('/loginUser', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const selectQuery = 'SELECT * FROM users WHERE username = ?';
+    const selectQuery = 'SELECT * FROM users WHERE username = ? LIMIT 1';
     const [rows] = await poolPromise.query({ sql: selectQuery, values: [username] });
     const user = rows[0];
     if (!user) {
@@ -597,32 +420,7 @@ app.post('/logout', async (req, res) => {
     return res.json({ success: false });
   }
 });
-app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
-  // const statusCode = await checkTokens(req, res); 
-  // if (statusCode === 403) {
-  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
-  // }
-  try {
-    const { id } = req.params;
-    const deleteQuery = 'DELETE FROM invoices WHERE id = ? LIMIT 1';
-    const [result, error] = await poolPromise.query({ sql: deleteQuery, values: [id] });
-    res.status(200).json({ success: result['affectedRows'] > 0 });
-    
-  } catch (error) {
-    console.error(`deleteInvoice: ${error}`);
-    res.status(401).json({ success: false });
-  }
-});
-app.get("/health-check", async (req, res) => {
-  try {
-    const selectQuery = 'Select 1 from invoices';
-    const [result, error] = await poolPromise.query(selectQuery);
-    res.json({ success: true });
-    
-  } catch (error) {
-    console.error(`health-check: ${error}`);
-  }
-});
+
 
 app.post('/refresh-token', validateToken, async (req, res) => {
   // const refreshToken = req.signedCookies['refresh_token'];
@@ -663,6 +461,205 @@ app.post('/refresh-token', validateToken, async (req, res) => {
   }
 
 });
+
+// GET API METHODS FOR RETURING INVOICES
+app.get("/getInvoices", extractToken, checkToken, validateToken, async (req, res) => {
+  
+  const { user: { id } } = req;
+  // console.log(id);
+  // const statusCode = await checkTokens(req, res);
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  try {
+    const selectQuery = "SELECT * FROM invoices WHERE user_id = ?";
+    const [results] = await poolPromise.query({sql: selectQuery, values: [id]});
+    res.json({ invoices: results });
+  } catch (error) {
+    console.error(`getInvoices: ${error}`);
+  }
+});
+
+app.get('/getInvoice/:id', extractToken, checkToken, validateToken,  async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  const { user: { id: user_id } } = req;
+  try {
+    const { id } = req.params;
+    const selectQuery = 'SELECT * FROM invoices WHERE id = ? AND user_id = ? LIMIT 1';
+    const [invoice] = await poolPromise.query({ sql: selectQuery, values: [id, user_id] });
+    res.json(invoice[0]);
+  } catch (error) {
+    console.log(`getInvoice/:id: ${error}`);
+  }
+});
+
+
+// POST API METHODS FOR INVOICE EDITS
+app.post('/saveInvoice', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  const { user: { id: user_id } } = req;
+  try {
+    const {
+      id,
+      createdAt,
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      clientAddress,
+      status,
+      senderAddress,
+      items,
+      total,
+    } = req.body;
+    const insertQuery =
+      "INSERT INTO invoices(id, user_id, createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, senderAddress, clientAddress, items, total) VALUES (?, ?, ?,?,?,?, ?, ?, ?, ?, ?, ?, ?)";
+    const [result] = await poolPromise.query({
+      sql: insertQuery, values: [id,
+        user_id,
+        createdAt,
+        paymentDue,
+        description,
+        paymentTerms,
+        clientName,
+        clientEmail,
+        status,
+        JSON.stringify(clientAddress),
+        JSON.stringify(senderAddress),
+        JSON.stringify(items),
+        total]
+    });
+    res.json({ success: result.affectedRows > 0, result });
+  } catch (error) {
+    console.error(`saveInvoice: ${error}`);
+  }
+});
+
+app.post('/updateInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  try {
+    const { user: { id: user_id } } = req;
+    const { id } = req.params;
+     const {
+     createdAt,
+      paymentDue,
+      description,
+      paymentTerms,
+      clientName,
+      clientEmail,
+      status,
+      clientAddress,
+      senderAddress,
+      items,
+      total,
+    } = req.body;
+    const updateQuery = 'UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ? AND user_id = ?';
+    const [results, error] = await poolPromise.query({ sql: updateQuery, values: [ createdAt, paymentDue, description, paymentTerms, clientName, clientEmail, status, JSON.stringify(clientAddress), JSON.stringify(senderAddress), JSON.stringify(items), total, id, user_id] });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(`updateInvoice: ${error}`)
+  }
+});
+
+app.put('/updateStatus/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res) 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  try {
+    const { user: { id: user_id } } = req;
+    const { id } = req.params;
+    const { status } = req.body;
+    const updateQuery = `UPDATE invoices SET status = ? WHERE id = ? AND user_id = ?`;
+    const [result, error] = await poolPromise.query({ sql: updateQuery, values: [status, id, user_id] });
+    res.json({ success: true })
+    
+  } catch (error) {
+    console.error(`updateStatus: ${error}`)
+  }
+});
+
+app.post('/upload', extractToken, checkToken, validateToken, upload.single('file'), async (req, res) => {
+  // const statusCode = await checkTokens(req, res);
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  const { username } = req.body;
+  const { id } = req.user;
+  if (await checkUserExists(username, id)) {
+    // console.log('here');
+    return res.status(403).json({ message: 'username exisits already!' });
+  };
+
+  try {
+    // const {id } = jwt.decode(req.signedCookies['refresh_token']);
+    const { user: { id } } = req;
+    const selectQuery = 'SELECT img, username FROM users WHERE id = ? LIMIT 1';
+    const [selectResult] = await poolPromise.query({ sql: selectQuery, values: [id] });
+    const newFileName = req.file ? `/uploads/${req.file?.filename}` : selectResult[0].img;
+    
+    
+    
+    if (selectResult.length > 0 && defaultProfilePic !== selectResult[0].img && newFileName !== selectResult[0].img) {
+
+      const prevFilePath = path.join(__dirname, `${selectResult[0].img}`);
+      await fs.access(prevFilePath);
+      await fs.unlink(prevFilePath);
+    }
+    
+    const updateQuery = 'UPDATE users SET img = ?, username = ? WHERE id = ? LIMIT 1';
+    const [result] = await poolPromise.query({ sql: updateQuery, values: [newFileName, username, id] });
+   
+    res.status(200).json({ file: {filename: newFileName, "alt": newFileName, title: newFileName }, username, success: result.affectedRows > 0 });
+  } catch (error) {
+    console.error(` upload filename: ${error}`);
+    res.status(400).json({ message: 'upload failed' });
+    }
+
+
+});
+
+// DELETE API METHODS FOR INVOICE
+app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async (req, res) => {
+  // const statusCode = await checkTokens(req, res); 
+  // if (statusCode === 403) {
+  //   return res.status(statusCode).json({ message: 'tokens are invalid' });
+  // }
+  try {
+    const { user: { id: user_id } } = req;
+    const { id } = req.params;
+    const deleteQuery = 'DELETE FROM invoices WHERE id = ? AND user_id = ? LIMIT 1';
+    const [result, error] = await poolPromise.query({ sql: deleteQuery, values: [id, user_id] });
+    res.status(200).json({ success: result['affectedRows'] > 0 });
+    
+  } catch (error) {
+    console.error(`deleteInvoice: ${error}`);
+    res.status(401).json({ success: false });
+  }
+});
+
+
+app.get("/health-check", async (req, res) => {
+  try {
+    const selectQuery = 'Select 1 from invoices WHERE user_id = ?';
+    const [result, error] = await poolPromise.query({ sql: selectQuery, values: [null]});
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error(`health-check: ${error}`);
+  }
+});
+
 
 
 app.listen(PORT, () => {
