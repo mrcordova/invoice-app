@@ -1,5 +1,9 @@
 import { hideProgressCircle, showFormErrors, showProgressCircle, URL_WEBSITE  } from "./functions.js";
 
+function matchPassword(password, repeatPassword) {
+  return password === repeatPassword;
+}
+
 document.addEventListener("click", async (e) => {
   e.preventDefault();
   const loginBtn = e.target.closest("[data-login]");
@@ -12,26 +16,33 @@ document.addEventListener("click", async (e) => {
       const formData = new FormData(signUpBtn.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
 
-     const btnText =showProgressCircle(signUpBtn);
-      try {
-        const response = await fetch(`${URL_WEBSITE}/registerUser`, {
-          method: "POST",
-          headers: { "Content-type": "application/json" },
-          body: JSON.stringify(formDataObj),
-          cache: 'reload'
-        });
-        if (response.ok) {
-          signUpBtn.parentElement.reset();
-          alert("user successfully registerd");
-          location.href = "login.html";
-        } else {
-          const { message } = await response.json();
-          alert(`Error: ${message}`);
+      if (matchPassword(formDataObj.password, formDataObj['repeat-password'])) {
+        
+        const btnText = showProgressCircle(signUpBtn);
+        try {
+          const response = await fetch(`${URL_WEBSITE}/registerUser`, {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify(formDataObj),
+            cache: 'reload'
+          });
+          if (response.ok) {
+            signUpBtn.parentElement.reset();
+            alert("user successfully registerd");
+            location.href = "login.html";
+          } else {
+            const { message } = await response.json();
+            alert(`Error: ${message}`);
+          }
+        } catch (error) {
+          console.error(`Sign up: ${error}`);
         }
-      } catch (error) {
-        console.error(`Sign up: ${error}`);
+        hideProgressCircle(signUpBtn, btnText);
+      } else {
+        // alert('passoword and repeat password do not match');
+        const repeatPassword = signUpBtn.parentElement.querySelector('input[name="repeat-password"]');
+        repeatPassword.setCustomValidity('Do not match password');
       }
-      hideProgressCircle(signUpBtn, btnText);
     };
   } else if (loginBtn) {
     if (showFormErrors(loginBtn)) {
