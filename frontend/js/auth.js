@@ -4,6 +4,10 @@ function matchPassword(password, repeatPassword) {
   return password === repeatPassword;
 }
 
+function checkPassword(e) {
+  e.target.setCustomValidity('');
+}
+
 document.addEventListener("click", async (e) => {
   e.preventDefault();
   const loginBtn = e.target.closest("[data-login]");
@@ -18,7 +22,6 @@ document.addEventListener("click", async (e) => {
       const { password, 'repeat-password': repeatPassword } = formDataObj;
 
       if (matchPassword(password, repeatPassword)) {
-        
         const btnText = showProgressCircle(signUpBtn);
         try {
           const response = await fetch(`${URL_WEBSITE}/registerUser`, {
@@ -43,6 +46,7 @@ document.addEventListener("click", async (e) => {
         // alert('passoword and repeat password do not match');
         const repeatPasswordInput = signUpBtn.parentElement.querySelector('input[name="repeat-password"]');
         repeatPasswordInput.setCustomValidity('Do not match password');
+        repeatPasswordInput.addEventListener('input', checkPassword);
       }
     };
   } else if (loginBtn) {
