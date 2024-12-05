@@ -61,8 +61,8 @@
 .progress-circle {
   display: block;
   margin: auto;
-  width: 1.1725rem;
-  height: 1.1725rem;
+  width: 0.94rem;
+  height: 0.94rem;
   animation: spin 1s linear infinite;
   border-radius: 50%;
   border: 4.75px solid white; 
