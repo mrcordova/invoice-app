@@ -16,7 +16,7 @@ export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'imag
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
-}
+};
 export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
   return await fetch(`${URL_WEBSITE}${path}`, {
     method,
@@ -28,7 +28,7 @@ export async function fetchWithAuth(path, method, body = null, headers = { "Cont
     credentials: 'same-origin',
     cache: 'reload'
   });
-}
+};
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
   for (const themeInput of themeInputs) {
@@ -36,18 +36,18 @@ export function themeUpdate(e, themeInputs) {
     input.checked = checked;
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
-}
+};
 export function showProgressCircle(btn) {
   const btnText = btn.textContent;
   btn.replaceChildren();
   btn.insertAdjacentHTML('beforeend', `<span class="progress-circle"></span>`);
   return btnText;
-}
+};
 
 export function hideProgressCircle(btn, btnText) {
   btn.replaceChildren();
   btn.insertAdjacentText('beforeend', btnText);
-}
+};
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));
 }
@@ -74,7 +74,7 @@ export function resetForm(invoiceDialog) {
     formInput.value = "";
   }
   invoiceForm.reset();
-}
+};
 function updateTotalWithQty(e) {
   const invoiceItem = e.target.closest("div.invoice-item");
   const total = invoiceItem.querySelector(".total  input");
@@ -216,7 +216,7 @@ export function addItemRow(addItemBtn) {
   addItemBtn.previousElementSibling
     .querySelector(".price")
     .addEventListener("input", updateTotalWithPrice);
-}
+};
 
 export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItems = invoiceDialog.querySelectorAll(
@@ -292,7 +292,7 @@ export function saveInvoice(invoiceDialog, status, id = null) {
 
   resetForm(invoiceDialog);
   return invoice;
-}
+};
 export function updatePaymentTerms(paymentTermsBtn) {
   const parentDiv = paymentTermsBtn.closest("div.net");
   const inputSpan = parentDiv.querySelector('span:has(input[type="checkbox"])');

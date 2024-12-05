@@ -44,8 +44,11 @@ const amountDue = document.querySelector("[data-amount-due]");
 const profileDialog = document.getElementById('profile-dialog');
 let username = localStorage.getItem('username');
 let img = localStorage.getItem('img');
-const profileImg = document.getElementById('profile_img');
-profileImg.src = img;
+// const profileImg = document.getElementById('profile_img');
+const profileImgs = document.querySelectorAll('.profile_img');
+for (const profileImg of profileImgs) {
+  profileImg.src = img;
+};
 const fileInput = document.getElementById("profile_pic");
 const currencyOptions = { style: "currency", currency: "GBP" };
 const homePage = "/index.html";
@@ -461,10 +464,11 @@ body.addEventListener("click", async (e) => {
           if (result['success']) {
             const { filename, alt, title } = result['file'];
             const { username: newUsername } = result;
-            profileImg.src = `${filename}`;
-           
-            profileImg.setAttribute('title', title);
-            profileImg.setAttribute('alt', alt);
+            for (const profileImg of profileImgs) {
+              profileImg.src = `${filename}`;
+              profileImg.setAttribute('title', title);
+              profileImg.setAttribute('alt', alt);
+            };
           
             fileInput.value = '';
             localStorage.setItem('img', filename);
