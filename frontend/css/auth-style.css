@@ -70,8 +70,18 @@ html {
 body {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 100%;
   transition: all 1s ease;
+  
+}
+.guest-cont {
+  display: flex;
+  flex-direction: column;
+margin-inline: clamp(1.5rem, calc(-8.042rem + 40.712vw), 11.5rem);
+  & h2 {
+    text-align: center;
+  }
 }
 label {
   display: grid;
@@ -135,7 +145,7 @@ label {
   border-radius: 0.625rem;
 
   background-color: light-dark(white, var(--kon));
-  margin-block: auto;
+  /* margin-block: auto; */
   margin-inline: clamp(1.5rem, calc(-8.042rem + 40.712vw), 11.5rem);
   padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
   padding-block: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
@@ -153,7 +163,14 @@ label {
   flex-direction: column;
   gap: 1.5rem;
   line-height: 1.25;
-  & button {
+ 
+
+  & .account-cont {
+    text-align: center;
+    font-size: 0.9375rem;
+  }
+}
+ & button {
     color: white;
     background-color: var(--forgotten-purple);
     border-radius: 0.375rem;
@@ -165,15 +182,11 @@ label {
       cursor: pointer;
     }
   }
-
-  & .account-cont {
-    text-align: center;
-    font-size: 0.9375rem;
-  }
-}
-
 @media (min-width: 48rem) {
   .user-form-cont {
+    margin-inline: clamp(11.5rem, calc(-12.5rem + 50vw), 32.5rem);
+  }
+  .guest-cont {
     margin-inline: clamp(11.5rem, calc(-12.5rem + 50vw), 32.5rem);
   }
 }
