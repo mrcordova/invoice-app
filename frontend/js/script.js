@@ -13,7 +13,10 @@ import {
   fetchWithAuth,
   showFormErrors,
   showProgressCircle,
-hideProgressCircle
+  hideProgressCircle,
+  showOverlayLoading,
+  hideOverlayLoading,
+
 } from "./functions.js";
 
 
@@ -30,6 +33,7 @@ const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
 let username = localStorage.getItem('username');
 let img = localStorage.getItem('img');
+const loadingOverlay = document.getElementById('overlay');
 // const profileImg = document.getElementById('profile_img');
 // profileImg.src = img;
 const profileImgs = document.querySelectorAll('.profile_img');
@@ -41,6 +45,7 @@ const fileInput = document.getElementById("profile_pic");
 window.addEventListener("DOMContentLoaded", async (e) => {
   let response;
  
+  showOverlayLoading(loadingOverlay);
   response = await fetchWithAuth('/getInvoices', 'GET');
   if (response.status === 403) {
   
@@ -51,6 +56,8 @@ window.addEventListener("DOMContentLoaded", async (e) => {
   const { invoices } = await response.json();
   createInvoices(invoices);
   invoiceTotal.textContent = invoices.length;
+  hideOverlayLoading(loadingOverlay);
+  // loadingOverlay.style.visibility = 'hidden';
 });
 
 if (!(perferredColorScheme in localStorage)) {

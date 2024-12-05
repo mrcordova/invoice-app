@@ -13,11 +13,16 @@ import {
   showFormErrors, 
   acceptedFileTypes,
   showProgressCircle,
-  hideProgressCircle
+  hideProgressCircle,
+  showOverlayLoading,
+  hideOverlayLoading,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
+const loadingOverlay = document.getElementById('overlay');
 const invoiceId = params.get("invoice-id");
+showOverlayLoading(loadingOverlay);
 let invoice = await getInvoice(invoiceId);
+hideOverlayLoading(loadingOverlay);
 async function getInvoice(invoiceId) {
   let response;
   try {
@@ -398,6 +403,7 @@ body.addEventListener("click", async (e) => {
     if (invoiceForm.checkValidity()) {
       let response;
       const btnText = showProgressCircle(saveChangesBtn);
+      showOverlayLoading(loadingOverlay);
       try {  
         const tempInvoice = saveInvoice(
           editDialog,
@@ -422,12 +428,15 @@ body.addEventListener("click", async (e) => {
         tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
         tempInvoice.items = JSON.stringify(tempInvoice.items);
         updateStatus(tempInvoice);
+        
         updateInvoice(tempInvoice);
+       
         invoice = tempInvoice;
       } catch (error) {
         console.error(`update invoice: ${error}`);
       }
       hideProgressCircle(saveChangesBtn, btnText);
+       hideOverlayLoading(loadingOverlay);
     } else {
       invoiceForm.reportValidity();
       invoiceForm.requestSubmit(saveChangesBtn);

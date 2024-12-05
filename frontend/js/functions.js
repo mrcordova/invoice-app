@@ -48,6 +48,13 @@ export function hideProgressCircle(btn, btnText) {
   btn.replaceChildren();
   btn.insertAdjacentText('beforeend', btnText);
 };
+
+export function showOverlayLoading(overlay) {
+ overlay.style.visibility = 'visible';
+};
+export function hideOverlayLoading(overlay) {
+ overlay.style.visibility = 'hidden';
+};
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));
 }
