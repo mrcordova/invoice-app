@@ -213,6 +213,7 @@ body {
     & .close-btn {
      background-color: transparent;
      padding: 0;
+     width: max-content;
 
      &:hover > svg {
       color: var(--venetian-nights);
@@ -267,9 +268,13 @@ body {
       display: flex;
       justify-content: space-between;
       width: 100%;
+      & button {
+       
+      }
     }
     & .logout {
       background-color: var(--khmer-curry);
+      width: 5.7131rem;
     }
    & input[name='username'] {
         flex: 1;
@@ -294,7 +299,9 @@ body {
     font-size: 0.938rem;
     letter-spacing: -0.016rem;
     border-radius: 1.5rem;
-    padding-inline: 1.5rem;
+    width: 8.658rem;
+     text-align: center;
+    /* padding-inline: 1.5rem; */
     padding-block: 1.125rem 0.938rem;
     color: white;
     background-color: var(--venetian-nights);
@@ -330,7 +337,7 @@ body {
       font-size: 0.938rem;
       letter-spacing: -0.016rem;
       border-radius: 1.5rem;
-      padding-inline: 1.5rem;
+      /* padding-inline: 1.5rem; */
       padding-block: 1.125rem 0.938rem;
 
       &:hover {
@@ -341,9 +348,11 @@ body {
     & .cancel-btn {
       background-color: light-dark(#f9fafe, var(--royal-curtsy));
       color: light-dark(var(--true-lavender), var(--stotic-white));
+      flex: 1;
     }
-
+    
     & .delete-btn {
+      flex: 1;
       background-color: var(--khmer-curry);
       color: white;
     }
@@ -376,7 +385,7 @@ div.edit-btns {
     border-radius: 1.5rem;
 
     padding-block: 1.125rem 0.938rem;
-    padding-inline: 1.5rem 1.438rem;
+    /* padding-inline: 1.5rem 1.438rem; */
     &:hover {
       cursor: pointer;
     }
@@ -386,6 +395,7 @@ div.edit-btns {
     color: light-dark(var(--true-lavender), var(--stotic-white));
     background-color: light-dark(#f9fafe, var(--royal-curtsy));
 
+    width: 4.563rem;
     &:hover {
       background-color: light-dark(var(--stotic-white), white);
       color: var(--true-lavender);
@@ -396,6 +406,7 @@ div.edit-btns {
     margin-inline-start: auto;
     color: white;
     background-color: var(--khmer-curry);
+    width:5.563rem;
 
     &:hover {
       background-color: var(--american-pink);
@@ -405,6 +416,7 @@ div.edit-btns {
   & button.mark-btn {
     color: white;
     background-color: var(--venetian-nights);
+    width: clamp(8.188rem, calc(10.386rem + -4.58vw),9.313rem );
 
     &:hover {
       background-color: var(--forgotten-purple);
@@ -1298,8 +1310,8 @@ input {
     & button {
       border-radius: 1.5rem;
       padding-block: 1.125rem 0.938rem;
-      padding-inline: clamp(1.007rem, calc(0.536rem + 2.008vw), 1.5rem)
-        clamp(0.868rem, calc(0.206rem + 2.827vw), 1.563rem);
+      /* padding-inline: clamp(1.007rem, calc(0.536rem + 2.008vw), 1.5rem)
+        clamp(0.868rem, calc(0.206rem + 2.827vw), 1.563rem); */
       &:hover {
         cursor: pointer;
       }
@@ -1309,6 +1321,7 @@ input {
       color: light-dark(var(--true-lavender), var(--stotic-white));
       background-color: light-dark(#f9fafe, var(--royal-curtsy));
 
+      width: 6rem;
       &:hover {
         background-color: light-dark(var(--stotic-white), white);
         color: var(--true-lavender);
@@ -1319,6 +1332,8 @@ input {
       color: light-dark(var(--papilio-argeotus), var(--stotic-white));
       background-color: var(--carbon-blue);
 
+      width: clamp(7.313rem, calc(6.358rem + 4.071vw), 8.313rem);
+
       &:hover {
         background-color: light-dark(var(--ruined-smores), var(--kon));
       }
@@ -1327,6 +1342,8 @@ input {
     & .save-btn {
       color: white;
       background-color: var(--venetian-nights);
+
+      width: 8.625rem;
 
       &:hover {
         background-color: var(--forgotten-purple);
