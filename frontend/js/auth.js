@@ -15,8 +15,9 @@ document.addEventListener("click", async (e) => {
     if (showFormErrors(signUpBtn)) {
       const formData = new FormData(signUpBtn.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
+      const { password, 'repeat-password': repeatPassword } = formDataObj;
 
-      if (matchPassword(formDataObj.password, formDataObj['repeat-password'])) {
+      if (matchPassword(password, repeatPassword)) {
         
         const btnText = showProgressCircle(signUpBtn);
         try {
@@ -40,8 +41,8 @@ document.addEventListener("click", async (e) => {
         hideProgressCircle(signUpBtn, btnText);
       } else {
         // alert('passoword and repeat password do not match');
-        const repeatPassword = signUpBtn.parentElement.querySelector('input[name="repeat-password"]');
-        repeatPassword.setCustomValidity('Do not match password');
+        const repeatPasswordInput = signUpBtn.parentElement.querySelector('input[name="repeat-password"]');
+        repeatPasswordInput.setCustomValidity('Do not match password');
       }
     };
   } else if (loginBtn) {
