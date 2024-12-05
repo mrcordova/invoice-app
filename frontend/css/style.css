@@ -14,7 +14,7 @@
   --river-styx: #141625;
   --carbon-blue: #373b53;
   --independence: #494e6e;
-    --sapphire-blue: #0057D9;
+  --sapphire-blue: #0057D9;
   --paid: #33d69f;
   --pending: #ff8f00;
   --draft: light-dark(var(--carbon-blue), var(--stotic-white));
@@ -124,6 +124,8 @@ body {
   flex-direction: column;
   min-height: 100%;
   transition: all 1s ease;
+
+  /* overflow: hidden; */
 
   background-color: light-dark(var(--zhēn-zhū-bái-pearl), var(--river-styx));
 
@@ -1403,10 +1405,18 @@ input {
   }
 }
 main {
-  flex: 1;
-  padding-inline: clamp(1.5rem, calc(0.069rem + 6.107vw), 3rem);
-  padding-block: clamp(2rem, calc(0.271rem + 7.379vw), 3.813rem)
-    clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
+  /* show scrollbars in main */
+  /* scrollbar-color: light-dark(var(--stotic-white), var(--royal-curtsy))
+      transparent; */
+      /* height: 100vh; */
+      /* overflow: auto; */
+      /* comment out flex: 1 */
+      /* dynamic block padding end less as screen gets bigget */
+      flex: 1;
+      padding-inline: clamp(1.5rem, calc(0.069rem + 6.107vw), 3rem);
+      padding-block: clamp(2rem, calc(0.271rem + 7.379vw), 3.813rem)
+      clamp(6.563rem, calc(2.507rem + 17.303vw), 10.813rem);
+      /* padding-block-end: 12rem; */
 }
 @media (min-width: 48rem) {
   .bill-from-section {
