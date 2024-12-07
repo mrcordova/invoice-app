@@ -8,6 +8,8 @@ const cookieParser = require('cookie-parser');
 const { randomBytes, scryptSync } = require('crypto');
 const cron = require('node-cron');
 const fs = require('fs/promises');
+const http = require('http');
+const socketIo = require('socket.io');
 const multer = require('multer');
 const acceptedFileTypes = { 'image/jpeg': 'jpeg', 'image/png': 'png', "image/webp": 'webp', 'image/svg+xml': 'svg'};
 const defaultProfilePic = 'uploads/image-avatar.jpg';
@@ -20,6 +22,8 @@ const allowedOrigins = [
 ];
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 require("dotenv").config();
 
 const corsOptions = {
@@ -48,6 +52,8 @@ const pool = mysql.createPool({
     if (field.type === "NEWDECIMAL") {
       return parseFloat(field.string());
     } else if (field.type === "NEWDATE") {
+    } else if ((field.type === "TINYINT" || field.type === 'TINY') && field.length === 1) {
+      return parseInt(field.string()) === 1;
     }
     return next();
   },
@@ -595,19 +601,44 @@ app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async 
   }
 });
 
-app.get('/create-room', validateToken, async (req, res) => {
+app.get('/create-room/:invoiceId', validateToken, async (req, res) => {
   const { user: { id } } = req;
-  const token = jwt.sign({ user_id: id }, process.env.ROOM_SECRET, { expiresIn: '7d' });
-  const hashToken = hashPassword(token);
+  const { invoiceId } = req.params;
+  const token = jwt.sign({ id: id, invoiceId }, process.env.ROOM_SECRET, { expiresIn: '7d' });
+  // const hashToken = hashPassword(token);
 
   try {
     const insertQuery = 'INSERT INTO rooms(room_id, user_id) VALUES (?, ?)';
-    const [result] = await poolPromise.query({ sql: insertQuery, values: [hashToken, id] });
+    const [result] = await poolPromise.query({ sql: insertQuery, values: [token, id] });
+ 
+    // create tinyurl here
+    res.json({ link:  `https://invoice-backend.noahprojects.work/room/${token}` });
+  } catch (error) {
+    console.error(`create room : ${error}`);
+  }
 
+});
+
+app.get('/room/:token', async (req, res) => {
+  const hashToken = hashPassword(req.params.token);
+  const { id , invoiceId } = jwt.verify(req.params.token, process.env.ROOM_SECRET);
+
+  try {
+    const selectQuery = 'SELECT room_id FROM rooms WHERE room_id = ?';
+    const [result] = await poolPromise.query({ sql: selectQuery, values: [hashToken] });
+    const { 'num_of_guests': numOfGuests, used } = result[0];
+    if (!result.length) {
+      return res.status(404).send('Room not found');
+    };
+
+    if (!numOfGuests && used) {
+      return res.status(403).send('This room is full');
+    };
+
+    res.sendFile(path.join(__dirname, "../frontend/room.html"));
   } catch (error) {
     
   }
-
 });
 
 
@@ -622,10 +653,53 @@ app.get("/health-check", async (req, res) => {
   }
 });
 
+io.on('connection', (socket) => {
+  console.log('New user connected');
+  
+  //When a user joins the room
+  socket.on('joinRoom', async (token, userId) => {
+    try {
+      const selectQuery = 'SELECT room_id, user_id, used, guestIds, num_of_guests FROM rooms WHERE token = ?';
+      const [room] = await poolPromise.query({ sql: selectQuery, values: token });
 
+      const { user_id, room_id, "num_of_guests": numOfGuests, guestIds } = room[0];
+    
+      if (user_id === userId) {
+        const updateQuery = 'UPDATE rooms SET used = ? WHERE room_id = ?';
+        const [result] = await poolPromise.query({ sql: updateQuery, values: [true, room_id] });
+        socket.join(room_id);
+        io.to(room_id).emit('message', 'Creator has joined the room');
 
-app.listen(PORT, () => {
-  console.log(`Server is running of ${PORT}`);
+      } else if (numOfGuests) {
+        const updateQuery = 'UPDATE rooms SET numOfGuests = ?, guestIds = ? WHERE room_id = ?';
+        const newNumOfGuests = numOfGuests - 1;
+        const tempGuestIds = JSON.stringify(JSON.parse(guestIds).push(userId));
+        const [result] = await poolPromise.query({ sql: updateQuery, values: [newNumOfGuests, tempGuestIds, room_id] });
+        socket.join(room_id);
+        io.to(room_id).emit('message', 'Guest has joined the room');
+      } else {
+        socket.emit('error', 'This room is full');
+      }
+    } catch (error) {
+      socket.emait('error', 'Room not found');
+    }
+  });
+
+  // Handle messages
+  socket.on('senedMessage', (roomId, message) => {
+    io.to(roomId).emit('message', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+// app.listen(PORT, () => {
+//   console.log(`Server is running of ${PORT}`);
+// });
+server.listen(PORT, () => {
+  console.log(`socket Server is running of ${PORT}`);
 });
 
 const task = cron.schedule('0 0 * * *', async () => {
