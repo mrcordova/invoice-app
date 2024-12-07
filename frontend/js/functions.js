@@ -340,7 +340,23 @@ export async function logout() {
   }
 }
 
+export async function getShortenUrl(link) {
+  const URL = "https://tinyurl.com/api-create.php?url=";
 
+  try {
+    const urlResponse = await fetch(`${URL}${link}`);
+    const shortenUrl = await urlResponse.text();
+    return shortenUrl;
+  } catch (error) {
+    console.error(` getShortenUrl: ${error}`);
+  }
+}
+export async function copyUrl(e) {
+
+  await navigator.clipboard.writeText('link');
+
+  // e.target.textContent = 'Copied!'
+}
 
 export async function refreshAccessToken() {
   try {

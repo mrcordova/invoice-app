@@ -74,7 +74,7 @@ const upload = multer({ storage, limits: {fileSize: 2 * 1024 * 1024},  fileFilte
         cb(null, true); // Accept the file
     } });
 
-// console.log(randomBytes(32).toString("hex"))
+// console.log(randomBytes(32).toString("hex"));
 async function setUpDb() {
   for (const invoice of data) {
     const {
@@ -593,6 +593,21 @@ app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async 
     console.error(`deleteInvoice: ${error}`);
     res.status(401).json({ success: false });
   }
+});
+
+app.get('/create-room', validateToken, async (req, res) => {
+  const { user: { id } } = req;
+  const token = jwt.sign({ user_id: id }, process.env.ROOM_SECRET, { expiresIn: '7d' });
+  const hashToken = hashPassword(token);
+
+  try {
+    const insertQuery = 'INSERT INTO rooms(room_id, user_id) VALUES (?, ?)';
+    const [result] = await poolPromise.query({ sql: insertQuery, values: [hashToken, id] });
+
+  } catch (error) {
+    
+  }
+
 });
 
 

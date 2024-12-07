@@ -16,6 +16,8 @@ import {
   hideProgressCircle,
   showOverlayLoading,
   hideOverlayLoading,
+  getShortenUrl,
+  copyUrl
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const loadingOverlay = document.getElementById('overlay');

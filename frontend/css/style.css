@@ -1467,6 +1467,10 @@ letter-spacing: -0.015625rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+
+    & h2 {
+      color: light-dark(var(--ruined-smores), white);
+    }
    
     & .join-room-btn {
       background-color: var(--venetian-nights);
