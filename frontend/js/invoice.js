@@ -47,6 +47,7 @@ const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
 const profileDialog = document.getElementById('profile-dialog');
+const shareDialog = document.getElementById('share-dialog');
 let username = localStorage.getItem('username');
 let img = localStorage.getItem('img');
 // const profileImg = document.getElementById('profile_img');
@@ -198,6 +199,8 @@ body.addEventListener("click", async (e) => {
   const closeBtn = e.target.closest('[data-close]');
   const submtiBtn = e.target.closest('[data-profile-submit]');
   const logoutBtn = e.target.closest('[data-logout]');
+
+  const shareDialogBtn = e.target.closest('[data-share]');
 
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -507,5 +510,7 @@ body.addEventListener("click", async (e) => {
       document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     }
     
+  } else if (shareDialogBtn) {
+    shareDialog.showModal();
   }
 });

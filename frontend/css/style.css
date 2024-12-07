@@ -69,7 +69,7 @@
   border-top: 4.75px solid var(--sapphire-blue);
 }
 /* Full-screen overlay */
-#overlay {
+#overlay, #share-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -210,8 +210,13 @@ body {
     grid-area: email;
   }
 }
-
-#delete-dialog, #profile-dialog  {
+.control-btns-cont {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block-end: 1.625rem;
+}
+#delete-dialog, #profile-dialog, #share-dialog  {
   border: 0;
   margin: auto;
   top: 0;
@@ -623,7 +628,7 @@ div.edit-btns {
   line-height: 1;
   letter-spacing: -0.015625rem;
   color: light-dark(var(--ruined-smores), white);
-  padding-block-end: 1.625rem;
+  /* padding-block-end: 1.625rem; */
   padding-inline-start: clamp(1.5rem, calc(-0.408rem + 8.142vw), 3.5rem);
   padding-inline-end: clamp(1.188rem, calc(-0.721rem + 8.142vw), 3.188rem);
 
@@ -1400,6 +1405,85 @@ input {
   align-items: center;
 }
 
+.share-btn {
+display: flex;
+gap: 0.5rem;
+align-items: center;
+font-size: 0.9375rem;
+line-height: 1;
+letter-spacing: -0.015625rem;
+  &:hover {
+    color: var(--venetian-nights);
+    cursor: pointer;
+  }
+}
+#share-dialog[open] {
+  display: flex;
+/* border: 0; */
+/* background-color: white; */
+/* margin: auto; */
+  & #share-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: max-content;
+    width: max-content;
+    margin: auto;
+    background-color: light-dark(white, var(--kon));
+  }
+
+  & .share-link {
+    display: flex;
+    justify-content: space-between;
+    background-color: light-dark(var(--carbon-blue), var(--ruined-smores));
+    padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+    padding-block: clamp(1.625rem, calc(1.565rem + 0.254vw), 1.688rem)
+        clamp(1.313rem, calc(1.435rem + -0.254vw), 1.375em);
+        border-radius: 0.45rem;
+    & a {
+      text-decoration: none;
+      color: white;
+      pointer-events: none;
+      
+    }
+    & button {
+      background-color: transparent;
+      padding-block: 0;
+      padding-inline: 0;
+      width: max-content;
+      /* border-radius: n; */
+      &:hover {
+        cursor: pointer;
+        & svg {
+          color: var(--venetian-nights);
+        }
+      }
+    }
+  }
+  & .share-dialog-cont {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+   
+    & .join-room-btn {
+      background-color: var(--venetian-nights);
+      width: clamp(8.188rem, calc(10.386rem + -4.58vw),9.313rem );
+      color: white;
+      text-align: center;
+      border-radius: 1.5rem;
+      padding-block: 0.5rem;
+      align-self: center;
+
+      &:hover {
+        background-color: var(--forgotten-purple);
+        cursor: pointer;
+      }
+    }
+  }
+}
 .status-token {
   display: flex;
   align-items: baseline;

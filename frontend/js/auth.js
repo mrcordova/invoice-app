@@ -16,12 +16,12 @@ document.addEventListener("click", async (e) => {
   const guestBtn = e.target.closest('[data-guest]');
 
   if (signUpBtn) {
-    if (showFormErrors(signUpBtn)) {
+  
       const formData = new FormData(signUpBtn.parentElement);
       const formDataObj = Object.fromEntries(formData.entries());
       const { password, 'repeat-password': repeatPassword } = formDataObj;
 
-      if (matchPassword(password, repeatPassword)) {
+      if (showFormErrors(signUpBtn) && matchPassword(password, repeatPassword)) {
         const btnText = showProgressCircle(signUpBtn);
         try {
           const response = await fetch(`${URL_WEBSITE}/registerUser`, {
@@ -48,7 +48,7 @@ document.addEventListener("click", async (e) => {
         repeatPasswordInput.setCustomValidity('Do not match password');
         repeatPasswordInput.addEventListener('input', checkPassword);
       }
-    };
+  
   } else if (loginBtn) {
     if (showFormErrors(loginBtn)) {
       const formData = new FormData(loginBtn.parentElement);

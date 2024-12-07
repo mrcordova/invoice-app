@@ -386,12 +386,35 @@
       </dialog>
     </div>
     <main>
-      <button
+      <dialog id="share-dialog">
+
+       <div id="share-overlay">
+        <div class="spinner"></div>
+       </div>
+       <div class="share-dialog-cont">
+        <h2 class="league-spartan-bold">Share Invoice</h2>
+        <div class="share-link">
+          <a href="www.google.com">www.google.com</a>
+          <button class="copy-bnt" data-copy>
+           <svg width="20" height="20" fill="currentColor" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M448 0H224C188.7 0 160 28.65 160 64v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64V64C512 28.65 483.3 0 448 0zM464 288c0 8.822-7.178 16-16 16H224C215.2 304 208 296.8 208 288V64c0-8.822 7.178-16 16-16h224c8.822 0 16 7.178 16 16V288zM304 448c0 8.822-7.178 16-16 16H64c-8.822 0-16-7.178-16-16V224c0-8.822 7.178-16 16-16h64V160H64C28.65 160 0 188.7 0 224v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64v-64h-48V448z"/></svg>
+          </button>
+        </div>
+        <a data-join class="join-room-btn league-spartan-bold">Join Room</a>
+       </div>
+      </dialog>
+      <div class="control-btns-cont">
+        <button
         class="go-back-btn go-back-btn-invoice-page league-spartan-bold"
         data-go-back="">
         <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
         Go back
       </button>
+      <button data-share class="share-btn">
+        <span class="hide-mobile league-spartan-bold">Share</span>
+        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><g><path d="M0 0h24v24H0z" fill="none"/><path d="M13 14h-2a8.999 8.999 0 0 0-7.968 4.81A10.136 10.136 0 0 1 3 18C3 12.477 7.477 8 13 8V2.5L23.5 11 13 19.5V14zm-2-2h4v3.308L20.321 11 15 6.692V10h-2a7.982 7.982 0 0 0-6.057 2.773A10.988 10.988 0 0 1 11 12z"/></g></svg>
+        <!-- <svg  fill="currentColor" width="20" height="20" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g data-name="Layer 51" id="Layer_51"><path fill="currentColor" class="cls-1" d="M2,29A1.12,1.12,0,0,1,1.69,29,1,1,0,0,1,1,28V27A19,19,0,0,1,17,8.24V4a1,1,0,0,1,1.6-.8l12,9a1,1,0,0,1,0,1.6l-12,9A1,1,0,0,1,17,22V18.25A18.66,18.66,0,0,0,4.93,25.67L2.81,28.59A1,1,0,0,1,2,29ZM19,6V9.12a1,1,0,0,1-.89,1,17,17,0,0,0-15,14.6l.16-.21A20.68,20.68,0,0,1,17.9,16.11a1,1,0,0,1,.77.26,1,1,0,0,1,.33.74V20l9.33-7Z"/></g></svg> -->
+      </button>
+    </div>
       <div class="edit-btns league-spartan-bold" data-status-bar>
       
       </div>
