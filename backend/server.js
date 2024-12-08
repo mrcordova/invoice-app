@@ -624,7 +624,7 @@ app.get('/create-room/:invoiceId', extractToken, checkToken, validateToken, asyn
     // console.log(urlResponse);
     // create tinyurl here
     const {data: {'tiny_url': url}} = await urlResponse.json();
-    console.log(url);
+    // console.log(url);
     res.json({ link: url , path: `/room.html?token=${token}`,  success: true });
   } catch (error) {
     console.error(`create room : ${error}`);
@@ -700,7 +700,7 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', async (token) => {
     // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
     
-    
+    // check if used is already true or num of guests is zero then redirect to rejoin event instead
 
     try {
       const selectQuery = 'SELECT room_id, user_id, used, guestIds, num_of_guests, data FROM rooms WHERE room_id = ?';

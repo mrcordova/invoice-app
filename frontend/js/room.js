@@ -4,7 +4,6 @@ localStorage.debug = 'socket.io-client:socket';
 const token = parems.get('token');
 
 const socket = io();
-// console.log(token);
 
 const room_id = localStorage.getItem('room_id');
 if (room_id) {
