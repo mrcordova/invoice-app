@@ -351,11 +351,13 @@ export async function getShortenUrl(link) {
     console.error(` getShortenUrl: ${error}`);
   }
 }
-export async function copyUrl(e) {
+export async function copyUrl(text) {
 
-  await navigator.clipboard.writeText('link');
-
-  // e.target.textContent = 'Copied!'
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
 export async function refreshAccessToken() {

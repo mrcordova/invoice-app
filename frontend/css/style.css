@@ -216,6 +216,18 @@ body {
   align-items: center;
   padding-block-end: 1.625rem;
 }
+
+.copy-btn {
+  position: relative;
+
+  & .copy-feedback {
+    position: absolute;
+    bottom: -2rem;
+    /* right: 0; */
+    left: -80%;
+    visibility: hidden;
+  }
+}
 #delete-dialog, #profile-dialog, #share-dialog  {
   border: 0;
   margin: auto;
@@ -1437,6 +1449,7 @@ letter-spacing: -0.015625rem;
   & .share-link {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background-color: light-dark(var(--carbon-blue), var(--ruined-smores));
     padding-inline: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
     padding-block: clamp(1.625rem, calc(1.565rem + 0.254vw), 1.688rem)
@@ -1446,6 +1459,10 @@ letter-spacing: -0.015625rem;
       text-decoration: none;
       color: white;
       pointer-events: none;
+      line-height: 1;
+      font-size: 0.938rem;
+      letter-spacing: -0.016rem;
+      word-break: break-word;
       
     }
     & button {

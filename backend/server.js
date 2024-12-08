@@ -20,7 +20,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
   "chrome-extension://mpognobbkildjkofajifpdfhcoklimli"
 ];
-
+const TINY_URL = 'https://api.tinyurl.com';
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -616,8 +616,16 @@ app.get('/create-room/:invoiceId', extractToken, checkToken, validateToken, asyn
     const insertQuery = 'INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)';
     const [result] = await poolPromise.query({ sql: insertQuery, values: [token, id, invoiceData] });
  
+    const urlResponse = await fetch(`${TINY_URL}/create?api_token=${process.env.TINY_URL_API}`, {
+      method: 'POST',
+      headers: { "Content-Type": 'application/json' }, 
+      body: JSON.stringify({ url: `https://invoice-backend.noahprojects.work/room.html?token=${token}`, "domain": "tinyurl.com", "description": "string" })
+    });
+    // console.log(urlResponse);
     // create tinyurl here
-    res.json({ link:  `/room.html?token=${token}`, success: true });
+    const {data: {'tiny_url': url}} = await urlResponse.json();
+    console.log(url);
+    res.json({ link: url , path: `/room.html?token=${token}`,  success: true });
   } catch (error) {
     console.error(`create room : ${error}`);
     res.json({ link: 'failed' });

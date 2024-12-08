@@ -17,7 +17,8 @@ import {
   showOverlayLoading,
   hideOverlayLoading,
   getShortenUrl,
-  copyUrl
+  copyUrl,
+  URL_WEBSITE
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const loadingOverlay = document.getElementById('overlay');
@@ -204,6 +205,7 @@ body.addEventListener("click", async (e) => {
   const logoutBtn = e.target.closest('[data-logout]');
 
   const shareDialogBtn = e.target.closest('[data-share]');
+  const copyBtn = e.target.closest('[data-copy]');
 
   if (deleteDialogTarget) {
     deleteDialog.showModal();
@@ -526,14 +528,13 @@ body.addEventListener("click", async (e) => {
         if (response.ok) {
           const result = await response.json();
           if (result['success']) {
-            const { link } = result;
+            const { link, path } = result;
             const joinRoomLink = shareDialog.querySelector('[data-join]');
             const displayLink = shareDialog.querySelector('[data-display-link]');
             const copyBtn = shareDialog.querySelector('[data-copy]');
             displayLink.textContent = `${link}`;
-            copyBtn.setAttribute('data-copy', link);
-            joinRoomLink.setAttribute('href', link);
-           
+            copyBtn.setAttribute('data-copy', `${link}`);
+            joinRoomLink.setAttribute('href', path);
           } else {
             console.error(result);
           }
@@ -542,5 +543,18 @@ body.addEventListener("click", async (e) => {
       console.error(`share link: ${error}`);
     }
     hideOverlayLoading(shareOverlay);
+  } else if (copyBtn) {
+    const linkText = copyBtn.dataset.copy;
+    console.log(linkText);
+    await copyUrl(linkText);
+    const feedback = document.getElementById("copyFeedback");
+    feedback.style.visibility = 'visible';
+
+    // Hide feedback after 2 seconds
+    setTimeout(() => {
+      feedback.style = ''
+    }, 1000);
+
+    // alert('copied');
   }
 });
