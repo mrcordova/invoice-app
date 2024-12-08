@@ -10,15 +10,21 @@ if (room_id) {
     socket.emit('rejoinRoom', room_id);
 } else {
     socket.emit('joinRoom', token);
-    localStorage.setItem('room_id', token);
+   
 }
 
 
-socket.on('message', ({invoice}) => {
+socket.on('message', ({ invoice }) => {
+     localStorage.setItem('room_id', token);
     console.log(JSON.parse(invoice));
-})
+});
 socket.on('rejoined-room', (message) => {
     console.log(message);
+});
+
+socket.on('error', (message) => {
+    console.error(message);
+    localStorage.removeItem('room_id');
 })
 socket.on("connect_error", (err) => {
   // the reason of the error, for example "xhr poll error"

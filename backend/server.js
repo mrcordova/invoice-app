@@ -676,13 +676,13 @@ io.use((socket, next) => {
 
     if (signedCookies.refresh_token) {
       socket.refresh_token = signedCookies.refresh_token; // Attach verified cookie to socket
-      return next();
+       next();
     } else {
       socket.refresh_token = undefined;
-      return next();
+       next();
     }
   }
-   socket.refresh_token = undefined;
+  socket.refresh_token = undefined;
   next();
 });
 io.on('connection', (socket) => {
@@ -723,7 +723,7 @@ io.on('connection', (socket) => {
         const updateQuery = 'UPDATE rooms SET num_of_guests = ?, guestIds = ? WHERE room_id = ?';
         const newNumOfGuests = numOfGuests - 1;
         // console.log(newNumOfGuests);
-        
+       
         temp.push(userId);
         // console.log(test.push(1));
         const tempGuestIds = JSON.stringify(temp);
@@ -744,6 +744,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('rejoinRoom', (room_id) => {
+    // console.log("guest", socket.guest);
     socket.join(room_id);
     io.to(room_id).emit('rejoined-room', `User ${socket.id} rejoined room`);
   })
