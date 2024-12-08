@@ -676,17 +676,17 @@ io.use((socket, next) => {
 
     if (signedCookies.refresh_token) {
       socket.refresh_token = signedCookies.refresh_token; // Attach verified cookie to socket
-       next();
+       return next();
     } else {
       socket.refresh_token = undefined;
-       next();
+       return next();
     }
   }
   socket.refresh_token = undefined;
   next();
 });
 io.on('connection', (socket) => {
-  console.log('New user connected');
+  console.log('New user connected', socket.id);
   // console.log(socket.refresh_token);
   // const refresh_token = cookies['refresh_token'];
   //When a user joins the room
@@ -719,7 +719,7 @@ io.on('connection', (socket) => {
         io.to(room_id).emit('message', {message: 'creator joined', invoice: data});
         
       } else if (numOfGuests) {
-        console.log('here');
+        // console.log('here');
         const updateQuery = 'UPDATE rooms SET num_of_guests = ?, guestIds = ? WHERE room_id = ?';
         const newNumOfGuests = numOfGuests - 1;
         // console.log(newNumOfGuests);
@@ -753,6 +753,12 @@ io.on('connection', (socket) => {
   socket.on('senedMessage', (roomId, message) => {
     io.to(roomId).emit('message', message);
   });
+
+  socket.on('updateInvoice', ({room_id, invoice}) => {
+    console.log(userId);
+    // socket.to(room_id).emit('invoice', { invoice });
+    io.to(room_id).emit('invoice', { invoice });
+  })
 
   socket.on('disconnect', () => {
     console.log('User disconnected');

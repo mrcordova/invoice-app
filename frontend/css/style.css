@@ -1327,6 +1327,9 @@ input {
         color: var(--true-lavender);
       }
     }
+    & .go-back-btn {
+        padding-block-end: 1.625rem;
+      }
   }
 
   & .form-btns {
@@ -1760,6 +1763,7 @@ main {
           }
         }
       }
+      
     }
 
     & .form-btns {

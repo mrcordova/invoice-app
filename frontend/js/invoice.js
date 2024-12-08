@@ -18,6 +18,8 @@ import {
   hideOverlayLoading,
   getShortenUrl,
   copyUrl,
+  updateInvoice,
+  updateStatus,
   URL_WEBSITE
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
@@ -60,7 +62,7 @@ for (const profileImg of profileImgs) {
   profileImg.src = img;
 };
 const fileInput = document.getElementById("profile_pic");
-const currencyOptions = { style: "currency", currency: "GBP" };
+
 const homePage = "/index.html";
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 
@@ -75,101 +77,9 @@ for (const themeInput of themeInputs) {
   input.checked = localStorage.getItem(perferredColorScheme);
 }
 
-function updateStatus({ status }) {
-  statusBarEle.insertAdjacentHTML(
-    "afterbegin",
-    `<div class="status-cont">
-    <p class="league-spartan-medium">Status</p>
-    <div class="status-token" data-status="${status}">
-    <div class="status"></div>
-    <span data-status-text>${status}<span>
-    </div>
-    </div>
-     <button
-          class="edit-btn"
-          data-show-edit-dialog
-          aria-label="discard edit">
-          Edit
-        </button>
-        <button class="delete-btn" data-show-delete-dialog>Delete</button>
-        <button class="mark-btn" data-mark-status-paid="">Mark as Paid</button>
-    `
-  );
-}
-function updateInvoice(invoice) {
-  const senderAddress = JSON.parse(invoice.senderAddress);
-  const clientAddress = JSON.parse(invoice.clientAddress);
-  const items = JSON.parse(invoice.items);
- 
-  invoiceEle.insertAdjacentHTML(
-    "afterbegin",
-    `<div class="invoice-info league-spartan-medium">
-    <div class="invoice-title">
-    <div class="invoice-id league-spartan-bold">
-    <span>#</span>
-    ${invoice.id}
-    </div>
-    <p>${invoice.description}</p>
-    </div>
-    <address class="user-addy">
-    <p>${senderAddress.street}</p>
-    <p>${senderAddress.city}</p>
-    <p>${senderAddress.postCode}</p>
-    <p>${senderAddress.country}</p>
-    </address>
-    <div class="invoice-date">
-    Invoice Date
-    <p class="league-spartan-bold">${new Date(
-      `${invoice.createdAt}`
-    ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
-    </div>
-    <div class="payment-due">
-    Payment Due
-    <p class="league-spartan-bold">${new Date(
-      `${invoice.paymentDue}`
-    ).toLocaleDateString("en-AU", { dateStyle: "medium" })}</p>
-    </div>
-    <div class="bill-to">
-    Bill to
-    <p class="league-spartan-bold">${invoice.clientName}</p>
-    <address>
-    <p>${clientAddress.street}</p>
-    <p>${clientAddress.city}</p>
-    <p>${clientAddress.postCode}</p>
-    <p>${clientAddress.country}</p>
-    </address>
-    </div>
-    <div class="email">
-    Sent to
-    <p class="league-spartan-bold">${invoice.clientEmail}</p>
-    </div>
-    </div>`
-  );
 
-  for (const item of items) {
-    invoiceItemsTable.insertAdjacentHTML(
-      "beforeend",
-      ` <div class="invoice-item">
-      <span class="name" aria-describedby="name">${item.name}</span>
-      <span class="qty">
-      ${item.quantity}
-      <span>x</span>
-      </span>
-      <span class="price">${item.price.toLocaleString(
-        "en",
-        currencyOptions
-      )}</span>
-      <span class="total">${item.total.toLocaleString(
-        "en",
-        currencyOptions
-      )}</span>
-      </div>`
-    );
-  }
-  amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
-}
-updateStatus(invoice);
-updateInvoice(invoice);
+updateStatus(invoice, statusBarEle);
+updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
 fileInput.addEventListener('change', (e) => {
   if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
     const file = e.target.files[0];
