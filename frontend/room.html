@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/reset.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="js/room.js"></script>
+</head>
+<body>
+     <div id="overlay">
+      <div class="spinner"></div>
+    </div>
+    <dialog id="delete-dialog" class="league-spartan-bold">
+      <h1>Confirm Deletion</h1>
+      <p class="league-spartan-medium">
+        Are you sure you want to delete invoice
+        <span data-invoice-id>#RT3080</span>
+        ? This action cannot be undone
+      </p>
+      <div class="btn-cont">
+        <button class="cancel-btn" data-close-delete-dialog>Cancel</button>
+        <button class="delete-btn" delete-invoice>Delete</button>
+      </div>
+    </dialog>
+     <div class="header-cont">
+      <header class="header">
+        <div class="logo-cont">
+          <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+          <div class="logo-bg"></div>
+        </div>
+        <label class="theme-toggle" data-theme>
+          <input type="checkbox" name="theme" id="theme" />
+          <svg
+            class="dark-mode"
+            width="20"
+            height="20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M9.817 16.18a.96.96 0 01.953.848l.007.112v1.535a.96.96 0 01-1.913.112l-.006-.112V17.14c0-.53.43-.96.96-.96zm-4.5-1.863c.347.346.373.89.08 1.266l-.08.09-1.085 1.087a.96.96 0 01-1.437-1.267l.08-.09 1.086-1.086a.959.959 0 011.357 0zm10.356 0l1.086 1.086a.959.959 0 11-1.357 1.357l-1.085-1.086a.959.959 0 111.356-1.357zM9.817 4.9a4.924 4.924 0 014.918 4.918 4.924 4.924 0 01-4.918 4.918A4.924 4.924 0 014.9 9.818 4.924 4.924 0 019.817 4.9zm8.858 3.958a.96.96 0 110 1.919H17.14a.96.96 0 110-1.92h1.535zm-16.18 0a.96.96 0 01.112 1.912l-.112.007H.96a.96.96 0 01-.112-1.913l.112-.006h1.534zm14.264-5.983a.96.96 0 010 1.357l-1.086 1.086a.96.96 0 11-1.356-1.357l1.085-1.086a.96.96 0 011.357 0zm-12.617-.08l.09.08 1.086 1.086A.96.96 0 014.05 5.398l-.09-.08-1.086-1.086a.959.959 0 011.267-1.436zM9.817 0c.53 0 .96.43.96.96v1.535a.96.96 0 01-1.92 0V.96c0-.53.43-.96.96-.96z"
+              fill="currentColor"
+              fill-rule="nonzero" />
+          </svg>
+          <svg
+            class="light-mode"
+            width="20"
+            height="20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19.502 11.342a.703.703 0 00-.588.128 7.499 7.499 0 01-2.275 1.33 7.123 7.123 0 01-2.581.46A7.516 7.516 0 018.74 11.06a7.516 7.516 0 01-2.198-5.316c0-.87.153-1.713.41-2.48.28-.817.69-1.559 1.226-2.197a.652.652 0 00-.102-.92.703.703 0 00-.588-.128C5.316.607 3.425 1.91 2.07 3.649A10.082 10.082 0 000 9.783C0 12.57 1.125 15.1 2.965 16.94a10.04 10.04 0 007.156 2.965c2.352 0 4.524-.818 6.262-2.173a10.078 10.078 0 003.579-5.597.62.62 0 00-.46-.793z"
+              fill="currentColor"
+              fill-rule="nonzero" />
+          </svg>
+        </label>
+       <button class="profile-pic-cont" data-show-profile-dialog>
+          <img src="" id="profile_img"  class="profile_img" width="32" height="32" alt="profile picture" />
+        </button>
+        <dialog id="profile-dialog" class="league-spartan-bold" >
+           <div class="profile-header">
+             <h3>Profile Info</h3>
+             <button data-close class="close-btn">
+             <svg fill="currentColor" height="26" viewBox="0 0 26 26" width="26" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="m17.53 9.53-3.47 3.47 3.47 3.47c.0737.0687.1328.1515.1738.2435s.063.1913.0648.292-.0168.2007-.0545.2941-.0938.1782-.1651.2494c-.0712.0713-.156.1274-.2494.1651s-.1934.0563-.2941.0545-.2-.0238-.292-.0648-.1748-.1001-.2435-.1738l-3.47-3.47-3.47 3.47c-.14217.1325-.33022.2046-.52452.2012-.1943-.0035-.37968-.0822-.5171-.2196-.13741-.1374-.21612-.3228-.21955-.5171s.0687-.3823.20118-.5245l3.46999-3.47-3.46999-3.47c-.13248-.14218-.20461-.33022-.20118-.52452s.08214-.37969.21955-.5171c.13742-.13741.3228-.21613.5171-.21956.1943-.00342.38235.0687.52452.20118l3.47 3.47 3.47-3.47c.1422-.13248.3302-.2046.5245-.20118.1943.00343.3797.08215.5171.21956s.2162.3228.2196.5171-.0687.38234-.2012.52452zm8.22 3.47c0 2.5217-.7478 4.9868-2.1488 7.0835-1.4009 2.0967-3.3922 3.7309-5.722 4.696-2.3297.965-4.8933 1.2175-7.3666.7255-2.47325-.4919-4.74509-1.7063-6.52821-3.4894s-2.997435-4.0549-3.489397-6.5282c-.49196108-2.4733-.239469-5.0369.725547-7.36661.96502-2.32976 2.59922-4.32104 4.69594-5.72203 2.09673-1.400986 4.56182-2.14876 7.08352-2.14876 3.3803.00397 6.621 1.34854 9.0112 3.73877 2.3903 2.39023 3.7348 5.63094 3.7388 9.01123zm-1.5 0c0-2.225-.6598-4.40011-1.896-6.25017-1.2361-1.85005-2.9931-3.29199-5.0488-4.14348-2.0557-.85148-4.3177-1.07427-6.5-.64018-2.18225.43408-4.18681 1.50554-5.76015 3.07888s-2.6448 3.5779-3.07888 5.76015c-.43408 2.1823-.2113 4.4443.64019 6.5s2.29343 3.8127 4.14348 5.0488c1.85005 1.2362 4.02516 1.896 6.25016 1.896 2.9827-.0033 5.8422-1.1896 7.9513-3.2987s3.2954-4.9686 3.2987-7.9513z" fill="#696868"/></svg>
+             </button>
+            </div>
+          <img data-preview src="" height="80" width="80" alt="profile pic">
+          <form id="profile-form" >
+            <label  data-file >
+              Click here to upload (PNG, JPG, SVG, WEBP)
+              <input type="file" id="profile_pic" name="file" accept=".jpg, .png, .jpeg, .svg, .webp,image/jpeg, image/png, image/svg+xml, image/webp" size="">
+            </label>
+            <label>
+              <input type="text" name="username" maxlength='255' pattern="^[^\s]+$" required placeholder="Enter your username">
+            </label>
+            <div class="profile-btn-cont">
+              <button data-logout class="logout">Logout</button>
+              <button type="submit" data-profile-submit >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </dialog>
+      </header>
+      <dialog id="edit-invoice-dialog">
+        <header class="header">
+          <div class="logo-cont">
+            <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+            <div class="logo-bg"></div>
+          </div>
+          <label class="theme-toggle" data-theme>
+            <input type="checkbox" name="theme" id="dialog-theme" />
+            <svg
+              class="dark-mode"
+              width="20"
+              height="20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M9.817 16.18a.96.96 0 01.953.848l.007.112v1.535a.96.96 0 01-1.913.112l-.006-.112V17.14c0-.53.43-.96.96-.96zm-4.5-1.863c.347.346.373.89.08 1.266l-.08.09-1.085 1.087a.96.96 0 01-1.437-1.267l.08-.09 1.086-1.086a.959.959 0 011.357 0zm10.356 0l1.086 1.086a.959.959 0 11-1.357 1.357l-1.085-1.086a.959.959 0 111.356-1.357zM9.817 4.9a4.924 4.924 0 014.918 4.918 4.924 4.924 0 01-4.918 4.918A4.924 4.924 0 014.9 9.818 4.924 4.924 0 019.817 4.9zm8.858 3.958a.96.96 0 110 1.919H17.14a.96.96 0 110-1.92h1.535zm-16.18 0a.96.96 0 01.112 1.912l-.112.007H.96a.96.96 0 01-.112-1.913l.112-.006h1.534zm14.264-5.983a.96.96 0 010 1.357l-1.086 1.086a.96.96 0 11-1.356-1.357l1.085-1.086a.96.96 0 011.357 0zm-12.617-.08l.09.08 1.086 1.086A.96.96 0 014.05 5.398l-.09-.08-1.086-1.086a.959.959 0 011.267-1.436zM9.817 0c.53 0 .96.43.96.96v1.535a.96.96 0 01-1.92 0V.96c0-.53.43-.96.96-.96z"
+                fill="currentColor"
+                fill-rule="nonzero" />
+            </svg>
+            <svg
+              class="light-mode"
+              width="20"
+              height="20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M19.502 11.342a.703.703 0 00-.588.128 7.499 7.499 0 01-2.275 1.33 7.123 7.123 0 01-2.581.46A7.516 7.516 0 018.74 11.06a7.516 7.516 0 01-2.198-5.316c0-.87.153-1.713.41-2.48.28-.817.69-1.559 1.226-2.197a.652.652 0 00-.102-.92.703.703 0 00-.588-.128C5.316.607 3.425 1.91 2.07 3.649A10.082 10.082 0 000 9.783C0 12.57 1.125 15.1 2.965 16.94a10.04 10.04 0 007.156 2.965c2.352 0 4.524-.818 6.262-2.173a10.078 10.078 0 003.579-5.597.62.62 0 00-.46-.793z"
+                fill="currentColor"
+                fill-rule="nonzero" />
+            </svg>
+          </label>
+          <div class="profile-pic-cont">
+            <img src="" width="32" height="32" class="profile_img" alt="profile picture" />
+          </div>
+        </header>
+        <div class="form-cont league-spartan-bold">
+          <button class="go-back-btn" data-go-back-page>
+            <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
+            Go back
+          </button>
+          <h3>
+            Edit
+            <span class="invoice-id">
+              <span>#</span>
+              <span data-invoice-id></span>
+            </span>
+          </h3>
+          <form class="invoice-form" id="invoice-form">
+            <section class="bill-from-section">
+              <h4 class="section-header">Bill From</h4>
+              <label class="addy league-spartan-medium">
+                <span class="label-name">
+                  Street Address
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="street"
+                  id="street"
+                  required
+                  autocomplete="address-level3" />
+              </label>
+              <label class="city league-spartan-medium">
+                <span class="label-name">
+                  City
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="city"
+                  id="city"
+                  required
+                  autocomplete="address-level2" />
+              </label>
+              <label class="postal-code league-spartan-medium">
+                <span class="label-name">
+                  Postal Code
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="postal-code"
+                  id="postal-code"
+                  required
+                  autocomplete="postal-code" />
+              </label>
+              <label class="country league-spartan-medium">
+                <span class="label-name">
+                  Country
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="country"
+                  id="country"
+                  required
+                  autocomplete="country" />
+              </label>
+            </section>
+            <section class="bill-to-section">
+              <h4 class="section-header">Bill To</h4>
+              <label class="client-name league-spartan-medium">
+                <span class="label-name">
+                  Client's Name
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="client-name"
+                  id="client-name"
+                  required
+                  autocomplete="name" />
+              </label>
+              <label class="client-email league-spartan-medium">
+                <span class="label-name">
+                  Client's Email
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="email"
+                  name="client-email"
+                  id="client-email"
+                  required
+                  autocomplete="email" />
+              </label>
+              <label class="addy league-spartan-medium">
+                <span class="label-name">
+                  Street Address
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="client-street"
+                  id="client-street"
+                  required
+                  autocomplete="street-address" />
+              </label>
+              <label class="city league-spartan-medium">
+                <span class="label-name">
+                  City
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="client-city"
+                  id="client-city"
+                  required
+                  autocomplete="address-level2" />
+              </label>
+              <label class="postal-code league-spartan-medium">
+                <span class="label-name">
+                  Postal Code
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="client-postal-code"
+                  id="client-postal-code"
+                  required
+                  autocomplete="postal-code" />
+              </label>
+              <label class="country league-spartan-medium">
+                <span class="label-name">
+                  Country
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  class="league-spartan-bold"
+                  type="text"
+                  name="client-country"
+                  id="client-country"
+                  required
+                  autocomplete="country" />
+              </label>
+            </section>
+            <section class="invoice-date-section">
+              <label class="date">
+                <span class="label-name">
+                  Invoice Date
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+                <input
+                  type="date"
+                  name="date"
+                  id="date"
+                  required
+                  onclick="this.showPicker()" />
+              </label>
+              <div class="net">
+                <label data-payment-terms-input data-payment-terms-value="30">
+                  <span class="label-name">
+                    Payment Terms
+                    <span class="error-text" aria-live="polite"></span>
+                  </span>
+                  <span class="net-span" tabindex="0">
+                    <span>Net 30 Days</span>
+                    <input type="checkbox" name="terms" id="terms" />
+                  </span>
+                </label>
+                <menu id="net-menu" class="net-menu">
+                  <li>
+                    <label data-payment-terms-option="1">
+                      <input type="radio" name="net-term-days" id="net-one" />
+                      <span>Net 1 Day</span>
+                    </label>
+                  </li>
+                  <li>
+                    <label data-payment-terms-option="7">
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-seven" />
+                      <span>Net 7 Days</span>
+                    </label>
+                  </li>
+
+                  <li>
+                    <label data-payment-terms-option="14">
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-fourteen" />
+                      <span>Net 14 Days</span>
+                    </label>
+                  </li>
+                  <li>
+                    <label data-payment-terms-option="30">
+                      <input
+                        type="radio"
+                        name="new-invoice-days"
+                        id="net-thirty" />
+                      <span>Net 30 Days</span>
+                    </label>
+                  </li>
+                </menu>
+              </div>
+
+              <label class="desc">
+                <span class="label-name">
+                  Project Description
+                  <span class="error-text" aria-live="polite"></span>
+                </span>
+
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  required
+                  placeholder="e.g. Graphic Design Service" />
+              </label>
+            </section>
+            <section class="invoice-items-section">
+              <h4>Item List</h4>
+              <div class="invoice-item hide-mobile item-header">
+                <div class="name">Item name</div>
+                <div class="qty">Qty.</div>
+                <div class="price">Price</div>
+                <div class="total">Total</div>
+                <div class="delete"></div>
+              </div>
+              <div class="invoice-items">
+                <button
+                  class="add-new-item-btn league-spartan-bold"
+                  data-add-item
+                  type="button">
+                  + Add New Item
+                </button>
+              </div>
+            </section>
+            <span
+              class="error-text league-spartan-bold"
+              aria-live="polite"></span>
+          </form>
+          <div class="btn-cont form-btns league-spartan-bold">
+            <button class="discard-btn" data-go-back-page>Cancel</button>
+            <button
+              class="save-btn"
+              type="submit"
+              data-save
+              form="invoice-form">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+     <main>
+
+      <div class="edit-btns league-spartan-bold" data-status-bar>
+      
+      </div>
+
+      <div class="individual-invoice" data-invoice>
+        <div class="invoice-items league-spartan-bold">
+          <div class="invoice-table-cont">
+            <div class="invoice-item invoice-header league-spartan-medium">
+              <span class="name" id="name">Item Name</span>
+              <span class="qty">QTY.</span>
+              <span class="price">Price</span>
+              <span class="total">Total</span>
+            </div>
+          </div>
+          <div class="amount-due-cont">
+            <span class="league-spartan-medium amount-due-header">
+              Amount Due
+            </span>
+            <span class="amount-due" data-amount-due>$0.00</span>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="edit-btns league-spartan-bold">
+      <button class="edit-btn" data-show-edit-dialog aria-label="discard edit">
+        Edit
+      </button>
+      <!-- <button class="delete-btn" data-show-delete-dialog>Delete</button> -->
+      <!-- <button class="mark-btn" data-mark-status-paid>Mark as Paid</button> -->
+    </footer>
+</body>
+</html>

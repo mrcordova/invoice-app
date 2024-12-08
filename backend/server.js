@@ -282,6 +282,7 @@ app.use('/uploads', express.static('uploads', {
 //     }
 // }));
 
+
 app.use(express.static(path.join(__dirname, "../frontend/"), {
     setHeaders: (res, path) => {
         if (path.endsWith('.css')) {
@@ -378,8 +379,8 @@ app.post('/loginUser', async (req, res) => {
 
 app.post('/logout', async (req, res) => {
 
-  const refreshToken = req.signedCookies['refresh_token'];
-  if (!refreshToken) return res.status(204).send('Refresh token invalid');
+  // const refreshToken = req.signedCookies['refresh_token'];
+  // if (!refreshToken) return res.status(204).json({'Refresh token invalid'{});
   try {
     const hashToken = hashPassword(refreshToken);
     const blackListed = await blacklistToken(refreshToken);
@@ -601,45 +602,50 @@ app.delete('/deleteInvoice/:id', extractToken, checkToken, validateToken, async 
   }
 });
 
-app.get('/create-room/:invoiceId', validateToken, async (req, res) => {
+app.get('/create-room/:invoiceId', extractToken, checkToken, validateToken, async (req, res) => {
   const { user: { id } } = req;
   const { invoiceId } = req.params;
   const token = jwt.sign({ id: id, invoiceId }, process.env.ROOM_SECRET, { expiresIn: '7d' });
   // const hashToken = hashPassword(token);
 
   try {
-    const insertQuery = 'INSERT INTO rooms(room_id, user_id) VALUES (?, ?)';
-    const [result] = await poolPromise.query({ sql: insertQuery, values: [token, id] });
+     const selectInvoice = 'SELECT * FROM invoices WHERE user_id = ? AND id = ?';
+    const [invoices] = await poolPromise.query({ sql: selectInvoice, values: [id, invoiceId] });
+    const invoice = invoices[0];
+    const invoiceData = JSON.stringify(invoice);
+    const insertQuery = 'INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)';
+    const [result] = await poolPromise.query({ sql: insertQuery, values: [token, id, invoiceData] });
  
     // create tinyurl here
-    res.json({ link:  `https://invoice-backend.noahprojects.work/room/${token}` });
+    res.json({ link:  `/room.html?token=${token}`, success: true });
   } catch (error) {
     console.error(`create room : ${error}`);
+    res.json({ link: 'failed' });
   }
 
 });
 
-app.get('/room/:token', async (req, res) => {
-  const hashToken = hashPassword(req.params.token);
-  const { id , invoiceId } = jwt.verify(req.params.token, process.env.ROOM_SECRET);
+// app.get('/room/:token', async (req, res) => {
+//   const token = req.params.token;
+//   const { id , invoiceId } = jwt.verify(req.params.token, process.env.ROOM_SECRET);
 
-  try {
-    const selectQuery = 'SELECT room_id FROM rooms WHERE room_id = ?';
-    const [result] = await poolPromise.query({ sql: selectQuery, values: [hashToken] });
-    const { 'num_of_guests': numOfGuests, used } = result[0];
-    if (!result.length) {
-      return res.status(404).send('Room not found');
-    };
+//   try {
+//     const selectQuery = 'SELECT room_id FROM rooms WHERE room_id = ?';
+//     const [result] = await poolPromise.query({ sql: selectQuery, values: [token] });
+//     const { 'num_of_guests': numOfGuests, used } = result[0];
+//     if (!result.length) {
+//       return res.status(404).send('Room not found');
+//     };
 
-    if (!numOfGuests && used) {
-      return res.status(403).send('This room is full');
-    };
+//     if (!numOfGuests && used) {
+//       return res.status(403).send('This room is full');
+//     };
 
-    res.sendFile(path.join(__dirname, "../frontend/room.html"));
-  } catch (error) {
+//     res.sendFile(path.join(__dirname, "../frontend/room.html"));
+//   } catch (error) {
     
-  }
-});
+//   }
+// });
 
 
 app.get("/health-check", async (req, res) => {
@@ -653,37 +659,86 @@ app.get("/health-check", async (req, res) => {
   }
 });
 
+// Middleware to verify and extract signed cookies for socket.io
+io.use((socket, next) => {
+  const cookieHeader = socket.handshake.headers.cookie;
+  if (cookieHeader) {
+    const cookies = require('cookie').parse(cookieHeader); // Parse raw cookies
+    const signedCookies = require('cookie-parser').signedCookies(cookies, process.env.COOKIE_SECRET);
+
+    if (signedCookies.refresh_token) {
+      socket.refresh_token = signedCookies.refresh_token; // Attach verified cookie to socket
+      return next();
+    } else {
+      socket.refresh_token = undefined;
+      return next();
+    }
+  }
+   socket.refresh_token = undefined;
+  next();
+});
 io.on('connection', (socket) => {
   console.log('New user connected');
-  
+  // console.log(socket.refresh_token);
+  // const refresh_token = cookies['refresh_token'];
   //When a user joins the room
-  socket.on('joinRoom', async (token, userId) => {
-    try {
-      const selectQuery = 'SELECT room_id, user_id, used, guestIds, num_of_guests FROM rooms WHERE token = ?';
-      const [room] = await poolPromise.query({ sql: selectQuery, values: token });
-
-      const { user_id, room_id, "num_of_guests": numOfGuests, guestIds } = room[0];
+  let userId = 32423;
+  // console.log(userId);
+  if (socket.refresh_token) {
+    // console.log(userId);
+    const { id } = jwt.verify(socket.refresh_token, process.env.REFRESH_SECRET);
+    userId = id;
+  } 
+  socket.on('joinRoom', async (token) => {
+    // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
     
+    
+
+    try {
+      const selectQuery = 'SELECT room_id, user_id, used, guestIds, num_of_guests, data FROM rooms WHERE room_id = ?';
+     
+      // console.log(token);
+      const [room] = await poolPromise.query({ sql: selectQuery, values: token });
+     
+
+      const { user_id, room_id, "num_of_guests": numOfGuests, guestIds, data } = room[0];
+      const temp = JSON.parse(guestIds ?? '[]');
+      // console.log(room);
       if (user_id === userId) {
         const updateQuery = 'UPDATE rooms SET used = ? WHERE room_id = ?';
         const [result] = await poolPromise.query({ sql: updateQuery, values: [true, room_id] });
         socket.join(room_id);
-        io.to(room_id).emit('message', 'Creator has joined the room');
-
+        io.to(room_id).emit('message', {message: 'creator joined', invoice: data});
+        
       } else if (numOfGuests) {
-        const updateQuery = 'UPDATE rooms SET numOfGuests = ?, guestIds = ? WHERE room_id = ?';
+        console.log('here');
+        const updateQuery = 'UPDATE rooms SET num_of_guests = ?, guestIds = ? WHERE room_id = ?';
         const newNumOfGuests = numOfGuests - 1;
-        const tempGuestIds = JSON.stringify(JSON.parse(guestIds).push(userId));
+        // console.log(newNumOfGuests);
+        
+        temp.push(userId);
+        // console.log(test.push(1));
+        const tempGuestIds = JSON.stringify(temp);
+        console.log(tempGuestIds);
         const [result] = await poolPromise.query({ sql: updateQuery, values: [newNumOfGuests, tempGuestIds, room_id] });
+        // console.log(result);
         socket.join(room_id);
-        io.to(room_id).emit('message', 'Guest has joined the room');
+         io.to(room_id).emit('message', {message: 'guest joined', invoice: data});
+      } else if (temp.includes(userId)) {
+        socket.join(room_id);
+         io.to(room_id).emit('message', {message: 'guest returned', invoice: data});
       } else {
         socket.emit('error', 'This room is full');
       }
     } catch (error) {
-      socket.emait('error', 'Room not found');
+      socket.emit('error', 'Room not found');
     }
   });
+
+  socket.on('rejoinRoom', (room_id) => {
+    socket.join(room_id);
+    io.to(room_id).emit('rejoined-room', `User ${socket.id} rejoined room`);
+  })
 
   // Handle messages
   socket.on('senedMessage', (roomId, message) => {
@@ -693,8 +748,15 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
-});
 
+  
+});
+io.engine.on("connection_error", (err) => {
+  console.log(err.req);      // the request object
+  console.log(err.code);     // the error code, for example 1
+  console.log(err.message);  // the error message, for example "Session ID unknown"
+  console.log(err.context);  // some additional error context
+});
 // app.listen(PORT, () => {
 //   console.log(`Server is running of ${PORT}`);
 // });

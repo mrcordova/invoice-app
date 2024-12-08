@@ -1428,8 +1428,8 @@ letter-spacing: -0.015625rem;
     bottom: 0;
     left: 0;
     right: 0;
-    height: max-content;
-    width: max-content;
+    height: 100%;
+    width: 100%;
     margin: auto;
     background-color: light-dark(white, var(--kon));
   }
@@ -1480,6 +1480,7 @@ letter-spacing: -0.015625rem;
       border-radius: 1.5rem;
       padding-block: 0.5rem;
       align-self: center;
+      text-decoration: none;
 
       &:hover {
         background-color: var(--forgotten-purple);

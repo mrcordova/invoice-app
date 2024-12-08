@@ -333,11 +333,11 @@ export async function logout() {
   // console.log(response);
   const result = await response.json();
   // console.log(result);
-  if (result['success']) {
+  // if (result['success']) {
     localStorage.removeItem('img');
     localStorage.removeItem('username');
     location.href = "/login.html";
-  }
+  // }
 }
 
 export async function getShortenUrl(link) {
@@ -377,6 +377,8 @@ export async function refreshAccessToken() {
     }
   } catch (error) {
     console.error(error);
+    await logout();
+    // location.href = "/login.html";
   }
 }
 

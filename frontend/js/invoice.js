@@ -50,6 +50,7 @@ const invoiceItemsTable = document.querySelector(".invoice-table-cont");
 const amountDue = document.querySelector("[data-amount-due]");
 const profileDialog = document.getElementById('profile-dialog');
 const shareDialog = document.getElementById('share-dialog');
+const shareOverlay = shareDialog.querySelector('#share-overlay');
 let username = localStorage.getItem('username');
 let img = localStorage.getItem('img');
 // const profileImg = document.getElementById('profile_img');
@@ -513,6 +514,33 @@ body.addEventListener("click", async (e) => {
     }
     
   } else if (shareDialogBtn) {
+    showOverlayLoading(shareOverlay);
     shareDialog.showModal();
+    let response;
+    try {
+      response = await fetchWithAuth(`/create-room/${invoice.id}`);
+      if (response.status === 403) {
+          await refreshAccessToken();
+        response = await fetchWithAuth(`/create-room/${invoice.id}`);
+      }
+        if (response.ok) {
+          const result = await response.json();
+          if (result['success']) {
+            const { link } = result;
+            const joinRoomLink = shareDialog.querySelector('[data-join]');
+            const displayLink = shareDialog.querySelector('[data-display-link]');
+            const copyBtn = shareDialog.querySelector('[data-copy]');
+            displayLink.textContent = `${link}`;
+            copyBtn.setAttribute('data-copy', link);
+            joinRoomLink.setAttribute('href', link);
+           
+          } else {
+            console.error(result);
+          }
+        }
+    } catch (error) {
+      console.error(`share link: ${error}`);
+    }
+    hideOverlayLoading(shareOverlay);
   }
 });
