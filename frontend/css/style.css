@@ -228,7 +228,7 @@ body {
     visibility: hidden;
   }
 }
-#delete-dialog, #profile-dialog, #share-dialog  {
+#delete-dialog, #profile-dialog, #share-dialog, #response-dialog {
   border: 0;
   margin: auto;
   top: 0;
@@ -1432,7 +1432,7 @@ letter-spacing: -0.015625rem;
     cursor: pointer;
   }
 }
-#share-dialog[open] {
+#share-dialog[open], #response-dialog[open] {
   display: flex;
 /* border: 0; */
 /* background-color: white; */
@@ -1506,6 +1506,25 @@ letter-spacing: -0.015625rem;
         background-color: var(--forgotten-purple);
         cursor: pointer;
       }
+    }
+  }
+}
+
+#response-dialog[open] {
+
+  height: 10rem;
+ & #share-overlay {
+
+    visibility: visible;
+    flex-direction: column;
+    gap: 1rem;
+
+    & p {
+      /* flex: 1; */
+      margin-block-end: 0;
+    }
+    & div {
+      /* flex: 1; */
     }
   }
 }

@@ -14,7 +14,7 @@
       <div class="spinner"></div>
     </div>
     
-    <dialog id="delete-dialog" class="league-spartan-bold">
+    <!-- <dialog id="delete-dialog" class="league-spartan-bold">
       <h1>Confirm Deletion</h1>
       <p class="league-spartan-medium">
         Are you sure you want to delete invoice
@@ -25,7 +25,8 @@
         <button class="cancel-btn" data-close-delete-dialog>Cancel</button>
         <button class="delete-btn" delete-invoice>Delete</button>
       </div>
-    </dialog>
+    </dialog> -->
+    
      <div class="header-cont">
       <header class="header">
         <div class="logo-cont">
@@ -354,7 +355,17 @@
       </dialog>
     </div>
      <main>
+      <dialog id="response-dialog">
+        <div id="share-overlay">
+          <h1 class="league-spartan-bold">Waiting on other's responses</h1>
 
+        <div class="spinner"></div>
+       </div>
+      </dialog>
+      <div popover id='response-popover'>
+        <p>User has <span data-response></span> invoice
+        </p>
+      </div>
       <div class="edit-btns league-spartan-bold" data-status-bar>
       
       </div>

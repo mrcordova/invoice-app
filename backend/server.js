@@ -754,11 +754,33 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('message', message);
   });
 
-  socket.on('updateInvoice', ({room_id, invoice}) => {
+  socket.on('updateInvoice', ({ room_id, invoice }) => {
     console.log(userId);
     // socket.to(room_id).emit('invoice', { invoice });
     io.to(room_id).emit('invoice', { invoice });
-  })
+  });
+
+  socket.on('sendInvoiceMessage', ({ room_id, approve }) => { 
+    // if (socket.refresh_token) {
+      socket.to(room_id).emit('askForResponse', { userId, approve });
+      socket.emit('waitingForResponse', { status: 'waiting' });
+    // } else {
+      // io.to(room_id).emit('responseReceived', { approve }); 
+    // };
+  });
+  socket.on('sendResponse', ({ room_id, approve: response }) => {
+    socket.to(room_id).emit('responseReceived', {  response });
+  });
+//   socket.on('waitForOthers', ({ room_id, approve }) => {
+//     if (socket.refresh_token) {
+//       socket.to(room_id).emit('response', { approve });
+//       socket.emit('waitingResponse', { status: 'waiting' });
+//     }
+    
+//   });
+//   socket.on('othersRespnse', ({room_id}) => {
+// io.to(room_id).emit('reponseReceived', {})
+//   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
