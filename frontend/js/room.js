@@ -5,6 +5,7 @@ import {
   setUpEditDialog,
   saveInvoice,
   themeUpdate,
+  URL_WEBSITE,
 } from "./functions.js";
 
 const parems = new URLSearchParams(document.location.search);
@@ -22,8 +23,12 @@ localStorage.debug = "socket.io-client:socket";
 // console.log(token);
 const token = parems.get("token");
 const room_id = localStorage.getItem("room_id");
+const status = localStorage.getItem("status");
 // let invoice;
 let socket;
+// responsePopover.showPopover();
+await fetch(`${URL_WEBSITE}/guest-token`);
+
 if (!socket) {
   socket = io();
 }
@@ -42,6 +47,10 @@ if (room_id) {
   socket.emit("rejoinRoom", room_id);
 } else {
   socket.emit("joinRoom", token);
+}
+
+if (status) {
+  responseDialog.showModal();
 }
 
 for (const themeInput of themeInputs) {
@@ -78,6 +87,7 @@ body.addEventListener("click", (e) => {
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
       socket.emit("sendResponse", { room_id, approve: true });
+      localStorage.removeItem("senderId");
     } else {
       socket.emit("sendInvoiceMessage", { approve: true, room_id });
     }
@@ -86,6 +96,7 @@ body.addEventListener("click", (e) => {
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
       socket.emit("sendResponse", { room_id, approve: false });
+      localStorage.removeItem("senderId");
     } else {
       socket.emit("sendInvoiceMessage", { approve: false, room_id });
     }
@@ -102,7 +113,7 @@ socket.on("message", ({ invoice: newInvoice }) => {
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
   localStorage.setItem("invoice", newInvoice);
-  invoice = JSON.parse(newInvoice);
+  const invoice = JSON.parse(newInvoice);
   updateShareStatus(invoice, statusBarEle);
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
   // }
@@ -134,23 +145,19 @@ socket.on("rejoined-room", (message) => {
 socket.on("askForResponse", ({ approve, userId }) => {
   // alert(`User has approved: ${approve}, waiting on your response`);
   localStorage.setItem("senderId", userId);
-  const userResponse = responsePopover.querySelector("[data-response]");
-  userResponse.textContent = `${approve ? "approved" : "rejected"}`;
-  responsePopover.showPopover();
-  setTimeout(() => {
-    responsePopover.hidePopover();
-  }, 2000);
+  showResponsePopover(approve);
 });
 
 socket.on("waitingForResponse", ({ status }) => {
   console.log(status);
-  ß;
   localStorage.setItem("status", status);
   responseDialog.showModal();
 });
 
 socket.on("responseReceived", ({ response }) => {
   console.log(response);
+  showResponsePopover(response);
+  localStorage.removeItem("status");
   responseDialog.close();
 });
 socket.on("error", (message) => {
@@ -167,3 +174,11 @@ socket.on("connect_error", (err) => {
   // some additional context, for example the XMLHttpRequest object
   console.log(err.context);
 });
+function showResponsePopover(approve) {
+  const userResponse = responsePopover.querySelector("[data-response]");
+  userResponse.textContent = `${approve ? "approved" : "rejected"}`;
+  responsePopover.showPopover();
+  setTimeout(() => {
+    responsePopover.hidePopover();
+  }, 2000);
+}

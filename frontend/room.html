@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="/css/reset.css" />
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"
+      integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"></script>
     <script type="module" src="js/room.js"></script>
-</head>
-<body>
-     <div id="overlay">
+  </head>
+  <body>
+    <div id="overlay">
       <div class="spinner"></div>
     </div>
-    
+
     <!-- <dialog id="delete-dialog" class="league-spartan-bold">
       <h1>Confirm Deletion</h1>
       <p class="league-spartan-medium">
@@ -26,11 +30,15 @@
         <button class="delete-btn" delete-invoice>Delete</button>
       </div>
     </dialog> -->
-    
-     <div class="header-cont">
+
+    <div class="header-cont">
       <header class="header">
         <div class="logo-cont">
-          <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+          <img
+            src="./assets/logo.svg"
+            width="32"
+            height="32"
+            alt="invoice logo" />
           <div class="logo-bg"></div>
         </div>
         <label class="theme-toggle" data-theme>
@@ -56,15 +64,18 @@
               fill-rule="nonzero" />
           </svg>
         </label>
-       <!-- <button class="profile-pic-cont" data-show-profile-dialog>
+        <!-- <button class="profile-pic-cont" data-show-profile-dialog>
           <img src="" id="profile_img"  class="profile_img" width="32" height="32" alt="profile picture" />
         </button> -->
-        
       </header>
       <dialog id="edit-invoice-dialog">
         <header class="header">
           <div class="logo-cont">
-            <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+            <img
+              src="./assets/logo.svg"
+              width="32"
+              height="32"
+              alt="invoice logo" />
             <div class="logo-bg"></div>
           </div>
           <label class="theme-toggle" data-theme>
@@ -354,21 +365,22 @@
         </div>
       </dialog>
     </div>
-     <main>
+    <main>
       <dialog id="response-dialog">
         <div id="share-overlay">
           <h1 class="league-spartan-bold">Waiting on other's responses</h1>
 
-        <div class="spinner"></div>
-       </div>
+          <div class="spinner"></div>
+        </div>
       </dialog>
-      <div popover id='response-popover'>
-        <p>User has <span data-response></span> invoice
+      <div popover id="response-popover" class="league-spartan-medium">
+        <p>
+          User has
+          <span data-response></span>
+          invoice
         </p>
       </div>
-      <div class="edit-btns league-spartan-bold" data-status-bar>
-      
-      </div>
+      <div class="edit-btns league-spartan-bold" data-status-bar></div>
 
       <div class="individual-invoice" data-invoice>
         <div class="invoice-items league-spartan-bold">
@@ -393,8 +405,8 @@
       <button class="edit-btn" data-show-edit-dialog aria-label="discard edit">
         Edit
       </button>
-      <button class="delete-btn" data-reject>Reject </button> 
+      <button class="delete-btn" data-reject>Reject</button>
       <button class="mark-btn" data-approve>Approve</button>
     </footer>
-</body>
+  </body>
 </html>
