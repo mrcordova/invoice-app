@@ -6,9 +6,12 @@ import {
   saveInvoice,
   themeUpdate,
   URL_WEBSITE,
+  showOverlayLoading,
+  hideOverlayLoading,
 } from "./functions.js";
 
 const parems = new URLSearchParams(document.location.search);
+const loadingOverlay = document.getElementById("overlay");
 const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const invoiceEle = document.querySelector("[data-invoice]");
@@ -19,20 +22,32 @@ const body = document.querySelector("body");
 const responseDialog = document.querySelector("#response-dialog");
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const responsePopover = document.querySelector("#response-popover");
-localStorage.debug = "socket.io-client:socket";
+// localStorage.debug = "socket.io-client:socket";
+localStorage.debug = "socket.io-client:socket,socket.io-client:manager";
+
 // console.log(token);
 const token = parems.get("token");
 const room_id = localStorage.getItem("room_id");
 const status = localStorage.getItem("status");
 // let invoice;
-let socket;
+// let socket;
 // responsePopover.showPopover();
 
 await fetch(`${URL_WEBSITE}/guest-token`);
 
-if (!socket) {
-  socket = io();
-}
+// if (!socket) {
+const socket = io({
+  reconnection: true, // Enable reconnection
+  reconnectionAttempts: 10, // Limit the number of attempts
+  reconnectionDelay: 1000, // Delay between attempts in ms
+  reconnectionDelayMax: 5000, // Max delay between attempts
+  transports: ["websocket"],
+  upgrade: true,
+});
+// }
+// if (socket.disconnected) {
+//   socket.connect();
+// }
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
     perferredColorScheme,
@@ -108,6 +123,15 @@ body.addEventListener("click", (e) => {
   }
 });
 
+// document.addEventListener("visibilitychange", () => {
+//   console.log("here");
+//   if (document.visibilityState === "visible" && socket.disconnected) {
+//     console.log("Reconnecting after wake-up...");
+//     // socket.connect();
+//     socket.emit("rejoinRoom", room_id);
+//   }
+// });
+
 socket.on("message", ({ invoice: newInvoice }) => {
   localStorage.setItem("room_id", token);
   // if (!'invoice' in localStorage) {
@@ -172,6 +196,37 @@ socket.on("responseReceived", ({ response }) => {
 socket.on("error", (message) => {
   console.error(message);
   localStorage.removeItem("room_id");
+});
+
+socket.on("disconnect", (reason) => {
+  console.log("Socket disconnected:", reason);
+  // socket.emit("joinRoom", token);
+  showOverlayLoading(loadingOverlay);
+  console.log(loadingOverlay);
+  // if (reason === "ping timeout") {
+  //   // socket.connect();
+  // }
+  // if (
+  //   reason === "io server disconnect" ||
+  //   reason == "transport close" ||
+  //   reason === "ping timeout"
+  // ) {
+  //   // Manual disconnect; prevent automatic reconnection
+  //   // location.reload();
+  //   // console.log("here");
+  //   // socket.connect();
+  //   socket.emit("rejoinRoom", room_id);
+  // }
+  // hideOverlayLoading(loadingOverlay);
+});
+
+socket.on("connect", () => {
+  console.log("Connected to server");
+
+  // const token = localStorage.getItem("room_id"); // Send token to identify client
+  // showOverlayLoading(loadingOverlay);
+  socket.emit("rejoinRoom", parems.get("token"));
+  hideOverlayLoading(loadingOverlay);
 });
 socket.on("connect_error", (err) => {
   // the reason of the error, for example "xhr poll error"

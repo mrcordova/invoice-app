@@ -29,7 +29,11 @@ const allowedOrigins = [
 const TINY_URL = "https://api.tinyurl.com";
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  pingInterval: 25000, // Default: 25 seconds
+  pingTimeout: 120000, // Extend timeout to 2 minutes
+  transports: ["polling", "websocket"],
+});
 require("dotenv").config();
 
 const corsOptions = {
@@ -921,6 +925,9 @@ io.on("connection", (socket) => {
     userId = id;
   }
 
+  socket.on("reconnect", (token) => {
+    console.log("hello");
+  });
   // socket.user_id = userId;
   socket.on("joinRoom", async (token) => {
     // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
@@ -994,9 +1001,19 @@ io.on("connection", (socket) => {
 
   socket.on("rejoinRoom", (room_id) => {
     // console.log("guest", socket.user_id);
-
     socket.join(room_id);
-    io.to(room_id).emit("rejoined-room", `User ${socket.id} rejoined room`);
+    const roomSockets = io.sockets.adapter.rooms.get(room_id); // Set of socket IDs
+    if (roomSockets) {
+      console.log(`Sockets in room:`, Array.from(roomSockets));
+      // socket.emit("roomSockets", Array.from(roomSockets)); // Send list to the client
+    } else {
+      console.log(`Room does not exist or is empty`);
+      // socket.emit("roomSockets", []);
+    }
+    io.to(room_id).emit("rejoined-room", {
+      message: `User ${socket.id} rejoined room`,
+      roomSockets: Array.from(roomSockets) ?? [],
+    });
   });
 
   // Handle messages
@@ -1014,7 +1031,7 @@ io.on("connection", (socket) => {
     // if (socket.refresh_token) {
     // console.log("guest", socket.user_id);
 
-    console.log(room_id);
+    // console.log(room_id);
     try {
       const selectQuery =
         "SELECT user_id, guestIds FROM rooms WHERE room_id = ?";
@@ -1056,8 +1073,12 @@ io.on("connection", (socket) => {
   // io.to(room_id).emit('reponseReceived', {})
   //   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
+  socket.on("disconnect", (reason) => {
+    console.log("User disconnected", reason);
+    if (reason === "ping timeout") {
+      // Handle ping timeout (e.g., notify, log, or attempt reconnection)
+      console.log(`Ping timeout detected for socket ${socket.id}`);
+    }
   });
 });
 io.engine.on("connection_error", (err) => {
