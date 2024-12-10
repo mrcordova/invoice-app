@@ -816,21 +816,26 @@ app.get(
 
 app.get("/guest-token", async (req, res) => {
   if (req.signedCookies["refresh_token"] || req.signedCookies["guest_token"]) {
-    return res.status(200).json({ message: "has refresh_token" });
+    return res.status(200).json({ message: "has token already" });
   }
   const guestId = uuidv4();
-  const guestToken = await generateAccessToken({
-    id: guestId,
-    username: `guest_${guestId}`,
-    img: "",
-  });
+  // jwt.sign({ id: user.id, username: user.username, img: user.img });
+  const guestToken = jwt.sign(
+    {
+      id: guestId,
+      username: `guest_${guestId}`,
+      img: "",
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
   res.cookie("guest_token", guestToken, {
     httpOnly: true,
     signed: true,
     secure: true,
     sameSite: "strict",
     path: "/",
-    maxAge: 7 * 60 * (60 * 1000),
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.status(200).json({ message: `done` });
 });
@@ -962,7 +967,7 @@ io.on("connection", (socket) => {
         temp.push(userId);
         // console.log(test.push(1));
         const tempGuestIds = JSON.stringify(temp);
-        console.log(tempGuestIds);
+        // console.log(tempGuestIds);
         const [result] = await poolPromise.query({
           sql: updateQuery,
           values: [newNumOfGuests, tempGuestIds, room_id],
@@ -989,6 +994,7 @@ io.on("connection", (socket) => {
 
   socket.on("rejoinRoom", (room_id) => {
     // console.log("guest", socket.user_id);
+
     socket.join(room_id);
     io.to(room_id).emit("rejoined-room", `User ${socket.id} rejoined room`);
   });
@@ -999,16 +1005,39 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateInvoice", ({ room_id, invoice }) => {
-    console.log(userId);
+    // console.log(userId);
     // socket.to(room_id).emit('invoice', { invoice });
     io.to(room_id).emit("invoice", { invoice });
   });
 
-  socket.on("sendInvoiceMessage", ({ room_id, approve }) => {
+  socket.on("sendInvoiceMessage", async ({ room_id, approve }) => {
     // if (socket.refresh_token) {
     // console.log("guest", socket.user_id);
-    socket.to(room_id).emit("askForResponse", { userId, approve });
-    socket.emit("waitingForResponse", { status: "waiting" });
+
+    console.log(room_id);
+    try {
+      const selectQuery =
+        "SELECT user_id, guestIds FROM rooms WHERE room_id = ?";
+
+      const [room] = await poolPromise.query({
+        sql: selectQuery,
+        values: [room_id],
+      });
+      const guestIds = JSON.parse(room[0].guestIds);
+      const { user_id } = room[0];
+      // console.log(user_id, userId);
+      socket.to(room_id).emit("askForResponse", {
+        userId,
+        approve,
+      });
+      socket.emit("waitingForResponse", {
+        status: "waiting",
+        numOfGuests: guestIds.length,
+      });
+    } catch (error) {
+      console.error(`sendInvoiceMessage: ${error}`);
+    }
+
     // } else {
     // io.to(room_id).emit('responseReceived', { approve });
     // };

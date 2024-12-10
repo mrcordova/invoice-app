@@ -27,6 +27,7 @@ const status = localStorage.getItem("status");
 // let invoice;
 let socket;
 // responsePopover.showPopover();
+
 await fetch(`${URL_WEBSITE}/guest-token`);
 
 if (!socket) {
@@ -89,6 +90,7 @@ body.addEventListener("click", (e) => {
       socket.emit("sendResponse", { room_id, approve: true });
       localStorage.removeItem("senderId");
     } else {
+      // console.log(room_id);
       socket.emit("sendInvoiceMessage", { approve: true, room_id });
     }
   } else if (rejectBtn) {
@@ -148,17 +150,24 @@ socket.on("askForResponse", ({ approve, userId }) => {
   showResponsePopover(approve);
 });
 
-socket.on("waitingForResponse", ({ status }) => {
+socket.on("waitingForResponse", ({ status, numOfGuests }) => {
   console.log(status);
   localStorage.setItem("status", status);
+  localStorage.setItem("numOfGuests", numOfGuests);
   responseDialog.showModal();
 });
 
 socket.on("responseReceived", ({ response }) => {
   console.log(response);
   showResponsePopover(response);
-  localStorage.removeItem("status");
-  responseDialog.close();
+  const numOfGuests = localStorage.getItem("numOfGuests") - 1;
+  if (!numOfGuests) {
+    localStorage.removeItem("status");
+    responseDialog.close();
+    localStorage.removeItem("numOfGuests");
+  } else {
+    localStorage.setItem("numOfGuests", numOfGuests);
+  }
 });
 socket.on("error", (message) => {
   console.error(message);
