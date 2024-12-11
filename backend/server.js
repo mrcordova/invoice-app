@@ -960,10 +960,12 @@ io.on("connection", (socket) => {
           values: [true, room_id],
         });
         socket.join(room_id);
-        io.to(room_id).emit("message", {
+        socket.emit("message", {
           message: "creator joined",
           invoice: data,
+          userId: user_id,
         });
+        socket.to(room_id).emit("checkStatus", { room_id });
       } else if (numOfGuests) {
         // console.log('here');
         const updateQuery =
@@ -981,16 +983,20 @@ io.on("connection", (socket) => {
         });
         // console.log(result);
         socket.join(room_id);
-        io.to(room_id).emit("message", {
+        socket.emit("message", {
           message: "guest joined",
           invoice: data,
+          userId,
         });
+        socket.to(room_id).emit("checkStatus", { room_id });
       } else if (temp.includes(userId)) {
         socket.join(room_id);
-        io.to(room_id).emit("message", {
+        socket.emit("message", {
           message: "guest returned",
           invoice: data,
+          userId,
         });
+        socket.to(room_id).emit("checkStatus", { room_id });
       } else {
         socket.emit("error", "This room is full");
       }
@@ -1010,10 +1016,15 @@ io.on("connection", (socket) => {
       console.log(`Room does not exist or is empty`);
       // socket.emit("roomSockets", []);
     }
+    // socket.to(room_id).emit("checkStatus", { room_id });
     io.to(room_id).emit("rejoined-room", {
       message: `User ${socket.id} rejoined room`,
       roomSockets: Array.from(roomSockets) ?? [],
     });
+  });
+
+  socket.on("returnStatus", ({ status, room_id, userId, approve }) => {
+    socket.to(room_id).emit("askForResponse", { approve, userId });
   });
 
   // Handle messages

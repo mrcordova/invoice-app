@@ -27,7 +27,7 @@ localStorage.debug = "socket.io-client:socket,socket.io-client:manager";
 
 // console.log(token);
 const token = parems.get("token");
-const room_id = localStorage.getItem("room_id");
+// const room_id = localStorage.getItem("room_id");
 const status = localStorage.getItem("status");
 // let invoice;
 // let socket;
@@ -58,11 +58,6 @@ if ("invoice" in localStorage) {
   const invoice = JSON.parse(localStorage.getItem("invoice"));
   updateShareStatus(invoice, statusBarEle);
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
-}
-if (room_id) {
-  socket.emit("rejoinRoom", room_id);
-} else {
-  socket.emit("joinRoom", token);
 }
 
 if (status) {
@@ -96,26 +91,37 @@ body.addEventListener("click", (e) => {
     // invoiceEle.childNodes[0].remove();
     // invoiceItemsTable.replaceChildren();
     const jsonInvoice = JSON.stringify(tempInvoice);
-    socket.emit("updateInvoice", { room_id, invoice: jsonInvoice });
+    // socket.emit("updateInvoice", { room_id, invoice: jsonInvoice });
+    socket.emit("updateInvoice", { room_id: token, invoice: jsonInvoice });
   } else if (approveBtn) {
     console.log(approveBtn);
+    const rejectBtn = document.querySelector("[data-reject]");
+    approveBtn.setAttribute("data-reject", true);
+    rejectBtn.setAttribute("data-approve", "");
     // editDialog.showModal();
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
-      socket.emit("sendResponse", { room_id, approve: true });
+      // socket.emit("sendResponse", { room_id, approve: true });
+      socket.emit("sendResponse", { room_id: token, approve: true });
       localStorage.removeItem("senderId");
     } else {
       // console.log(room_id);
-      socket.emit("sendInvoiceMessage", { approve: true, room_id });
+      // socket.emit("sendResponse", { room_id, approve: true });
+      socket.emit("sendInvoiceMessage", { approve: true, room_id: token });
     }
   } else if (rejectBtn) {
     console.log("reject", rejectBtn);
+    const approveBtn = document.querySelector("[data-approve]");
+    rejectBtn.setAttribute("data-reject", true);
+    approveBtn.setAttribute("data-approve", "");
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
-      socket.emit("sendResponse", { room_id, approve: false });
+      // socket.emit("sendResponse", { room_id, approve: false });
+      socket.emit("sendResponse", { room_id: token, approve: false });
       localStorage.removeItem("senderId");
     } else {
-      socket.emit("sendInvoiceMessage", { approve: false, room_id });
+      // socket.emit("sendInvoiceMessage", { approve: false, room_id });
+      socket.emit("sendInvoiceMessage", { approve: false, room_id: token });
     }
   } else if (themeBtn) {
     e.preventDefault();
@@ -132,13 +138,15 @@ body.addEventListener("click", (e) => {
 //   }
 // });
 
-socket.on("message", ({ invoice: newInvoice }) => {
-  localStorage.setItem("room_id", token);
+socket.on("message", ({ invoice: newInvoice, userId }) => {
+  // localStorage.setItem("room_id", token);
   // if (!'invoice' in localStorage) {
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
   localStorage.setItem("invoice", newInvoice);
+  // console.log(userId);
+  localStorage.setItem("userId", userId);
   const invoice = JSON.parse(newInvoice);
   updateShareStatus(invoice, statusBarEle);
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
@@ -195,7 +203,23 @@ socket.on("responseReceived", ({ response }) => {
 });
 socket.on("error", (message) => {
   console.error(message);
-  localStorage.removeItem("room_id");
+  // localStorage.removeItem("room_id");
+});
+
+socket.on("checkStatus", ({ room_id }) => {
+  const status = localStorage.getItem("status");
+  if (status === "waiting") {
+    const userId = localStorage.getItem("userId");
+    const approveResult =
+      document.querySelector("[data-approve]").dataset.approve;
+    console.log(approveResult);
+    socket.emit("returnStatus", {
+      status,
+      room_id,
+      userId,
+      approve: approveResult == "true" ? true : false,
+    });
+  }
 });
 
 socket.on("disconnect", (reason) => {
@@ -225,7 +249,13 @@ socket.on("connect", () => {
 
   // const token = localStorage.getItem("room_id"); // Send token to identify client
   // showOverlayLoading(loadingOverlay);
-  socket.emit("rejoinRoom", parems.get("token"));
+  const userId = localStorage.getItem("userId");
+  if (userId) {
+    socket.emit("rejoinRoom", token);
+  } else {
+    socket.emit("joinRoom", token);
+  }
+  // socket.emit("rejoinRoom", token);
   hideOverlayLoading(loadingOverlay);
 });
 socket.on("connect_error", (err) => {
