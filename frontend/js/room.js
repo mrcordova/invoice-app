@@ -8,6 +8,7 @@ import {
   URL_WEBSITE,
   showOverlayLoading,
   hideOverlayLoading,
+  resetForm,
 } from "./functions.js";
 
 const parems = new URLSearchParams(document.location.search);
@@ -60,7 +61,7 @@ if ("invoice" in localStorage) {
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
 }
 
-if (status) {
+if (status === "waiting") {
   responseDialog.showModal();
 }
 
@@ -75,10 +76,17 @@ body.addEventListener("click", (e) => {
   const approveBtn = e.target.closest("[data-approve]");
   const rejectBtn = e.target.closest("[data-reject]");
   const themeBtn = e.target.closest("[data-theme]");
+  const goBackBtn = e.target.closest("[data-go-back-page]");
 
   if (editDialogTarget) {
+    // e.preventDefault();
     // console.log(invoice);
     setUpEditDialog(editDialog, JSON.parse(localStorage.getItem("invoice")));
+  } else if (goBackBtn) {
+    // const form = document.querySelector("form#invoice-form");
+    // editDialog.close();
+    // e.preventDefault();
+    resetForm(editDialog);
   } else if (saveBtn) {
     e.preventDefault();
     const invoice = JSON.parse(localStorage.getItem("invoice"));
@@ -94,31 +102,44 @@ body.addEventListener("click", (e) => {
     // socket.emit("updateInvoice", { room_id, invoice: jsonInvoice });
     socket.emit("updateInvoice", { room_id: token, invoice: jsonInvoice });
   } else if (approveBtn) {
-    console.log(approveBtn);
-    const rejectBtn = document.querySelector("[data-reject]");
-    approveBtn.setAttribute("data-reject", true);
-    rejectBtn.setAttribute("data-approve", "");
+    // console.log(approveBtn);
+    choiceBtn(approveBtn);
     // editDialog.showModal();
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
+      // const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+      // console.log(editBtns);
       // socket.emit("sendResponse", { room_id, approve: true });
       socket.emit("sendResponse", { room_id: token, approve: true });
       localStorage.removeItem("senderId");
+      localStorage.setItem("status", "approve");
+      // for (const editBtn of editBtns) {
+      //   editBtn.classList.remove("hide");
+      // }
     } else {
       // console.log(room_id);
       // socket.emit("sendResponse", { room_id, approve: true });
       socket.emit("sendInvoiceMessage", { approve: true, room_id: token });
     }
   } else if (rejectBtn) {
-    console.log("reject", rejectBtn);
-    const approveBtn = document.querySelector("[data-approve]");
-    rejectBtn.setAttribute("data-reject", true);
-    approveBtn.setAttribute("data-approve", "");
+    // console.log("reject", rejectBtn);
+    // const approveBtn = document.querySelector("[data-approve]");
+    // rejectBtn.setAttribute("data-reject", true);
+    // approveBtn.setAttribute("data-approve", "");
+    choiceBtn(rejectBtn);
+    // console.log(rejectBtn);
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
+      // const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+      toggleEditBtns();
+      // console.log(editBtns);
       // socket.emit("sendResponse", { room_id, approve: false });
       socket.emit("sendResponse", { room_id: token, approve: false });
       localStorage.removeItem("senderId");
+      localStorage.setItem("status", "reject");
+      // for (const editBtn of editBtns) {
+      //   editBtn.classList.remove("hide");
+      // }
     } else {
       // socket.emit("sendInvoiceMessage", { approve: false, room_id });
       socket.emit("sendInvoiceMessage", { approve: false, room_id: token });
@@ -173,11 +194,14 @@ socket.on("invoice", ({ invoice }) => {
   // console.log(localStorage.getItem('invoice'));
 });
 socket.on("rejoined-room", (message) => {
-  console.log(message);
+  // console.log(message);
 });
 
 socket.on("askForResponse", ({ approve, userId }) => {
   // alert(`User has approved: ${approve}, waiting on your response`);
+  toggleEditBtns();
+  editDialog.close();
+  // console.log(editBtns);
   localStorage.setItem("senderId", userId);
   showResponsePopover(approve);
 });
@@ -190,11 +214,14 @@ socket.on("waitingForResponse", ({ status, numOfGuests }) => {
 });
 
 socket.on("responseReceived", ({ response }) => {
-  console.log(response);
+  // console.log(response);
   showResponsePopover(response);
   const numOfGuests = localStorage.getItem("numOfGuests") - 1;
   if (!numOfGuests) {
-    localStorage.removeItem("status");
+    // localStorage.removeItem("status");
+    // const approveResult =
+    //   document.querySelector("[data-approve]").dataset.approve;
+    localStorage.setItem("status", response ? "approved" : "rejected");
     responseDialog.close();
     localStorage.removeItem("numOfGuests");
   } else {
@@ -212,7 +239,7 @@ socket.on("checkStatus", ({ room_id }) => {
     const userId = localStorage.getItem("userId");
     const approveResult =
       document.querySelector("[data-approve]").dataset.approve;
-    console.log(approveResult);
+    // console.log(approveResult);
     socket.emit("returnStatus", {
       status,
       room_id,
@@ -268,6 +295,31 @@ socket.on("connect_error", (err) => {
   // some additional context, for example the XMLHttpRequest object
   console.log(err.context);
 });
+function toggleEditBtns() {
+  const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+  for (const editBtn of editBtns) {
+    editBtn.classList.toggle("hide");
+  }
+}
+
+function choiceBtn(btn) {
+  const rejectBtns = document.querySelectorAll("[data-reject]");
+  const approveBtns = document.querySelectorAll("[data-approve]");
+  for (const rejectBtn of rejectBtns) {
+    // console.log(rejectBtn.hasAttribute("data-reject"));
+    rejectBtn.setAttribute(
+      "data-reject",
+      btn.hasAttribute("data-reject") ? true : ""
+    );
+  }
+  for (const approveBtn of approveBtns) {
+    approveBtn.setAttribute(
+      "data-approve",
+      btn.hasAttribute("data-approve") ? true : ""
+    );
+  }
+}
+
 function showResponsePopover(approve) {
   const userResponse = responsePopover.querySelector("[data-response]");
   userResponse.textContent = `${approve ? "approved" : "rejected"}`;
