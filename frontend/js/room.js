@@ -1,4 +1,5 @@
 import {
+  addItemRow,
   updateInvoice,
   updateShareStatus,
   perferredColorScheme,
@@ -9,6 +10,8 @@ import {
   showOverlayLoading,
   hideOverlayLoading,
   resetForm,
+  showPaymentTermsMenu,
+  updatePaymentTerms,
 } from "./functions.js";
 
 const parems = new URLSearchParams(document.location.search);
@@ -83,6 +86,13 @@ body.addEventListener("click", (e) => {
   const themeBtn = e.target.closest("[data-theme]");
   const goBackBtn = e.target.closest("[data-go-back-page]");
 
+  const paymentTermsBtn = e.target.closest("[data-payment-terms-option]");
+  const paymentTermInput = e.target.closest("[data-payment-terms-input]");
+
+  const addItemBtn = e.target.closest("[data-add-item]");
+
+  const deleteItemBtn = e.target.closest("[data-delete-item]");
+
   if (editDialogTarget) {
     // e.preventDefault();
     // console.log(invoice);
@@ -96,6 +106,18 @@ body.addEventListener("click", (e) => {
     // editDialog.close();
     // e.preventDefault();
     resetForm(editDialog);
+  } else if (paymentTermsBtn) {
+    e.preventDefault();
+    updatePaymentTerms(paymentTermsBtn);
+  } else if (paymentTermInput) {
+    e.preventDefault();
+    showPaymentTermsMenu(paymentTermInput);
+  } else if (addItemBtn) {
+    e.preventDefault();
+    addItemRow(addItemBtn);
+  } else if (deleteItemBtn) {
+    e.preventDefault();
+    deleteItemBtn.parentElement.remove();
   } else if (saveBtn) {
     e.preventDefault();
     const invoice = JSON.parse(localStorage.getItem("invoice"));
