@@ -961,6 +961,7 @@ io.on("connection", (socket) => {
           values: [true, room_id],
         });
         socket.join(room_id);
+        // console.log(data);
         socket.emit("message", {
           message: "creator joined",
           invoice: data,
@@ -1039,8 +1040,9 @@ io.on("connection", (socket) => {
     io.to(room_id).emit("invoice", { invoice });
   });
 
-  socket.on("saveInvoice", async ({ userId, invoice, room_id }) => {
+  socket.on("saveInvoice", async ({ invoice, room_id }) => {
     try {
+      const { id: userId } = jwt.verify(room_id, process.env.ROOM_SECRET);
       const tempInvoice = JSON.parse(invoice);
       const {
         id,
@@ -1061,6 +1063,7 @@ io.on("connection", (socket) => {
       // console.log(clientAddress);
       const updateQuery =
         "UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ? AND user_id = ?";
+      const updateRoomDataQuery = "UPDATE rooms SET data = ? WHERE room_id = ?";
       const [results, error] = await poolPromise.query({
         sql: updateQuery,
         values: [
@@ -1079,7 +1082,11 @@ io.on("connection", (socket) => {
           userId,
         ],
       });
-      console.log(results.affectedRows);
+      const [roomResult] = await poolPromise.query({
+        sql: updateRoomDataQuery,
+        values: [invoice, room_id],
+      });
+      // console.log(results.affectedRows);
       tempInvoice.senderAddress = JSON.parse(senderAddress);
       tempInvoice.clientAddress = JSON.parse(clientAddress);
       tempInvoice.items = JSON.parse(items);
@@ -1089,6 +1096,27 @@ io.on("connection", (socket) => {
       io.to(room_id).emit("invoice", { invoice: tempInvoice });
     } catch (error) {
       console.error(`saveInvoice event: ${error}`);
+    }
+  });
+
+  socket.on("resetInvoice", async ({ room_id }) => {
+    try {
+      // const { id, invoiceId } = jwt.verify(room_id, process.env.ROOM_SECRET);
+      const selectQuery = "SELECT  data FROM rooms WHERE room_id = ?";
+      // const selectQuery = "SELECT * FROM invoices WHERE id = ? AND user_id = ?";
+      const [invoices] = await poolPromise.query({
+        sql: selectQuery,
+        values: [room_id],
+      });
+
+      const invoice = JSON.parse(invoices[0].data);
+      // console.log(invoice);
+      invoice.senderAddress = JSON.parse(invoice.senderAddress);
+      invoice.clientAddress = JSON.parse(invoice.clientAddress);
+      invoice.items = JSON.parse(invoice.items);
+      io.to(room_id).emit("invoice", { invoice: invoice });
+    } catch (error) {
+      console.error(`resetInvoice event: ${error}`);
     }
   });
 

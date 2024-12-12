@@ -124,6 +124,7 @@ body.addEventListener("click", (e) => {
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
       // const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+      removeEditBtns();
       // console.log(editBtns);
       // socket.emit("sendResponse", { room_id, approve: true });
       socket.emit("sendResponse", { room_id: token, approve: true });
@@ -258,11 +259,12 @@ socket.on("responseReceived", ({ response }) => {
       //save invoice to database
       socket.emit("saveInvoice", {
         invoice: localStorage.getItem("invoice"),
-        userId: localStorage.getItem("userId"),
         room_id: token,
       });
     } else {
       // tell all users invoice rejected
+      // const { id } = JSON.parse(localStorage.getItem("invoice"));
+      socket.emit("resetInvoice", { room_id: token });
     }
     localStorage.removeItem("responses");
     // responses.push(localStorage.getItem("status"));
