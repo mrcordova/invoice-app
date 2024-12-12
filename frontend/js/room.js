@@ -23,6 +23,7 @@ const body = document.querySelector("body");
 const responseDialog = document.querySelector("#response-dialog");
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const responsePopover = document.querySelector("#response-popover");
+// let responses = [];
 // localStorage.debug = "socket.io-client:socket";
 localStorage.debug = "socket.io-client:socket,socket.io-client:manager";
 
@@ -57,6 +58,10 @@ if (!(perferredColorScheme in localStorage)) {
 }
 if ("invoice" in localStorage) {
   const invoice = JSON.parse(localStorage.getItem("invoice"));
+  // console.log(invoice);
+  // invoice.senderAddress = JSON.stringify(invoice.senderAddress);
+  // invoice.clientAddress = JSON.stringify(invoice.clientAddress);
+  // invoice.items = JSON.stringify(invoice.items);
   updateShareStatus(invoice, statusBarEle);
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
 }
@@ -81,7 +86,11 @@ body.addEventListener("click", (e) => {
   if (editDialogTarget) {
     // e.preventDefault();
     // console.log(invoice);
-    setUpEditDialog(editDialog, JSON.parse(localStorage.getItem("invoice")));
+    const tempInvoice = JSON.parse(localStorage.getItem("invoice"));
+    // tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
+    // tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+    // tempInvoice.items = JSON.stringify(tempInvoice.items);
+    setUpEditDialog(editDialog, tempInvoice);
   } else if (goBackBtn) {
     // const form = document.querySelector("form#invoice-form");
     // editDialog.close();
@@ -90,15 +99,22 @@ body.addEventListener("click", (e) => {
   } else if (saveBtn) {
     e.preventDefault();
     const invoice = JSON.parse(localStorage.getItem("invoice"));
+    // console.log(invoice);
     const tempInvoice = saveInvoice(
       editDialog,
       invoice.status === "draft" ? "pending" : invoice.status,
       invoice.id
     );
+    // console.log(tempInvoice);
     // statusBarEle.replaceChildren();
     // invoiceEle.childNodes[0].remove();
     // invoiceItemsTable.replaceChildren();
-    const jsonInvoice = JSON.stringify(tempInvoice);
+    const jsonInvoice = tempInvoice;
+    // console.log(jsonInvoice);
+    // jsonInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
+    // jsonInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+    // jsonInvoice.items = JSON.stringify(tempInvoice.items);
+    // console.log(jsonInvoice);
     // socket.emit("updateInvoice", { room_id, invoice: jsonInvoice });
     socket.emit("updateInvoice", { room_id: token, invoice: jsonInvoice });
   } else if (approveBtn) {
@@ -131,7 +147,7 @@ body.addEventListener("click", (e) => {
     const senderId = localStorage.getItem("senderId");
     if (senderId) {
       // const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
-      toggleEditBtns();
+      removeEditBtns();
       // console.log(editBtns);
       // socket.emit("sendResponse", { room_id, approve: false });
       socket.emit("sendResponse", { room_id: token, approve: false });
@@ -165,6 +181,7 @@ socket.on("message", ({ invoice: newInvoice, userId }) => {
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
+  // console.log(newInvoice);
   localStorage.setItem("invoice", newInvoice);
   // console.log(userId);
   localStorage.setItem("userId", userId);
@@ -175,22 +192,26 @@ socket.on("message", ({ invoice: newInvoice, userId }) => {
 });
 
 socket.on("invoice", ({ invoice }) => {
-  // console.log('update', invoice);
+  // console.log("update", invoice);
   // invoice = newInvoice;
   // invoice = JSON.parse(newInvoice);
   // invoice = newInvoice;
+  // console.log(invoice);
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
-  const tempInvoice = JSON.parse(invoice);
-  // console.log();
+  // const tempInvoice = JSON.parse(invoice);
+  const tempInvoice = invoice;
+  // console.log(tempInvoice);
+  // console.log(invoice);
   tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
   tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
   tempInvoice.items = JSON.stringify(tempInvoice.items);
+  // console.log(JSON.parse(tempInvoice.items));
   updateShareStatus(tempInvoice, statusBarEle);
   updateInvoice(tempInvoice, invoiceEle, invoiceItemsTable, amountDue);
 
-  localStorage.setItem("invoice", JSON.stringify(tempInvoice));
+  localStorage.setItem("invoice", JSON.stringify(invoice));
   // console.log(localStorage.getItem('invoice'));
 });
 socket.on("rejoined-room", (message) => {
@@ -199,34 +220,62 @@ socket.on("rejoined-room", (message) => {
 
 socket.on("askForResponse", ({ approve, userId }) => {
   // alert(`User has approved: ${approve}, waiting on your response`);
-  toggleEditBtns();
+  addEditBtns();
   editDialog.close();
   // console.log(editBtns);
   localStorage.setItem("senderId", userId);
   showResponsePopover(approve);
 });
 
-socket.on("waitingForResponse", ({ status, numOfGuests }) => {
+socket.on("waitingForResponse", ({ status, numOfGuests, approve }) => {
   console.log(status);
   localStorage.setItem("status", status);
   localStorage.setItem("numOfGuests", numOfGuests);
+  localStorage.setItem(
+    "responses",
+    JSON.stringify([approve ? "approve" : "reject"])
+  );
+  // localStorage.setItem("responses", JSON.stringify([]));
   responseDialog.showModal();
 });
 
 socket.on("responseReceived", ({ response }) => {
   // console.log(response);
+
   showResponsePopover(response);
+  const responses = JSON.parse(localStorage.getItem("responses"));
+  responses.push(response ? "approve" : "reject");
+  localStorage.setItem("responses", JSON.stringify(responses));
   const numOfGuests = localStorage.getItem("numOfGuests") - 1;
   if (!numOfGuests) {
     // localStorage.removeItem("status");
-    // const approveResult =
-    //   document.querySelector("[data-approve]").dataset.approve;
-    localStorage.setItem("status", response ? "approved" : "rejected");
+    const approveResult =
+      document.querySelector("[data-approve]").dataset.approve;
+    localStorage.setItem("status", approveResult !== "" ? "approve" : "reject");
     responseDialog.close();
     localStorage.removeItem("numOfGuests");
+    if (!responses.includes("reject")) {
+      //save invoice to database
+      socket.emit("saveInvoice", {
+        invoice: localStorage.getItem("invoice"),
+        userId: localStorage.getItem("userId"),
+        room_id: token,
+      });
+    } else {
+      // tell all users invoice rejected
+    }
+    localStorage.removeItem("responses");
+    // responses.push(localStorage.getItem("status"));
+    // if (localStorage.getItem("status") === "approved") {
+    //   removeEditBtns();
+    // } else {
+    //   addEditBtns();
+    // }
+    // save invoice to database
   } else {
     localStorage.setItem("numOfGuests", numOfGuests);
   }
+  // console.log(responses);
 });
 socket.on("error", (message) => {
   console.error(message);
@@ -295,11 +344,25 @@ socket.on("connect_error", (err) => {
   // some additional context, for example the XMLHttpRequest object
   console.log(err.context);
 });
-function toggleEditBtns() {
+function addEditBtns() {
   const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+  // console.log(editBtns);
   for (const editBtn of editBtns) {
-    editBtn.classList.toggle("hide");
+    // if (!editBtn.classList.has("hide")) {
+    editBtn.classList.add("hide");
+    // }
   }
+  // console.log(editBtns);
+}
+function removeEditBtns() {
+  const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
+  // console.log(editBtns);
+  for (const editBtn of editBtns) {
+    // if (!editBtn.classList.has("hide")) {
+    editBtn.classList.remove("hide");
+    // }
+  }
+  // console.log(editBtns);
 }
 
 function choiceBtn(btn) {

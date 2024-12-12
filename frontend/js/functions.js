@@ -10,25 +10,35 @@ function generateCustomId() {
   const randomNumbers = Math.floor(1000 + Math.random() * 9000).toString();
   return `${randomLetters}${randomNumbers}`;
 }
-export const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+export const acceptedFileTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+];
 
 const currencyOptions = { style: "currency", currency: "USD" };
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);
-};
-export async function fetchWithAuth(path, method, body = null, headers = { "Content-type": "application/json" }) {
+}
+export async function fetchWithAuth(
+  path,
+  method,
+  body = null,
+  headers = { "Content-type": "application/json" }
+) {
   return await fetch(`${URL_WEBSITE}${path}`, {
     method,
     headers: {
-       ...headers,
+      ...headers,
       // "Access-Control-Allow-Origin": true,
     },
     body,
-    credentials: 'same-origin',
-    cache: 'reload'
+    credentials: "same-origin",
+    cache: "reload",
   });
-};
+}
 export function themeUpdate(e, themeInputs) {
   const checked = !e.target.closest("label").querySelector("input").checked;
   for (const themeInput of themeInputs) {
@@ -36,30 +46,30 @@ export function themeUpdate(e, themeInputs) {
     input.checked = checked;
     localStorage.setItem(perferredColorScheme, input.checked ? true : "");
   }
-};
+}
 export function showProgressCircle(btn) {
   const btnText = btn.textContent;
   btn.replaceChildren();
-  btn.insertAdjacentHTML('beforeend', `<span class="progress-circle"></span>`);
+  btn.insertAdjacentHTML("beforeend", `<span class="progress-circle"></span>`);
   return btnText;
-};
+}
 
 export function hideProgressCircle(btn, btnText) {
   btn.replaceChildren();
-  btn.insertAdjacentText('beforeend', btnText);
-};
+  btn.insertAdjacentText("beforeend", btnText);
+}
 
 export function showOverlayLoading(overlay) {
-  overlay.style.visibility = 'visible';
+  overlay.style.visibility = "visible";
   // overlay.style.opacity = '1';
-};
+}
 export function hideOverlayLoading(overlay) {
-  overlay.style.visibility = 'hidden';
+  overlay.style.visibility = "hidden";
   // overlay.style.opacity = '0';
   // setTimeout(() => {
   //   overlay.style.visibility = 'hidden';
   // }, 500); // Match the transition duration
-};
+}
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));
 }
@@ -86,7 +96,7 @@ export function resetForm(invoiceDialog) {
     formInput.value = "";
   }
   invoiceForm.reset();
-};
+}
 function updateTotalWithQty(e) {
   const invoiceItem = e.target.closest("div.invoice-item");
   const total = invoiceItem.querySelector(".total  input");
@@ -119,7 +129,7 @@ export function updateStatus({ status }, statusBarEle) {
         <button class="mark-btn" data-mark-status-paid="">Mark as Paid</button>
     `
   );
-};
+}
 export function updateShareStatus({ status }, statusBarEle) {
   statusBarEle.insertAdjacentHTML(
     "afterbegin",
@@ -140,12 +150,17 @@ export function updateShareStatus({ status }, statusBarEle) {
         <button class="mark-btn" data-approve="">Approve</button>
     `
   );
-};
-export function updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue) {
+}
+export function updateInvoice(
+  invoice,
+  invoiceEle,
+  invoiceItemsTable,
+  amountDue
+) {
   const senderAddress = JSON.parse(invoice.senderAddress);
   const clientAddress = JSON.parse(invoice.clientAddress);
   const items = JSON.parse(invoice.items);
- 
+
   invoiceEle.insertAdjacentHTML(
     "afterbegin",
     `<div class="invoice-info league-spartan-medium">
@@ -192,6 +207,7 @@ export function updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue)
   );
 
   for (const item of items) {
+    // console.log(JSON.parse(items));
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
@@ -212,68 +228,67 @@ export function updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue)
     );
   }
   amountDue.textContent = invoice.total.toLocaleString("en", currencyOptions);
-};
+}
 export function setUpEditDialog(editDialog, invoice) {
   editDialog.showModal();
-  
-    const editId = editDialog.querySelector("[data-invoice-id]");
-    const addItemBtn = editDialog.querySelector("[ data-add-item]");
-    editId.textContent = `${invoice.id}`;
-    const {
-      senderAddress,
-      clientAddress,
-      clientName,
-      clientEmail,
-      createdAt,
-      description,
-      items,
-      paymentTerms,
-    } = invoice;
-    const { street, city, postCode, country } = JSON.parse(senderAddress);
-    const {
-      street: clientStreet,
-      city: clientCity,
-      postCode: clientPostCode,
-      country: clientCountry,
-    } = JSON.parse(clientAddress);
 
-    const itemsArry = JSON.parse(items).entries();
-    const netEle = editDialog.querySelector("form [data-payment-terms-value]");
-    netEle.setAttribute("data-payment-terms-value", paymentTerms);
+  const editId = editDialog.querySelector("[data-invoice-id]");
+  const addItemBtn = editDialog.querySelector("[ data-add-item]");
+  editId.textContent = `${invoice.id}`;
+  const {
+    senderAddress,
+    clientAddress,
+    clientName,
+    clientEmail,
+    createdAt,
+    description,
+    items,
+    paymentTerms,
+  } = invoice;
+  const { street, city, postCode, country } = JSON.parse(senderAddress);
+  const {
+    street: clientStreet,
+    city: clientCity,
+    postCode: clientPostCode,
+    country: clientCountry,
+  } = JSON.parse(clientAddress);
 
-    netEle.querySelector(".net-span > span").textContent =
-      editDialog.querySelector(
-        `form [data-payment-terms-option="${paymentTerms}"] > span`
-      ).textContent;
-    editDialog.querySelector("form label > input#street").value = street ?? "";
-    editDialog.querySelector("form label > input#city").value = city ?? "";
-    editDialog.querySelector("form label > input#postal-code").value =
-      postCode ?? "";
-    editDialog.querySelector("form label > input#country").value =
-      country ?? "";
+  const itemsArry = JSON.parse(items).entries();
+  const netEle = editDialog.querySelector("form [data-payment-terms-value]");
+  netEle.setAttribute("data-payment-terms-value", paymentTerms);
 
-    editDialog.querySelector("form label > input#client-name").value =
-      clientName ?? "";
-    editDialog.querySelector("form label > input#client-email").value =
-      clientEmail ?? "";
+  netEle.querySelector(".net-span > span").textContent =
+    editDialog.querySelector(
+      `form [data-payment-terms-option="${paymentTerms}"] > span`
+    ).textContent;
+  editDialog.querySelector("form label > input#street").value = street ?? "";
+  editDialog.querySelector("form label > input#city").value = city ?? "";
+  editDialog.querySelector("form label > input#postal-code").value =
+    postCode ?? "";
+  editDialog.querySelector("form label > input#country").value = country ?? "";
 
-    editDialog.querySelector("form label > input#client-street").value =
-      clientStreet ?? "";
-    editDialog.querySelector("form label > input#client-city").value =
-      clientCity ?? "";
-    editDialog.querySelector("form label > input#client-postal-code").value =
-      clientPostCode ?? "";
-    editDialog.querySelector("form label > input#client-country").value =
-      clientCountry ?? "";
-    editDialog.querySelector("form label > input#date").value =
-      formatDate(createdAt);
-    editDialog.querySelector("form label > input#description").value =
-      description ?? "";
-    for (const [index, item] of itemsArry) {
-      const { name, price, quantity, total } = item;
-      addItemBtn.insertAdjacentHTML(
-        "beforebegin",
-        `<div class="invoice-item">
+  editDialog.querySelector("form label > input#client-name").value =
+    clientName ?? "";
+  editDialog.querySelector("form label > input#client-email").value =
+    clientEmail ?? "";
+
+  editDialog.querySelector("form label > input#client-street").value =
+    clientStreet ?? "";
+  editDialog.querySelector("form label > input#client-city").value =
+    clientCity ?? "";
+  editDialog.querySelector("form label > input#client-postal-code").value =
+    clientPostCode ?? "";
+  editDialog.querySelector("form label > input#client-country").value =
+    clientCountry ?? "";
+  editDialog.querySelector("form label > input#date").value =
+    formatDate(createdAt);
+  editDialog.querySelector("form label > input#description").value =
+    description ?? "";
+  for (const [index, item] of itemsArry) {
+    const { name, price, quantity, total } = item;
+    addItemBtn.insertAdjacentHTML(
+      "beforebegin",
+      `<div class="invoice-item">
                   <label class="name">
                     <span class="label-name">
                       Item name
@@ -333,8 +348,8 @@ export function setUpEditDialog(editDialog, invoice) {
                     </svg>
                   </button>
                 </div>`
-      );
-    }
+    );
+  }
 }
 export function addItemRow(addItemBtn) {
   if (!addItemBtn.previousElementSibling) {
@@ -464,7 +479,7 @@ export function addItemRow(addItemBtn) {
   addItemBtn.previousElementSibling
     .querySelector(".price")
     .addEventListener("input", updateTotalWithPrice);
-};
+}
 
 export function saveInvoice(invoiceDialog, status, id = null) {
   const invoiceItems = invoiceDialog.querySelectorAll(
@@ -540,7 +555,7 @@ export function saveInvoice(invoiceDialog, status, id = null) {
 
   resetForm(invoiceDialog);
   return invoice;
-};
+}
 export function updatePaymentTerms(paymentTermsBtn) {
   const parentDiv = paymentTermsBtn.closest("div.net");
   const inputSpan = parentDiv.querySelector('span:has(input[type="checkbox"])');
@@ -563,16 +578,16 @@ export async function logout() {
     headers: {
       // "Access-Control-Allow-Origin": true,
     },
-    cache: 'reload',
+    cache: "reload",
     credentials: "same-origin",
   });
   // console.log(response);
   const result = await response.json();
   // console.log(result);
   // if (result['success']) {
-    localStorage.removeItem('img');
-    localStorage.removeItem('username');
-    location.href = "/login.html";
+  localStorage.removeItem("img");
+  localStorage.removeItem("username");
+  location.href = "/login.html";
   // }
 }
 
@@ -588,7 +603,6 @@ export async function getShortenUrl(link) {
   }
 }
 export async function copyUrl(text) {
-
   try {
     await navigator.clipboard.writeText(text);
   } catch (error) {
@@ -606,9 +620,7 @@ export async function refreshAccessToken() {
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
       // console.log(accessToken);
-    
     } else {
-
       console.error(await tokenResponse.json());
       await logout();
       // location.href = "/login.html";

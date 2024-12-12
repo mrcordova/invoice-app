@@ -952,6 +952,7 @@ io.on("connection", (socket) => {
         data,
       } = room[0];
       const temp = JSON.parse(guestIds ?? "[]");
+
       // console.log(room);
       if (user_id === userId) {
         const updateQuery = "UPDATE rooms SET used = ? WHERE room_id = ?";
@@ -1038,6 +1039,59 @@ io.on("connection", (socket) => {
     io.to(room_id).emit("invoice", { invoice });
   });
 
+  socket.on("saveInvoice", async ({ userId, invoice, room_id }) => {
+    try {
+      const tempInvoice = JSON.parse(invoice);
+      const {
+        id,
+        createdAt,
+        paymentDue,
+        description,
+        paymentTerms,
+        clientName,
+        clientEmail,
+        status,
+        clientAddress,
+        senderAddress,
+        items,
+        total,
+      } = tempInvoice;
+      // console.log(new Intl.DateTimeFormat("en-CA").format(new Date(createdAt)));
+      // console.log(invoice);
+      // console.log(clientAddress);
+      const updateQuery =
+        "UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ? AND user_id = ?";
+      const [results, error] = await poolPromise.query({
+        sql: updateQuery,
+        values: [
+          createdAt.slice(0, createdAt.indexOf("T")),
+          paymentDue.slice(0, paymentDue.indexOf("T")),
+          description,
+          paymentTerms,
+          clientName,
+          clientEmail,
+          status,
+          clientAddress,
+          senderAddress,
+          items,
+          total,
+          id,
+          userId,
+        ],
+      });
+      console.log(results.affectedRows);
+      tempInvoice.senderAddress = JSON.parse(senderAddress);
+      tempInvoice.clientAddress = JSON.parse(clientAddress);
+      tempInvoice.items = JSON.parse(items);
+      // console.log(tempInvoice);
+      // tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
+      // tempInvoice.items = JSON.stringify(tempInvoice.items);
+      io.to(room_id).emit("invoice", { invoice: tempInvoice });
+    } catch (error) {
+      console.error(`saveInvoice event: ${error}`);
+    }
+  });
+
   socket.on("sendInvoiceMessage", async ({ room_id, approve }) => {
     // if (socket.refresh_token) {
     // console.log("guest", socket.user_id);
@@ -1061,6 +1115,7 @@ io.on("connection", (socket) => {
       socket.emit("waitingForResponse", {
         status: "waiting",
         numOfGuests: guestIds.length,
+        approve,
       });
     } catch (error) {
       console.error(`sendInvoiceMessage: ${error}`);
