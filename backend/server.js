@@ -1018,7 +1018,7 @@ io.on("connection", (socket) => {
       console.log(`Room does not exist or is empty`);
       // socket.emit("roomSockets", []);
     }
-    // socket.to(room_id).emit("checkStatus", { room_id });
+    socket.to(room_id).emit("checkStatus", { room_id });
     io.to(room_id).emit("rejoined-room", {
       message: `User ${socket.id} rejoined room`,
       roomSockets: Array.from(roomSockets) ?? [],
@@ -1120,6 +1120,10 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("informEveryUser", ({ message, room_id }) => {
+    io.to(room_id).emit("displayMessage", { message });
+  });
+
   socket.on("sendInvoiceMessage", async ({ room_id, approve }) => {
     // if (socket.refresh_token) {
     // console.log("guest", socket.user_id);
@@ -1134,7 +1138,7 @@ io.on("connection", (socket) => {
         values: [room_id],
       });
       const guestIds = JSON.parse(room[0].guestIds);
-      const { user_id } = room[0];
+      // const { user_id } = room[0];
       // console.log(user_id, userId);
       socket.to(room_id).emit("askForResponse", {
         userId,

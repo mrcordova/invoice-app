@@ -247,7 +247,10 @@ socket.on("askForResponse", ({ approve, userId }) => {
   editDialog.close();
   // console.log(editBtns);
   localStorage.setItem("senderId", userId);
-  showResponsePopover(approve);
+  const responseStr = `User ${userId} has ${
+    approve ? "approved" : "rejected"
+  } invoice`;
+  showResponsePopover(responseStr);
 });
 
 socket.on("waitingForResponse", ({ status, numOfGuests, approve }) => {
@@ -264,8 +267,9 @@ socket.on("waitingForResponse", ({ status, numOfGuests, approve }) => {
 
 socket.on("responseReceived", ({ response }) => {
   // console.log(response);
-
-  showResponsePopover(response);
+  const responseStr = `User  has ${response ? "approved" : "rejected"} invoice`;
+  showResponsePopover(responseStr);
+  // showResponsePopover(response);
   const responses = JSON.parse(localStorage.getItem("responses"));
   responses.push(response ? "approve" : "reject");
   localStorage.setItem("responses", JSON.stringify(responses));
@@ -283,10 +287,16 @@ socket.on("responseReceived", ({ response }) => {
         invoice: localStorage.getItem("invoice"),
         room_id: token,
       });
+      const message = "Invoice saved";
+      socket.emit("informEveryUser", { message, room_id: token });
+      // showResponsePopover("Invoice saved");
     } else {
       // tell all users invoice rejected
       // const { id } = JSON.parse(localStorage.getItem("invoice"));
       socket.emit("resetInvoice", { room_id: token });
+      const message = "Invoice reset";
+      socket.emit("informEveryUser", { message, room_id: token });
+      // showResponsePopover("Invoice reset");
     }
     localStorage.removeItem("responses");
     // responses.push(localStorage.getItem("status"));
@@ -300,6 +310,9 @@ socket.on("responseReceived", ({ response }) => {
     localStorage.setItem("numOfGuests", numOfGuests);
   }
   // console.log(responses);
+});
+socket.on("displayMessage", ({ message }) => {
+  showResponsePopover(message);
 });
 socket.on("error", (message) => {
   console.error(message);
@@ -326,7 +339,7 @@ socket.on("disconnect", (reason) => {
   console.log("Socket disconnected:", reason);
   // socket.emit("joinRoom", token);
   showOverlayLoading(loadingOverlay);
-  console.log(loadingOverlay);
+  // console.log(loadingOverlay);
   // if (reason === "ping timeout") {
   //   // socket.connect();
   // }
@@ -407,9 +420,9 @@ function choiceBtn(btn) {
   }
 }
 
-function showResponsePopover(approve) {
+function showResponsePopover(str) {
   const userResponse = responsePopover.querySelector("[data-response]");
-  userResponse.textContent = `${approve ? "approved" : "rejected"}`;
+  userResponse.textContent = `${str}`;
   responsePopover.showPopover();
   setTimeout(() => {
     responsePopover.hidePopover();
