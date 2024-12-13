@@ -339,6 +339,9 @@ socket.on("checkStatus", ({ room_id }) => {
 socket.on("disconnect", (reason) => {
   console.log("Socket disconnected:", reason);
   // socket.emit("joinRoom", token);
+  localStorage.removeItem("userId");
+  localStorage.removeItem("invoice");
+  localStorage.removeItem("status");
   showOverlayLoading(loadingOverlay);
   // console.log(loadingOverlay);
   // if (reason === "ping timeout") {
@@ -364,10 +367,11 @@ socket.on("connect", () => {
   // const token = localStorage.getItem("room_id"); // Send token to identify client
   // showOverlayLoading(loadingOverlay);
   const userId = localStorage.getItem("userId");
+  // console.log(token);
   if (userId) {
     socket.emit("rejoinRoom", token);
   } else {
-    socket.emit("joinRoom", token);
+    socket.emit("joinRoom", { token });
   }
   // socket.emit("rejoinRoom", token);
   hideOverlayLoading(loadingOverlay);

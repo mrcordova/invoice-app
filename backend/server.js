@@ -771,12 +771,14 @@ app.get(
       user: { id },
     } = req;
     const { invoiceId } = req.params;
-    const token = jwt.sign({ id: id, invoiceId }, process.env.ROOM_SECRET, {
+    let token = jwt.sign({ id: id, invoiceId }, process.env.ROOM_SECRET, {
       expiresIn: "7d",
     });
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     // const hashToken = hashPassword(token);
 
+    const { num_of_guests } = req.query;
+    // console.log(num_of_guests);
     try {
       const selectInvoiceQuery =
         "SELECT * FROM invoices WHERE user_id = ? AND id = ?  AND link_expires_at > NOW()";
@@ -785,10 +787,12 @@ app.get(
         values: [id, invoiceId],
       });
       const invoice = invoices[0];
-      const invoiceData = JSON.stringify(invoice);
+
       let urlLink = invoice?.link ?? "";
 
+      // console.log(urlLink);
       if (!urlLink) {
+        // console.log("here", urlLink);
         const urlResponse = await fetch(
           `${TINY_URL}/create?api_token=${process.env.TINY_URL_API}`,
           {
@@ -805,13 +809,16 @@ app.get(
         const {
           data: { tiny_url: url },
         } = await urlResponse.json();
+
         const updateInvoiceQuery =
           "UPDATE invoices SET link = ?, link_expires_at = ? WHERE user_id = ? AND id = ?";
         const [results] = await poolPromise.query({
           sql: updateInvoiceQuery,
           values: [url, expiresAt, id, invoiceId],
         });
-
+        invoice.link = url;
+        invoice["link_expires_at"] = expiresAt;
+        const invoiceData = JSON.stringify(invoice);
         const insertQuery =
           "INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)";
         const [result] = await poolPromise.query({
@@ -819,6 +826,13 @@ app.get(
           values: [token, id, invoiceData],
         });
         urlLink = url;
+      } else {
+        const selectQuery = "SELECT room_id FROM rooms WHERE user_id = ?";
+        const [result] = await poolPromise.query({
+          sql: selectQuery,
+          values: [id],
+        });
+        token = result[0].room_id;
       }
 
       // console.log(url);
@@ -935,7 +949,7 @@ io.on("connection", (socket) => {
   // const refresh_token = cookies['refresh_token'];
   //When a user joins the room
   let userId;
-  // console.log(socket.guest_token);
+  // console.log(socket.refresh_token);
 
   try {
     if (socket.refresh_token) {
@@ -944,6 +958,7 @@ io.on("connection", (socket) => {
         process.env.REFRESH_SECRET
       );
       userId = id;
+      // console.log("userid", userId);
     } else {
       const { id } = jwt.verify(socket.guest_token, process.env.JWT_SECRET);
       userId = id;
@@ -956,11 +971,12 @@ io.on("connection", (socket) => {
     console.log("hello");
   });
   // socket.user_id = userId;
-  socket.on("joinRoom", async (token) => {
+  socket.on("joinRoom", async ({ token }) => {
     // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
 
     // check if expired link? in rejoin room event as well?
 
+    // console.log(token);
     try {
       const selectQuery =
         "SELECT room_id, user_id, used, guestIds, num_of_guests, data FROM rooms WHERE room_id = ?";
@@ -968,9 +984,9 @@ io.on("connection", (socket) => {
       // console.log(token);
       const [room] = await poolPromise.query({
         sql: selectQuery,
-        values: token,
+        values: [token],
       });
-
+      // console.log(room);
       const {
         user_id,
         room_id,
@@ -980,7 +996,7 @@ io.on("connection", (socket) => {
       } = room[0];
       const temp = JSON.parse(guestIds ?? "[]");
 
-      // console.log(room);
+      // console.log(user_id);
       if (user_id === userId) {
         const updateQuery = "UPDATE rooms SET used = ? WHERE room_id = ?";
         const [result] = await poolPromise.query({
@@ -1030,7 +1046,7 @@ io.on("connection", (socket) => {
         socket.emit("error", "This room is full");
       }
     } catch (error) {
-      socket.emit("error", "Room not found");
+      socket.emit(`error`, `Room not found: ${error}`);
     }
   });
 
@@ -1204,6 +1220,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (reason) => {
     console.log("User disconnected", reason);
+    // socket.emit("disconnect", reason);
     if (reason === "ping timeout") {
       // Handle ping timeout (e.g., notify, log, or attempt reconnection)
       console.log(`Ping timeout detected for socket ${socket.id}`);

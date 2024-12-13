@@ -440,10 +440,14 @@ body.addEventListener("click", async (e) => {
     shareDialog.showModal();
     let response;
     try {
-      response = await fetchWithAuth(`/create-room/${invoice.id}`);
+      response = await fetchWithAuth(
+        `/create-room/${invoice.id}?num_of_guests=1`
+      );
       if (response.status === 403) {
         await refreshAccessToken();
-        response = await fetchWithAuth(`/create-room/${invoice.id}`);
+        response = await fetchWithAuth(
+          `/create-room/${invoice.id}?num_of_guests=1`
+        );
       }
       if (response.ok) {
         const result = await response.json();
@@ -467,7 +471,7 @@ body.addEventListener("click", async (e) => {
     shareDialog.close();
   } else if (copyBtn) {
     const linkText = copyBtn.dataset.copy;
-    console.log(linkText);
+    // console.log(linkText);
     await copyUrl(linkText);
     const feedback = document.getElementById("copyFeedback");
     feedback.style.visibility = "visible";
