@@ -774,18 +774,19 @@ app.get(
     const token = jwt.sign({ id: id, invoiceId }, process.env.ROOM_SECRET, {
       expiresIn: "7d",
     });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     // const hashToken = hashPassword(token);
 
     try {
       const selectInvoiceQuery =
-        "SELECT * FROM invoices WHERE user_id = ? AND id = ?";
+        "SELECT * FROM invoices WHERE user_id = ? AND id = ?  AND link_expires_at > NOW()";
       const [invoices] = await poolPromise.query({
         sql: selectInvoiceQuery,
         values: [id, invoiceId],
       });
       const invoice = invoices[0];
       const invoiceData = JSON.stringify(invoice);
-      let urlLink = invoice.link;
+      let urlLink = invoice?.link ?? "";
 
       if (!urlLink) {
         const urlResponse = await fetch(
@@ -805,10 +806,10 @@ app.get(
           data: { tiny_url: url },
         } = await urlResponse.json();
         const updateInvoiceQuery =
-          "UPDATE invoices SET link = ? WHERE user_id = ? AND id = ?";
+          "UPDATE invoices SET link = ?, link_expires_at = ? WHERE user_id = ? AND id = ?";
         const [results] = await poolPromise.query({
           sql: updateInvoiceQuery,
-          values: [url, id, invoiceId],
+          values: [url, expiresAt, id, invoiceId],
         });
 
         const insertQuery =
@@ -837,26 +838,30 @@ app.get("/guest-token", async (req, res) => {
   if (req.signedCookies["refresh_token"] || req.signedCookies["guest_token"]) {
     return res.status(200).json({ message: "has token already" });
   }
-  const guestId = uuidv4();
-  // jwt.sign({ id: user.id, username: user.username, img: user.img });
-  const guestToken = jwt.sign(
-    {
-      id: guestId,
-      username: `guest_${guestId}`,
-      img: "",
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-  res.cookie("guest_token", guestToken, {
-    httpOnly: true,
-    signed: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-  res.status(200).json({ message: `done` });
+  try {
+    const guestId = uuidv4();
+    // jwt.sign({ id: user.id, username: user.username, img: user.img });
+    const guestToken = jwt.sign(
+      {
+        id: guestId,
+        username: `guest_${guestId}`,
+        img: "",
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    res.cookie("guest_token", guestToken, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({ message: `done` });
+  } catch (error) {
+    console.error(`guest-token: ${error}`);
+  }
 });
 
 // app.get('/room/:token', async (req, res) => {
@@ -932,12 +937,19 @@ io.on("connection", (socket) => {
   let userId;
   // console.log(socket.guest_token);
 
-  if (socket.refresh_token) {
-    const { id } = jwt.verify(socket.refresh_token, process.env.REFRESH_SECRET);
-    userId = id;
-  } else {
-    const { id } = jwt.verify(socket.guest_token, process.env.JWT_SECRET);
-    userId = id;
+  try {
+    if (socket.refresh_token) {
+      const { id } = jwt.verify(
+        socket.refresh_token,
+        process.env.REFRESH_SECRET
+      );
+      userId = id;
+    } else {
+      const { id } = jwt.verify(socket.guest_token, process.env.JWT_SECRET);
+      userId = id;
+    }
+  } catch (error) {
+    console.error(`connection: ${error}`);
   }
 
   socket.on("reconnect", (token) => {
@@ -947,7 +959,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", async (token) => {
     // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
 
-    // check if used is already true or num of guests is zero then redirect to rejoin event instead
+    // check if expired link? in rejoin room event as well?
 
     try {
       const selectQuery =
