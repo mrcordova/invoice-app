@@ -777,40 +777,55 @@ app.get(
     // const hashToken = hashPassword(token);
 
     try {
-      const selectInvoice =
+      const selectInvoiceQuery =
         "SELECT * FROM invoices WHERE user_id = ? AND id = ?";
       const [invoices] = await poolPromise.query({
-        sql: selectInvoice,
+        sql: selectInvoiceQuery,
         values: [id, invoiceId],
       });
       const invoice = invoices[0];
       const invoiceData = JSON.stringify(invoice);
-      const insertQuery =
-        "INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)";
-      const [result] = await poolPromise.query({
-        sql: insertQuery,
-        values: [token, id, invoiceData],
-      });
+      let urlLink = invoice.link;
 
-      const urlResponse = await fetch(
-        `${TINY_URL}/create?api_token=${process.env.TINY_URL_API}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            url: `https://invoice-backend.noahprojects.work/room.html?token=${token}`,
-            domain: "tinyurl.com",
-            description: "string",
-          }),
-        }
-      );
-      // console.log(urlResponse);
-      // create tinyurl here
-      const {
-        data: { tiny_url: url },
-      } = await urlResponse.json();
+      if (!urlLink) {
+        const urlResponse = await fetch(
+          `${TINY_URL}/create?api_token=${process.env.TINY_URL_API}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: `https://invoice-backend.noahprojects.work/room.html?token=${token}`,
+              domain: "tinyurl.com",
+              description: "string",
+            }),
+          }
+        );
+
+        const {
+          data: { tiny_url: url },
+        } = await urlResponse.json();
+        const updateInvoiceQuery =
+          "UPDATE invoices SET link = ? WHERE user_id = ? AND id = ?";
+        const [results] = await poolPromise.query({
+          sql: updateInvoiceQuery,
+          values: [url, id, invoiceId],
+        });
+
+        const insertQuery =
+          "INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)";
+        const [result] = await poolPromise.query({
+          sql: insertQuery,
+          values: [token, id, invoiceData],
+        });
+        urlLink = url;
+      }
+
       // console.log(url);
-      res.json({ link: url, path: `/room.html?token=${token}`, success: true });
+      res.json({
+        link: urlLink,
+        path: `/room.html?token=${token}`,
+        success: true,
+      });
     } catch (error) {
       console.error(`create room : ${error}`);
       res.json({ link: "failed" });

@@ -299,6 +299,7 @@ socket.on("responseReceived", ({ response }) => {
       // showResponsePopover("Invoice reset");
     }
     localStorage.removeItem("responses");
+    // localStorage.removeItem('status');
     // responses.push(localStorage.getItem("status"));
     // if (localStorage.getItem("status") === "approved") {
     //   removeEditBtns();
