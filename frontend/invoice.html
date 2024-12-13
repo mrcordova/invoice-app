@@ -10,9 +10,15 @@
       sizes="32x32"
       href="./assets/favicon-32x32.png" />
 
-<link rel="stylesheet" href="css/reset.css" />
- <link  href="./assets/fonts/league-spartan-v11-latin-500.woff2" as="font" type="font/woff2" >
- <link  href="./assets/fonts/league-spartan-v11-latin-700.woff2" as="font" type="font/woff2" >
+    <link rel="stylesheet" href="css/reset.css" />
+    <link
+      href="./assets/fonts/league-spartan-v11-latin-500.woff2"
+      as="font"
+      type="font/woff2" />
+    <link
+      href="./assets/fonts/league-spartan-v11-latin-700.woff2"
+      as="font"
+      type="font/woff2" />
     <link rel="stylesheet" href="css/style.css" />
     <script type="module" src="js/invoice.js"></script>
 
@@ -20,7 +26,7 @@
   </head>
 
   <body class="league-spartan-medium">
-     <div id="overlay">
+    <div id="overlay">
       <div class="spinner"></div>
     </div>
     <dialog id="delete-dialog" class="league-spartan-bold">
@@ -38,7 +44,11 @@
     <div class="header-cont">
       <header class="header">
         <div class="logo-cont">
-          <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+          <img
+            src="./assets/logo.svg"
+            width="32"
+            height="32"
+            alt="invoice logo" />
           <div class="logo-bg"></div>
         </div>
         <label class="theme-toggle" data-theme>
@@ -64,30 +74,55 @@
               fill-rule="nonzero" />
           </svg>
         </label>
-       <button class="profile-pic-cont" data-show-profile-dialog>
-          <img src="" id="profile_img"  class="profile_img" width="32" height="32" alt="profile picture" />
+        <button class="profile-pic-cont" data-show-profile-dialog>
+          <img
+            src=""
+            id="profile_img"
+            class="profile_img"
+            width="32"
+            height="32"
+            alt="profile picture" />
         </button>
-        <dialog id="profile-dialog" class="league-spartan-bold" >
-           <div class="profile-header">
-             <h3>Profile Info</h3>
-             <button data-close class="close-btn">
-             <svg fill="currentColor" height="26" viewBox="0 0 26 26" width="26" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="m17.53 9.53-3.47 3.47 3.47 3.47c.0737.0687.1328.1515.1738.2435s.063.1913.0648.292-.0168.2007-.0545.2941-.0938.1782-.1651.2494c-.0712.0713-.156.1274-.2494.1651s-.1934.0563-.2941.0545-.2-.0238-.292-.0648-.1748-.1001-.2435-.1738l-3.47-3.47-3.47 3.47c-.14217.1325-.33022.2046-.52452.2012-.1943-.0035-.37968-.0822-.5171-.2196-.13741-.1374-.21612-.3228-.21955-.5171s.0687-.3823.20118-.5245l3.46999-3.47-3.46999-3.47c-.13248-.14218-.20461-.33022-.20118-.52452s.08214-.37969.21955-.5171c.13742-.13741.3228-.21613.5171-.21956.1943-.00342.38235.0687.52452.20118l3.47 3.47 3.47-3.47c.1422-.13248.3302-.2046.5245-.20118.1943.00343.3797.08215.5171.21956s.2162.3228.2196.5171-.0687.38234-.2012.52452zm8.22 3.47c0 2.5217-.7478 4.9868-2.1488 7.0835-1.4009 2.0967-3.3922 3.7309-5.722 4.696-2.3297.965-4.8933 1.2175-7.3666.7255-2.47325-.4919-4.74509-1.7063-6.52821-3.4894s-2.997435-4.0549-3.489397-6.5282c-.49196108-2.4733-.239469-5.0369.725547-7.36661.96502-2.32976 2.59922-4.32104 4.69594-5.72203 2.09673-1.400986 4.56182-2.14876 7.08352-2.14876 3.3803.00397 6.621 1.34854 9.0112 3.73877 2.3903 2.39023 3.7348 5.63094 3.7388 9.01123zm-1.5 0c0-2.225-.6598-4.40011-1.896-6.25017-1.2361-1.85005-2.9931-3.29199-5.0488-4.14348-2.0557-.85148-4.3177-1.07427-6.5-.64018-2.18225.43408-4.18681 1.50554-5.76015 3.07888s-2.6448 3.5779-3.07888 5.76015c-.43408 2.1823-.2113 4.4443.64019 6.5s2.29343 3.8127 4.14348 5.0488c1.85005 1.2362 4.02516 1.896 6.25016 1.896 2.9827-.0033 5.8422-1.1896 7.9513-3.2987s3.2954-4.9686 3.2987-7.9513z" fill="#696868"/></svg>
-             </button>
-            </div>
-          <img data-preview src="" height="80" width="80" alt="profile pic">
-          <form id="profile-form" >
-            <label  data-file >
+        <dialog id="profile-dialog" class="league-spartan-bold">
+          <div class="profile-header">
+            <h3>Profile Info</h3>
+            <button data-close class="close-btn">
+              <svg
+                fill="currentColor"
+                height="26"
+                viewBox="0 0 26 26"
+                width="26"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="m17.53 9.53-3.47 3.47 3.47 3.47c.0737.0687.1328.1515.1738.2435s.063.1913.0648.292-.0168.2007-.0545.2941-.0938.1782-.1651.2494c-.0712.0713-.156.1274-.2494.1651s-.1934.0563-.2941.0545-.2-.0238-.292-.0648-.1748-.1001-.2435-.1738l-3.47-3.47-3.47 3.47c-.14217.1325-.33022.2046-.52452.2012-.1943-.0035-.37968-.0822-.5171-.2196-.13741-.1374-.21612-.3228-.21955-.5171s.0687-.3823.20118-.5245l3.46999-3.47-3.46999-3.47c-.13248-.14218-.20461-.33022-.20118-.52452s.08214-.37969.21955-.5171c.13742-.13741.3228-.21613.5171-.21956.1943-.00342.38235.0687.52452.20118l3.47 3.47 3.47-3.47c.1422-.13248.3302-.2046.5245-.20118.1943.00343.3797.08215.5171.21956s.2162.3228.2196.5171-.0687.38234-.2012.52452zm8.22 3.47c0 2.5217-.7478 4.9868-2.1488 7.0835-1.4009 2.0967-3.3922 3.7309-5.722 4.696-2.3297.965-4.8933 1.2175-7.3666.7255-2.47325-.4919-4.74509-1.7063-6.52821-3.4894s-2.997435-4.0549-3.489397-6.5282c-.49196108-2.4733-.239469-5.0369.725547-7.36661.96502-2.32976 2.59922-4.32104 4.69594-5.72203 2.09673-1.400986 4.56182-2.14876 7.08352-2.14876 3.3803.00397 6.621 1.34854 9.0112 3.73877 2.3903 2.39023 3.7348 5.63094 3.7388 9.01123zm-1.5 0c0-2.225-.6598-4.40011-1.896-6.25017-1.2361-1.85005-2.9931-3.29199-5.0488-4.14348-2.0557-.85148-4.3177-1.07427-6.5-.64018-2.18225.43408-4.18681 1.50554-5.76015 3.07888s-2.6448 3.5779-3.07888 5.76015c-.43408 2.1823-.2113 4.4443.64019 6.5s2.29343 3.8127 4.14348 5.0488c1.85005 1.2362 4.02516 1.896 6.25016 1.896 2.9827-.0033 5.8422-1.1896 7.9513-3.2987s3.2954-4.9686 3.2987-7.9513z"
+                  fill="#696868" />
+              </svg>
+            </button>
+          </div>
+          <img data-preview src="" height="80" width="80" alt="profile pic" />
+          <form id="profile-form">
+            <label data-file>
               Click here to upload (PNG, JPG, SVG, WEBP)
-              <input type="file" id="profile_pic" name="file" accept=".jpg, .png, .jpeg, .svg, .webp,image/jpeg, image/png, image/svg+xml, image/webp" size="">
+              <input
+                type="file"
+                id="profile_pic"
+                name="file"
+                accept=".jpg, .png, .jpeg, .svg, .webp,image/jpeg, image/png, image/svg+xml, image/webp"
+                size="" />
             </label>
             <label>
-              <input type="text" name="username" maxlength='255' pattern="^[^\s]+$" required placeholder="Enter your username">
+              <input
+                type="text"
+                name="username"
+                maxlength="255"
+                pattern="^[^\s]+$"
+                required
+                placeholder="Enter your username" />
             </label>
             <div class="profile-btn-cont">
               <button data-logout class="logout">Logout</button>
-              <button type="submit" data-profile-submit >
-                Save Changes
-              </button>
+              <button type="submit" data-profile-submit>Save Changes</button>
             </div>
           </form>
         </dialog>
@@ -95,7 +130,11 @@
       <dialog id="edit-invoice-dialog">
         <header class="header">
           <div class="logo-cont">
-            <img src="./assets/logo.svg" width="32" height="32" alt="invoice logo" />
+            <img
+              src="./assets/logo.svg"
+              width="32"
+              height="32"
+              alt="invoice logo" />
             <div class="logo-bg"></div>
           </div>
           <label class="theme-toggle" data-theme>
@@ -122,7 +161,12 @@
             </svg>
           </label>
           <div class="profile-pic-cont">
-            <img src="" width="32" height="32" class="profile_img" alt="profile picture" />
+            <img
+              src=""
+              width="32"
+              height="32"
+              class="profile_img"
+              alt="profile picture" />
           </div>
         </header>
         <div class="form-cont league-spartan-bold">
@@ -387,38 +431,70 @@
     </div>
     <main>
       <dialog id="share-dialog">
-
-       <div id="share-overlay">
-        <div class="spinner"></div>
-       </div>
-       <div class="share-dialog-cont">
-        <h2 class="league-spartan-bold">Share Invoice</h2>
-        <div class="share-link">
-          <a data-display-link>www.google.com</a>
-          <button class="copy-btn" data-copy>
-           <svg width="20" height="20" fill="currentColor" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M448 0H224C188.7 0 160 28.65 160 64v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64V64C512 28.65 483.3 0 448 0zM464 288c0 8.822-7.178 16-16 16H224C215.2 304 208 296.8 208 288V64c0-8.822 7.178-16 16-16h224c8.822 0 16 7.178 16 16V288zM304 448c0 8.822-7.178 16-16 16H64c-8.822 0-16-7.178-16-16V224c0-8.822 7.178-16 16-16h64V160H64C28.65 160 0 188.7 0 224v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64v-64h-48V448z"/></svg>
-           <span id="copyFeedback" class="copy-feedback">Copied!</span>
-          </button>
+        <div id="share-overlay">
+          <div class="spinner"></div>
         </div>
-        <a data-join class="join-room-btn league-spartan-bold">Join Room</a>
-       </div>
+        <div class="share-dialog-cont">
+          <div class="share-header-cont">
+            <h2 class="league-spartan-bold">Share Invoice</h2>
+            <button data-close-share class="close-btn">
+              <svg
+                fill="currentColor"
+                height="26"
+                viewBox="0 0 26 26"
+                width="26"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="m17.53 9.53-3.47 3.47 3.47 3.47c.0737.0687.1328.1515.1738.2435s.063.1913.0648.292-.0168.2007-.0545.2941-.0938.1782-.1651.2494c-.0712.0713-.156.1274-.2494.1651s-.1934.0563-.2941.0545-.2-.0238-.292-.0648-.1748-.1001-.2435-.1738l-3.47-3.47-3.47 3.47c-.14217.1325-.33022.2046-.52452.2012-.1943-.0035-.37968-.0822-.5171-.2196-.13741-.1374-.21612-.3228-.21955-.5171s.0687-.3823.20118-.5245l3.46999-3.47-3.46999-3.47c-.13248-.14218-.20461-.33022-.20118-.52452s.08214-.37969.21955-.5171c.13742-.13741.3228-.21613.5171-.21956.1943-.00342.38235.0687.52452.20118l3.47 3.47 3.47-3.47c.1422-.13248.3302-.2046.5245-.20118.1943.00343.3797.08215.5171.21956s.2162.3228.2196.5171-.0687.38234-.2012.52452zm8.22 3.47c0 2.5217-.7478 4.9868-2.1488 7.0835-1.4009 2.0967-3.3922 3.7309-5.722 4.696-2.3297.965-4.8933 1.2175-7.3666.7255-2.47325-.4919-4.74509-1.7063-6.52821-3.4894s-2.997435-4.0549-3.489397-6.5282c-.49196108-2.4733-.239469-5.0369.725547-7.36661.96502-2.32976 2.59922-4.32104 4.69594-5.72203 2.09673-1.400986 4.56182-2.14876 7.08352-2.14876 3.3803.00397 6.621 1.34854 9.0112 3.73877 2.3903 2.39023 3.7348 5.63094 3.7388 9.01123zm-1.5 0c0-2.225-.6598-4.40011-1.896-6.25017-1.2361-1.85005-2.9931-3.29199-5.0488-4.14348-2.0557-.85148-4.3177-1.07427-6.5-.64018-2.18225.43408-4.18681 1.50554-5.76015 3.07888s-2.6448 3.5779-3.07888 5.76015c-.43408 2.1823-.2113 4.4443.64019 6.5s2.29343 3.8127 4.14348 5.0488c1.85005 1.2362 4.02516 1.896 6.25016 1.896 2.9827-.0033 5.8422-1.1896 7.9513-3.2987s3.2954-4.9686 3.2987-7.9513z"
+                  fill="#696868" />
+              </svg>
+            </button>
+          </div>
+          <div class="share-link">
+            <a data-display-link>www.google.com</a>
+            <button class="copy-btn" data-copy>
+              <svg
+                width="20"
+                height="20"
+                fill="currentColor"
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fill="currentColor"
+                  d="M448 0H224C188.7 0 160 28.65 160 64v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64V64C512 28.65 483.3 0 448 0zM464 288c0 8.822-7.178 16-16 16H224C215.2 304 208 296.8 208 288V64c0-8.822 7.178-16 16-16h224c8.822 0 16 7.178 16 16V288zM304 448c0 8.822-7.178 16-16 16H64c-8.822 0-16-7.178-16-16V224c0-8.822 7.178-16 16-16h64V160H64C28.65 160 0 188.7 0 224v224c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64v-64h-48V448z" />
+              </svg>
+              <span id="copyFeedback" class="copy-feedback">Copied!</span>
+            </button>
+          </div>
+          <a data-join class="join-room-btn league-spartan-bold">Join Room</a>
+        </div>
       </dialog>
       <div class="control-btns-cont">
         <button
-        class="go-back-btn go-back-btn-invoice-page league-spartan-bold"
-        data-go-back="">
-        <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
-        Go back
-      </button>
-      <button data-share class="share-btn">
-        <span class="hide-mobile league-spartan-bold">Share</span>
-        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><g><path d="M0 0h24v24H0z" fill="none"/><path d="M13 14h-2a8.999 8.999 0 0 0-7.968 4.81A10.136 10.136 0 0 1 3 18C3 12.477 7.477 8 13 8V2.5L23.5 11 13 19.5V14zm-2-2h4v3.308L20.321 11 15 6.692V10h-2a7.982 7.982 0 0 0-6.057 2.773A10.988 10.988 0 0 1 11 12z"/></g></svg>
-        <!-- <svg  fill="currentColor" width="20" height="20" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g data-name="Layer 51" id="Layer_51"><path fill="currentColor" class="cls-1" d="M2,29A1.12,1.12,0,0,1,1.69,29,1,1,0,0,1,1,28V27A19,19,0,0,1,17,8.24V4a1,1,0,0,1,1.6-.8l12,9a1,1,0,0,1,0,1.6l-12,9A1,1,0,0,1,17,22V18.25A18.66,18.66,0,0,0,4.93,25.67L2.81,28.59A1,1,0,0,1,2,29ZM19,6V9.12a1,1,0,0,1-.89,1,17,17,0,0,0-15,14.6l.16-.21A20.68,20.68,0,0,1,17.9,16.11a1,1,0,0,1,.77.26,1,1,0,0,1,.33.74V20l9.33-7Z"/></g></svg> -->
-      </button>
-    </div>
-      <div class="edit-btns league-spartan-bold" data-status-bar>
-      
+          class="go-back-btn go-back-btn-invoice-page league-spartan-bold"
+          data-go-back="">
+          <img src="./assets/icon-arrow-left.svg" alt="left arrow" />
+          Go back
+        </button>
+        <button data-share class="share-btn">
+          <span class="hide-mobile league-spartan-bold">Share</span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            width="32"
+            height="32"
+            xmlns="http://www.w3.org/2000/svg">
+            <g>
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M13 14h-2a8.999 8.999 0 0 0-7.968 4.81A10.136 10.136 0 0 1 3 18C3 12.477 7.477 8 13 8V2.5L23.5 11 13 19.5V14zm-2-2h4v3.308L20.321 11 15 6.692V10h-2a7.982 7.982 0 0 0-6.057 2.773A10.988 10.988 0 0 1 11 12z" />
+            </g>
+          </svg>
+          <!-- <svg  fill="currentColor" width="20" height="20" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g data-name="Layer 51" id="Layer_51"><path fill="currentColor" class="cls-1" d="M2,29A1.12,1.12,0,0,1,1.69,29,1,1,0,0,1,1,28V27A19,19,0,0,1,17,8.24V4a1,1,0,0,1,1.6-.8l12,9a1,1,0,0,1,0,1.6l-12,9A1,1,0,0,1,17,22V18.25A18.66,18.66,0,0,0,4.93,25.67L2.81,28.59A1,1,0,0,1,2,29ZM19,6V9.12a1,1,0,0,1-.89,1,17,17,0,0,0-15,14.6l.16-.21A20.68,20.68,0,0,1,17.9,16.11a1,1,0,0,1,.77.26,1,1,0,0,1,.33.74V20l9.33-7Z"/></g></svg> -->
+        </button>
       </div>
+      <div class="edit-btns league-spartan-bold" data-status-bar></div>
 
       <div class="individual-invoice" data-invoice>
         <div class="invoice-items league-spartan-bold">

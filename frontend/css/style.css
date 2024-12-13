@@ -228,6 +228,10 @@ body {
     /* right: 0; */
     left: -80%;
     visibility: hidden;
+    background-color: light-dark(var(--kon), white);
+    color: light-dark(white, var(--kon));
+    padding: 0.5rem;
+    border-radius: 0.5rem;
   }
 }
 #delete-dialog,
@@ -1444,6 +1448,20 @@ input {
     width: 100%;
     margin: auto;
     background-color: light-dark(white, var(--kon));
+  }
+
+  & .share-header-cont {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    & button {
+      width: max-content;
+      height: max-content;
+      background-color: transparent;
+      &.close-btn:hover > svg {
+        color: var(--venetian-nights);
+      }
+    }
   }
 
   & .share-link {
