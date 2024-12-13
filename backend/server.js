@@ -1158,14 +1158,16 @@ io.on("connection", (socket) => {
     // console.log(room_id);
     try {
       const selectQuery =
-        "SELECT user_id, guestIds FROM rooms WHERE room_id = ?";
+        "SELECT user_id, guestIds, num_of_guests FROM rooms WHERE room_id = ?";
 
       const [room] = await poolPromise.query({
         sql: selectQuery,
         values: [room_id],
       });
-      const guestIds = JSON.parse(room[0].guestIds);
-      // const { user_id } = room[0];
+      // console.log(room[0]);
+      // const guestIds = JSON.parse(room[0].guestIds);
+      const { num_of_guests, guestIds } = room[0];
+      // console.log(room);
       // console.log(user_id, userId);
       socket.to(room_id).emit("askForResponse", {
         userId,
@@ -1173,7 +1175,9 @@ io.on("connection", (socket) => {
       });
       socket.emit("waitingForResponse", {
         status: "waiting",
-        numOfGuests: guestIds.length,
+        numOfGuests: parseInt(
+          (JSON.parse(guestIds).length ?? 0) + num_of_guests
+        ),
         approve,
       });
     } catch (error) {
