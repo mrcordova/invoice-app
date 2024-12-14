@@ -826,7 +826,10 @@ app.get(
         });
         invoice.link = url;
         invoice["link_expires_at"] = expiresAt;
-        const invoiceData = JSON.stringify(invoice);
+        const invoiceData = JSON.stringify(
+          invoice,
+          Object.keys(invoices[0]).sort()
+        );
         const insertQuery =
           "INSERT INTO rooms(room_id, user_id, data) VALUES (?, ?, ?)";
         const [result] = await poolPromise.query({
@@ -835,10 +838,17 @@ app.get(
         });
         urlLink = url;
       } else {
-        const selectQuery = "SELECT room_id FROM rooms WHERE user_id = ?";
+        const invoiceData = JSON.stringify(
+          invoice,
+          Object.keys(invoice).sort()
+        );
+        // const invoiceData = invoices[0];
+        // console.log(invoiceData);
+        const selectQuery =
+          "SELECT room_id FROM rooms WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
         const [result] = await poolPromise.query({
           sql: selectQuery,
-          values: [id],
+          values: [id, invoiceId],
         });
         token = result[0].room_id;
       }
@@ -1052,7 +1062,7 @@ io.on("connection", (socket) => {
         });
         socket.to(room_id).emit("checkStatus", { room_id });
       } else {
-        socket.emit("error", "This room is full");
+        socket.emit("error", `This room is full: ${socket.id}`);
       }
     } catch (error) {
       socket.emit(`error`, `Room not found: ${error}`);
@@ -1226,8 +1236,8 @@ io.on("connection", (socket) => {
   //   socket.on('othersRespnse', ({room_id}) => {
   // io.to(room_id).emit('reponseReceived', {})
   //   });
-  socket.on("end", ({ id }) => {
-    console.log("end", 1);
+  socket.on("end", ({ token }) => {
+    // console.log("end", token);
     // get user id
     // reset used or num of guests and guestIds array
   });

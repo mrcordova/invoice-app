@@ -472,6 +472,9 @@ div.edit-btns {
   & .hide {
     display: none;
   }
+  &.hide {
+    display: none;
+  }
 }
 
 .filter-status-cont {

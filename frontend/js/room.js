@@ -315,8 +315,13 @@ socket.on("responseReceived", ({ response }) => {
 socket.on("displayMessage", ({ message }) => {
   showResponsePopover(message);
 });
+
 socket.on("error", (message) => {
   console.error(message);
+  const editBtns = document.querySelectorAll(".edit-btns");
+  for (const editBtn of editBtns) {
+    editBtn.style.display = "none";
+  }
   // localStorage.removeItem("room_id");
 });
 
@@ -339,12 +344,12 @@ socket.on("checkStatus", ({ room_id }) => {
 socket.on("disconnect", (reason) => {
   console.log("Socket disconnected:", reason);
   // socket.emit("joinRoom", token);
-  localStorage.removeItem("userId");
-  localStorage.removeItem("invoice");
-  localStorage.removeItem("status");
-  localStorage.removeItem("token");
-  showOverlayLoading(loadingOverlay);
-  socket.emit("end", { id: 1 });
+  // localStorage.removeItem("userId");
+  // localStorage.removeItem("invoice");
+  // localStorage.removeItem("status");
+  // localStorage.removeItem("token");
+  // showOverlayLoading(loadingOverlay);
+  // socket.emit("end", { id: 1 });
   // console.log(loadingOverlay);
   // if (reason === "ping timeout") {
   //   // socket.connect();
@@ -371,8 +376,8 @@ window.addEventListener("beforeunload", () => {
   localStorage.removeItem("userId");
   localStorage.removeItem("invoice");
   localStorage.removeItem("status");
+  socket.emit("end", { token });
   localStorage.removeItem("token");
-  socket.emit("end", { id: 1 });
 });
 socket.on("connect", () => {
   console.log("Connected to server");
