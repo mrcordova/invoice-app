@@ -753,6 +753,12 @@ app.delete(
         sql: deleteQuery,
         values: [id, user_id],
       });
+      const deleteRoomQuery =
+        "DELETE FROM rooms WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
+      const [roomResult, roomError] = await poolPromise.query({
+        sql: deleteRoomQuery,
+        values: [user_id, id],
+      });
       res.status(200).json({ success: result["affectedRows"] > 0 });
     } catch (error) {
       console.error(`deleteInvoice: ${error}`);
@@ -838,10 +844,10 @@ app.get(
         });
         urlLink = url;
       } else {
-        const invoiceData = JSON.stringify(
-          invoice,
-          Object.keys(invoice).sort()
-        );
+        // const invoiceData = JSON.stringify(
+        //   invoice,
+        //   Object.keys(invoice).sort()
+        // );
         // const invoiceData = invoices[0];
         // console.log(invoiceData);
         const selectQuery =
