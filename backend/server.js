@@ -786,13 +786,21 @@ app.get(
         sql: selectInvoiceQuery,
         values: [id, invoiceId],
       });
-      const invoice = invoices[0];
+      let invoice = invoices[0] ?? undefined;
 
-      let urlLink = invoice?.link ?? "";
+      // console.log(`invoice: ${invoice}`);
+      let urlLink = invoice != undefined ? invoice.link : "";
 
-      // console.log(urlLink);
+      // console.log("url", !urlLink);
       if (!urlLink) {
-        // console.log("here", urlLink);
+        // console.log("here", JSON);
+        const selectInvoiceQuery =
+          "SELECT * FROM invoices WHERE user_id = ? AND id = ? ";
+        const [invoices] = await poolPromise.query({
+          sql: selectInvoiceQuery,
+          values: [id, invoiceId],
+        });
+        invoice = invoices[0];
         const urlResponse = await fetch(
           `${TINY_URL}/create?api_token=${process.env.TINY_URL_API}`,
           {
@@ -962,6 +970,7 @@ io.on("connection", (socket) => {
     } else {
       const { id } = jwt.verify(socket.guest_token, process.env.JWT_SECRET);
       userId = id;
+      // console.log(userId);
     }
   } catch (error) {
     console.error(`connection: ${error}`);
@@ -1217,6 +1226,11 @@ io.on("connection", (socket) => {
   //   socket.on('othersRespnse', ({room_id}) => {
   // io.to(room_id).emit('reponseReceived', {})
   //   });
+  socket.on("end", ({ id }) => {
+    console.log("end", 1);
+    // get user id
+    // reset used or num of guests and guestIds array
+  });
 
   socket.on("disconnect", (reason) => {
     console.log("User disconnected", reason);

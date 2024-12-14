@@ -342,7 +342,9 @@ socket.on("disconnect", (reason) => {
   localStorage.removeItem("userId");
   localStorage.removeItem("invoice");
   localStorage.removeItem("status");
+  localStorage.removeItem("token");
   showOverlayLoading(loadingOverlay);
+  socket.emit("end", { id: 1 });
   // console.log(loadingOverlay);
   // if (reason === "ping timeout") {
   //   // socket.connect();
@@ -360,18 +362,32 @@ socket.on("disconnect", (reason) => {
   // }
   // hideOverlayLoading(loadingOverlay);
 });
+// socket.on("disconnect", () => {
+//   console.log("Socket disconnected");
+//   localStorage.removeItem("yourKey");
+// });
 
+window.addEventListener("beforeunload", () => {
+  localStorage.removeItem("userId");
+  localStorage.removeItem("invoice");
+  localStorage.removeItem("status");
+  localStorage.removeItem("token");
+  socket.emit("end", { id: 1 });
+});
 socket.on("connect", () => {
   console.log("Connected to server");
 
   // const token = localStorage.getItem("room_id"); // Send token to identify client
   // showOverlayLoading(loadingOverlay);
-  const userId = localStorage.getItem("userId");
+  // const userId = localStorage.getItem("userId");
   // console.log(token);
-  if (userId) {
+  showOverlayLoading(loadingOverlay);
+  const tempToken = localStorage.getItem("token");
+  if (token === tempToken) {
     socket.emit("rejoinRoom", token);
   } else {
     socket.emit("joinRoom", { token });
+    localStorage.setItem("token", token);
   }
   // socket.emit("rejoinRoom", token);
   hideOverlayLoading(loadingOverlay);
