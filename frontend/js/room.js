@@ -215,22 +215,16 @@ socket.on("message", ({ invoice: newInvoice, userId }) => {
 });
 
 socket.on("invoice", ({ invoice }) => {
-  // console.log("update", invoice);
-  // invoice = newInvoice;
-  // invoice = JSON.parse(newInvoice);
-  // invoice = newInvoice;
-  // console.log(invoice);
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
   // const tempInvoice = JSON.parse(invoice);
   const tempInvoice = invoice;
-  // console.log(tempInvoice);
-  // console.log(invoice);
+
   tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
   tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
   tempInvoice.items = JSON.stringify(tempInvoice.items);
-  // console.log(JSON.parse(tempInvoice.items));
+
   updateShareStatus(tempInvoice, statusBarEle);
   updateInvoice(tempInvoice, invoiceEle, invoiceItemsTable, amountDue);
 
