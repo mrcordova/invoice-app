@@ -673,6 +673,13 @@ app.put(
         sql: updateQuery,
         values: [status, id, user_id],
       });
+
+      const updateRoomQuery =
+        "UPDATE rooms SET data = JSON_SET(data, '$.status', ?) WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
+      const [roomResult, roomError] = await poolPromise.query({
+        sql: updateRoomQuery,
+        values: [status, user_id, id],
+      });
       res.json({ success: true });
     } catch (error) {
       console.error(`updateStatus: ${error}`);
