@@ -16,7 +16,8 @@ import {
 
 const parems = new URLSearchParams(document.location.search);
 const loadingOverlay = document.getElementById("overlay");
-const deleteDialog = document.querySelector("#delete-dialog");
+
+// const deleteDialog = document.querySelector("#delete-dialog");
 const editDialog = document.querySelector("#edit-invoice-dialog");
 const invoiceEle = document.querySelector("[data-invoice]");
 const invoiceItemsTable = document.querySelector(".invoice-table-cont");
@@ -26,9 +27,10 @@ const body = document.querySelector("body");
 const responseDialog = document.querySelector("#response-dialog");
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const responsePopover = document.querySelector("#response-popover");
+
 // let responses = [];
 // localStorage.debug = "socket.io-client:socket";
-localStorage.debug = "socket.io-client:socket,socket.io-client:manager";
+// localStorage.debug = "socket.io-client:socket,socket.io-client:manager";
 
 // console.log(token);
 const token = parems.get("token");
@@ -49,25 +51,131 @@ const socket = io({
   transports: ["websocket"],
   upgrade: true,
 });
-// }
-// if (socket.disconnected) {
-//   socket.connect();
-// }
+if (!indexedDB) {
+  console.error("IndexedDB is not supported by this browser.");
+}
+
+// var testrequest = window.indexedDB.open("mgDB", 1);
+// testrequest.onerror = function (e) {
+//   alert("error");
+// };
+
+// testrequest.onupgradeneeded = function (e) {
+//   alert("upgradeneeded");
+// };
+
+// testrequest.onsuccess = function (e) {
+//   alert("success");
+// };
+indexedDB.deleteDatabase("InvoiceInfo");
+const request = indexedDB.open("InvoiceInfo", 1);
+let db;
+request.onsuccess = (event) => {
+  // console.log("here");
+
+  db = event.target.result;
+
+  db.onerror = (event) => {
+    console.error(`Database error: ${event.target.error?.message}`);
+  };
+  // console.log("ehre");
+};
+
+request.onerror = (event) => {
+  console.error(`${event.target.error?.message}`);
+};
+
+request.onupgradeneeded = (event) => {
+  // alert("test");
+  try {
+    console.log("Old version:", event.oldVersion);
+    console.log("New version:", event.newVersion);
+    db = event.target.result;
+    if (!db.objectStoreNames.contains("invoice")) {
+      // console.log("here");
+      const objectStore = db.createObjectStore("invoice", { keyPath: "id" });
+
+      objectStore.createIndex("clientStreet", "clientAddress.street", {
+        unique: false,
+      });
+      objectStore.createIndex("clientCity", "clientAddress.city", {
+        unique: false,
+      });
+      objectStore.createIndex("clientPostCode", "clientAddress.postCode", {
+        unique: false,
+      });
+      objectStore.createIndex("clientCountry", "clientAddress.country", {
+        unique: false,
+      });
+      objectStore.createIndex("clientName", "clientName", {
+        unique: false,
+      });
+      objectStore.createIndex("createdAt", "createdAt", {
+        unique: false,
+      });
+      objectStore.createIndex("description", "description", {
+        unique: false,
+      });
+      objectStore.createIndex("items", "items", {
+        unique: false,
+      });
+      objectStore.createIndex("link", "link", { unique: false });
+      objectStore.createIndex("link_expires_at", "link_expires_at", {
+        unique: false,
+      });
+      objectStore.createIndex("paymentDue", "paymentDue", { unique: false });
+      objectStore.createIndex("paymentTerms", "paymentTerms", {
+        unique: false,
+      });
+      // objectStore.createIndex("senderAddress, senderAddress", {
+      //   unique: false,
+      // });
+      // objectStore.createIndex("clientAddress", "clientAddress", {
+      //   unique: false,
+      // });
+      // objectStore.createIndex("senderAddress", "senderAddress", {
+      //   unique: false,
+      // });
+      objectStore.createIndex("senderStreet", "senderAddress.street", {
+        unique: false,
+      });
+      objectStore.createIndex("senderCity", "senderAddress.city", {
+        unique: false,
+      });
+      objectStore.createIndex("senderPostCode", "senderAddress.postCode", {
+        unique: false,
+      });
+      objectStore.createIndex("senderCountry", "senderAddress.country", {
+        unique: false,
+      });
+      objectStore.createIndex("room_id", "room_id", { unique: true });
+      objectStore.createIndex("status", "status", { unique: false });
+      objectStore.createIndex("total", "total", { unique: false });
+      objectStore.createIndex("user_id", "user_id", { unique: false });
+      objectStore.createIndex("user_status", "user_status", { unique: false });
+    }
+  } catch (error) {
+    console.error(`updgradded: ${error}`);
+  }
+};
+
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
     perferredColorScheme,
     window.matchMedia("(prefers-color-scheme: dark)").matches ? true : ""
   );
 }
-if ("invoice" in localStorage) {
-  const invoice = JSON.parse(localStorage.getItem("invoice"));
-  // console.log(invoice);
-  // invoice.senderAddress = JSON.stringify(invoice.senderAddress);
-  // invoice.clientAddress = JSON.stringify(invoice.clientAddress);
-  // invoice.items = JSON.stringify(invoice.items);
-  updateShareStatus(invoice, statusBarEle);
-  updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
-}
+
+// if ("invoice" in localStorage) {
+// const invoice = JSON.parse(localStorage.getItem("invoice"));
+//  const invoice = localStorage.getItem("invoice");
+// console.log(invoice);
+// invoice.senderAddress = JSON.stringify(invoice.senderAddress);
+// invoice.clientAddress = JSON.stringify(invoice.clientAddress);
+// invoice.items = JSON.stringify(invoice.items);
+// updateShareStatus(invoice, statusBarEle);
+// updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
+// }
 
 if (status === "waiting") {
   responseDialog.showModal();
@@ -198,20 +306,23 @@ body.addEventListener("click", (e) => {
 //   }
 // });
 
-socket.on("message", ({ invoice: newInvoice, userId }) => {
+socket.on("message", ({ invoice: newInvoice }) => {
   // localStorage.setItem("room_id", token);
-  // if (!'invoice' in localStorage) {
+
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
-  // console.log(newInvoice);
+
+  if (db) {
+    addInvoiceToIndex(newInvoice);
+  } else {
+    console.error("IndexedDB is not ready yet.");
+  }
+
   localStorage.setItem("invoice", newInvoice);
-  // console.log(userId);
-  localStorage.setItem("userId", userId);
   const invoice = JSON.parse(newInvoice);
   updateShareStatus(invoice, statusBarEle);
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
-  // }
 });
 
 socket.on("invoice", ({ invoice }) => {
@@ -228,6 +339,22 @@ socket.on("invoice", ({ invoice }) => {
   updateShareStatus(tempInvoice, statusBarEle);
   updateInvoice(tempInvoice, invoiceEle, invoiceItemsTable, amountDue);
 
+  const objStore = db
+    .transaction(["invoice"], "readwrite")
+    .objectStore("invoice");
+  const userIdx = objStore.index("user_id");
+  // console.log(userIdx);
+  const request = userIdx.get(1);
+  request.onsuccess = (event) => {
+    const data = event.target.result;
+    console.log(data);
+    data.user_status = status;
+
+    const requestUpdate = objStore.put(data);
+    requestUpdate.onsuccess = (event) => {
+      console.log("status updated");
+    };
+  };
   localStorage.setItem("invoice", JSON.stringify(invoice));
   // console.log(localStorage.getItem('invoice'));
 });
@@ -250,6 +377,23 @@ socket.on("askForResponse", ({ approve, userId }) => {
 socket.on("waitingForResponse", ({ status, numOfGuests, approve }) => {
   console.log(status);
   localStorage.setItem("status", status);
+
+  const objStore = db
+    .transaction(["invoice"], "readwrite")
+    .objectStore("invoice");
+  const userIdx = objStore.index("user_id");
+  // console.log(userIdx);
+  const request = userIdx.get(1);
+  request.onsuccess = (event) => {
+    const data = event.target.result;
+    console.log(data);
+    data.user_status = status;
+
+    const requestUpdate = objStore.put(data);
+    requestUpdate.onsuccess = (event) => {
+      console.log("status updated");
+    };
+  };
   localStorage.setItem("numOfGuests", numOfGuests);
   localStorage.setItem(
     "responses",
@@ -322,14 +466,14 @@ socket.on("error", (message) => {
 socket.on("checkStatus", ({ room_id }) => {
   const status = localStorage.getItem("status");
   if (status === "waiting") {
-    const userId = localStorage.getItem("userId");
+    // const userId = localStorage.getItem("userId");
     const approveResult =
       document.querySelector("[data-approve]").dataset.approve;
     // console.log(approveResult);
     socket.emit("returnStatus", {
       status,
       room_id,
-      userId,
+      // userId,
       approve: approveResult == "true" ? true : false,
     });
   }
@@ -367,7 +511,7 @@ socket.on("disconnect", (reason) => {
 // });
 
 window.addEventListener("beforeunload", () => {
-  localStorage.removeItem("userId");
+  // localStorage.removeItem("userId");
   localStorage.removeItem("invoice");
   localStorage.removeItem("status");
   socket.emit("end", { token });
@@ -375,13 +519,14 @@ window.addEventListener("beforeunload", () => {
 });
 socket.on("connect", () => {
   console.log("Connected to server");
-
+  // console.log(localStorage.getItem("status"));
   // const token = localStorage.getItem("room_id"); // Send token to identify client
   // showOverlayLoading(loadingOverlay);
   // const userId = localStorage.getItem("userId");
   // console.log(token);
   showOverlayLoading(loadingOverlay);
   const tempToken = localStorage.getItem("token");
+  // console.log(tempToken);
   if (token === tempToken) {
     socket.emit("rejoinRoom", token);
   } else {
@@ -401,6 +546,30 @@ socket.on("connect_error", (err) => {
   // some additional context, for example the XMLHttpRequest object
   console.log(err.context);
 });
+function addInvoiceToIndex(invoice) {
+  const transaction = db.transaction(["invoice"], "readwrite");
+  transaction.oncomplete = (event) => {
+    console.log("transaction completed");
+  };
+
+  transaction.onerror = (event) => {
+    console.error("transaction not opened due to error", event);
+  };
+
+  const newObjStore = transaction.objectStore("invoice");
+  // console.log(invoice);
+  const tempInvoice = JSON.parse(invoice);
+  tempInvoice.senderAddress = JSON.parse(tempInvoice.senderAddress);
+  tempInvoice.clientAddress = JSON.parse(tempInvoice.clientAddress);
+  // tempInvoice.items = JSON.parse(tempInvoice.items);
+  tempInvoice.user_status = "none";
+  const objectStoreRequest = newObjStore.add(tempInvoice);
+
+  objectStoreRequest.onsuccess = (event) => {
+    console.log("request successful.");
+  };
+}
+
 function addEditBtns() {
   const editBtns = document.querySelectorAll("[data-show-edit-dialog]");
   // console.log(editBtns);

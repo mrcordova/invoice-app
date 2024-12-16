@@ -674,12 +674,12 @@ app.put(
         values: [status, id, user_id],
       });
 
-      const updateRoomQuery =
-        "UPDATE rooms SET data = JSON_SET(data, '$.status', ?) WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
-      const [roomResult, roomError] = await poolPromise.query({
-        sql: updateRoomQuery,
-        values: [status, user_id, id],
-      });
+      // const updateRoomQuery =
+      //   "UPDATE rooms SET data = JSON_SET(data, '$.status', ?) WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
+      // const [roomResult, roomError] = await poolPromise.query({
+      //   sql: updateRoomQuery,
+      //   values: [status, user_id, id],
+      // });
       res.json({ success: true });
     } catch (error) {
       console.error(`updateStatus: ${error}`);
@@ -1100,7 +1100,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("returnStatus", ({ status, room_id, userId, approve }) => {
+  socket.on("returnStatus", ({ status, room_id, approve }) => {
     socket.to(room_id).emit("askForResponse", { approve, userId });
   });
 
@@ -1148,7 +1148,7 @@ io.on("connection", (socket) => {
           paymentTerms,
           clientName,
           clientEmail,
-          status,
+          status === "draft" ? "pending" : status,
           clientAddress,
           senderAddress,
           items,
@@ -1249,7 +1249,27 @@ io.on("connection", (socket) => {
   //   socket.on('othersRespnse', ({room_id}) => {
   // io.to(room_id).emit('reponseReceived', {})
   //   });
-  socket.on("end", ({ token }) => {
+  socket.on("end", async ({ token }) => {
+    try {
+      const { id } = jwt.verify(token, process.env.ROOM_SECRET);
+      // console.log(token);
+      if (userId == id) {
+        const updateQuery = "UPDATE rooms SET used = false WHERE room_id = ?";
+        const [results, error] = await poolPromise.query({
+          sql: updateQuery,
+          values: [token],
+        });
+      } else {
+        const updateQuery =
+          "UPDATE rooms SET num_of_guests = num_of_guests + 1, guestIds = JSON_REMOVE(guestIds, JSON_UNQUOTE(JSON_SEARCH(guestIds, 'one', ?))) WHERE room_id = ?";
+        const [results, error] = await poolPromise.query({
+          sql: updateQuery,
+          values: [userId, token],
+        });
+      }
+    } catch (error) {
+      console.error(`end: ${error}`);
+    }
     // console.log("end", token);
     // get user id
     // reset used or num of guests and guestIds array
