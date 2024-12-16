@@ -1112,7 +1112,7 @@ io.on("connection", (socket) => {
   socket.on("updateInvoice", ({ room_id, invoice }) => {
     // console.log(userId);
     // socket.to(room_id).emit('invoice', { invoice });
-    io.to(room_id).emit("invoice", { invoice });
+    io.to(room_id).emit("invoice", { invoice, room_id });
   });
 
   socket.on("saveInvoice", async ({ invoice, room_id }) => {

@@ -51,9 +51,9 @@ const socket = io({
   transports: ["websocket"],
   upgrade: true,
 });
-if (!indexedDB) {
-  console.error("IndexedDB is not supported by this browser.");
-}
+// if (!indexedDB) {
+//   console.error("IndexedDB is not supported by this browser.");
+// }
 
 // var testrequest = window.indexedDB.open("mgDB", 1);
 // testrequest.onerror = function (e) {
@@ -67,97 +67,97 @@ if (!indexedDB) {
 // testrequest.onsuccess = function (e) {
 //   alert("success");
 // };
-indexedDB.deleteDatabase("InvoiceInfo");
-const request = indexedDB.open("InvoiceInfo", 1);
-let db;
-request.onsuccess = (event) => {
-  // console.log("here");
+// indexedDB.deleteDatabase("InvoiceDB");
+// const request = indexedDB.open("InvoiceDB", 1);
+// let db;
+// request.onsuccess = (event) => {
+//   // console.log("here");
 
-  db = event.target.result;
+//   db = event.target.result;
 
-  db.onerror = (event) => {
-    console.error(`Database error: ${event.target.error?.message}`);
-  };
-  // console.log("ehre");
-};
+//   db.onerror = (event) => {
+//     console.error(`Database error: ${event.target.error?.message}`);
+//   };
+//   // console.log("ehre");
+// };
 
-request.onerror = (event) => {
-  console.error(`${event.target.error?.message}`);
-};
+// request.onerror = (event) => {
+//   console.error(`${event.target.error?.message}`);
+// };
 
-request.onupgradeneeded = (event) => {
-  // alert("test");
-  try {
-    console.log("Old version:", event.oldVersion);
-    console.log("New version:", event.newVersion);
-    db = event.target.result;
-    if (!db.objectStoreNames.contains("invoice")) {
-      // console.log("here");
-      const objectStore = db.createObjectStore("invoice", { keyPath: "id" });
+// request.onupgradeneeded = (event) => {
+//   // alert("test");
+//   try {
+//     console.log("Old version:", event.oldVersion);
+//     console.log("New version:", event.newVersion);
+//     db = event.target.result;
+//     if (!db.objectStoreNames.contains("invoice")) {
+//       // console.log("here");
+//       const objectStore = db.createObjectStore("invoice", { keyPath: "id" });
 
-      objectStore.createIndex("clientStreet", "clientAddress.street", {
-        unique: false,
-      });
-      objectStore.createIndex("clientCity", "clientAddress.city", {
-        unique: false,
-      });
-      objectStore.createIndex("clientPostCode", "clientAddress.postCode", {
-        unique: false,
-      });
-      objectStore.createIndex("clientCountry", "clientAddress.country", {
-        unique: false,
-      });
-      objectStore.createIndex("clientName", "clientName", {
-        unique: false,
-      });
-      objectStore.createIndex("createdAt", "createdAt", {
-        unique: false,
-      });
-      objectStore.createIndex("description", "description", {
-        unique: false,
-      });
-      objectStore.createIndex("items", "items", {
-        unique: false,
-      });
-      objectStore.createIndex("link", "link", { unique: false });
-      objectStore.createIndex("link_expires_at", "link_expires_at", {
-        unique: false,
-      });
-      objectStore.createIndex("paymentDue", "paymentDue", { unique: false });
-      objectStore.createIndex("paymentTerms", "paymentTerms", {
-        unique: false,
-      });
-      // objectStore.createIndex("senderAddress, senderAddress", {
-      //   unique: false,
-      // });
-      // objectStore.createIndex("clientAddress", "clientAddress", {
-      //   unique: false,
-      // });
-      // objectStore.createIndex("senderAddress", "senderAddress", {
-      //   unique: false,
-      // });
-      objectStore.createIndex("senderStreet", "senderAddress.street", {
-        unique: false,
-      });
-      objectStore.createIndex("senderCity", "senderAddress.city", {
-        unique: false,
-      });
-      objectStore.createIndex("senderPostCode", "senderAddress.postCode", {
-        unique: false,
-      });
-      objectStore.createIndex("senderCountry", "senderAddress.country", {
-        unique: false,
-      });
-      objectStore.createIndex("room_id", "room_id", { unique: true });
-      objectStore.createIndex("status", "status", { unique: false });
-      objectStore.createIndex("total", "total", { unique: false });
-      objectStore.createIndex("user_id", "user_id", { unique: false });
-      objectStore.createIndex("user_status", "user_status", { unique: false });
-    }
-  } catch (error) {
-    console.error(`updgradded: ${error}`);
-  }
-};
+//       objectStore.createIndex("clientStreet", "clientAddress.street", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("clientCity", "clientAddress.city", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("clientPostCode", "clientAddress.postCode", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("clientCountry", "clientAddress.country", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("clientName", "clientName", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("createdAt", "createdAt", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("description", "description", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("items", "items", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("link", "link", { unique: false });
+//       objectStore.createIndex("link_expires_at", "link_expires_at", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("paymentDue", "paymentDue", { unique: false });
+//       objectStore.createIndex("paymentTerms", "paymentTerms", {
+//         unique: false,
+//       });
+//       // objectStore.createIndex("senderAddress, senderAddress", {
+//       //   unique: false,
+//       // });
+//       // objectStore.createIndex("clientAddress", "clientAddress", {
+//       //   unique: false,
+//       // });
+//       // objectStore.createIndex("senderAddress", "senderAddress", {
+//       //   unique: false,
+//       // });
+//       objectStore.createIndex("senderStreet", "senderAddress.street", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("senderCity", "senderAddress.city", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("senderPostCode", "senderAddress.postCode", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("senderCountry", "senderAddress.country", {
+//         unique: false,
+//       });
+//       objectStore.createIndex("room_id", "room_id", { unique: true });
+//       objectStore.createIndex("status", "status", { unique: false });
+//       objectStore.createIndex("total", "total", { unique: false });
+//       objectStore.createIndex("user_id", "user_id", { unique: false });
+//       objectStore.createIndex("user_status", "user_status", { unique: false });
+//     }
+//   } catch (error) {
+//     console.error(`updgradded: ${error}`);
+//   }
+// };
 
 if (!(perferredColorScheme in localStorage)) {
   localStorage.setItem(
@@ -176,10 +176,6 @@ if (!(perferredColorScheme in localStorage)) {
 // updateShareStatus(invoice, statusBarEle);
 // updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
 // }
-
-if (status === "waiting") {
-  responseDialog.showModal();
-}
 
 for (const themeInput of themeInputs) {
   const input = themeInput.querySelector("input");
@@ -313,11 +309,11 @@ socket.on("message", ({ invoice: newInvoice }) => {
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
 
-  if (db) {
-    addInvoiceToIndex(newInvoice);
-  } else {
-    console.error("IndexedDB is not ready yet.");
-  }
+  // if (db) {
+  //   addInvoiceToIndex(newInvoice);
+  // } else {
+  //   console.error("IndexedDB is not ready yet.");
+  // }
 
   localStorage.setItem("invoice", newInvoice);
   const invoice = JSON.parse(newInvoice);
@@ -325,7 +321,7 @@ socket.on("message", ({ invoice: newInvoice }) => {
   updateInvoice(invoice, invoiceEle, invoiceItemsTable, amountDue);
 });
 
-socket.on("invoice", ({ invoice }) => {
+socket.on("invoice", ({ invoice, room_id }) => {
   statusBarEle.replaceChildren();
   invoiceEle.childNodes[0].remove();
   invoiceItemsTable.replaceChildren();
@@ -339,22 +335,24 @@ socket.on("invoice", ({ invoice }) => {
   updateShareStatus(tempInvoice, statusBarEle);
   updateInvoice(tempInvoice, invoiceEle, invoiceItemsTable, amountDue);
 
-  const objStore = db
-    .transaction(["invoice"], "readwrite")
-    .objectStore("invoice");
-  const userIdx = objStore.index("user_id");
-  // console.log(userIdx);
-  const request = userIdx.get(1);
-  request.onsuccess = (event) => {
-    const data = event.target.result;
-    console.log(data);
-    data.user_status = status;
+  // const objStore = db
+  //   .transaction(["invoice"], "readwrite")
+  //   .objectStore("invoice");
+  // const userIdx = objStore.index("room_id");
+  // // console.log(userIdx);
+  // const request = userIdx.get(1);
+  // request.onsuccess = (event) => {
+  //   // if (!db.objectStoreNames.contains("invoice")) {
+  //   const data = event.target.result;
+  //   console.log(data);
+  //   data.user_status = status;
 
-    const requestUpdate = objStore.put(data);
-    requestUpdate.onsuccess = (event) => {
-      console.log("status updated");
-    };
-  };
+  //   const requestUpdate = objStore.put(data);
+  //   requestUpdate.onsuccess = (event) => {
+  //     console.log("status updated");
+  //   };
+  //   // }
+  // };
   localStorage.setItem("invoice", JSON.stringify(invoice));
   // console.log(localStorage.getItem('invoice'));
 });
@@ -378,22 +376,22 @@ socket.on("waitingForResponse", ({ status, numOfGuests, approve }) => {
   console.log(status);
   localStorage.setItem("status", status);
 
-  const objStore = db
-    .transaction(["invoice"], "readwrite")
-    .objectStore("invoice");
-  const userIdx = objStore.index("user_id");
-  // console.log(userIdx);
-  const request = userIdx.get(1);
-  request.onsuccess = (event) => {
-    const data = event.target.result;
-    console.log(data);
-    data.user_status = status;
+  // const objStore = db
+  //   .transaction(["invoice"], "readwrite")
+  //   .objectStore("invoice");
+  // const userIdx = objStore.index("user_id");
+  // // console.log(userIdx);
+  // const request = userIdx.get(1);
+  // request.onsuccess = (event) => {
+  //   const data = event.target.result;
+  //   console.log(data);
+  //   data.user_status = status;
 
-    const requestUpdate = objStore.put(data);
-    requestUpdate.onsuccess = (event) => {
-      console.log("status updated");
-    };
-  };
+  //   const requestUpdate = objStore.put(data);
+  //   requestUpdate.onsuccess = (event) => {
+  //     console.log("status updated");
+  //   };
+  // };
   localStorage.setItem("numOfGuests", numOfGuests);
   localStorage.setItem(
     "responses",
@@ -513,7 +511,7 @@ socket.on("disconnect", (reason) => {
 window.addEventListener("beforeunload", () => {
   // localStorage.removeItem("userId");
   localStorage.removeItem("invoice");
-  localStorage.removeItem("status");
+  // localStorage.removeItem("status");
   socket.emit("end", { token });
   localStorage.removeItem("token");
 });
@@ -527,6 +525,10 @@ socket.on("connect", () => {
   showOverlayLoading(loadingOverlay);
   const tempToken = localStorage.getItem("token");
   // console.log(tempToken);
+  if (status === "waiting") {
+    responseDialog.showModal();
+  }
+
   if (token === tempToken) {
     socket.emit("rejoinRoom", token);
   } else {
@@ -547,6 +549,7 @@ socket.on("connect_error", (err) => {
   console.log(err.context);
 });
 function addInvoiceToIndex(invoice) {
+  // if (!db.objectStoreNames.contains("invoice")) {
   const transaction = db.transaction(["invoice"], "readwrite");
   transaction.oncomplete = (event) => {
     console.log("transaction completed");
@@ -563,11 +566,13 @@ function addInvoiceToIndex(invoice) {
   tempInvoice.clientAddress = JSON.parse(tempInvoice.clientAddress);
   // tempInvoice.items = JSON.parse(tempInvoice.items);
   tempInvoice.user_status = "none";
+  tempInvoice.room_id = token;
   const objectStoreRequest = newObjStore.add(tempInvoice);
 
   objectStoreRequest.onsuccess = (event) => {
     console.log("request successful.");
   };
+  // }
 }
 
 function addEditBtns() {
