@@ -47,8 +47,8 @@ Then crop/optimize/edit your image however you like, add it to your project, and
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [iou.claims](iou.claims)
+- Live Site URL: [github repo](https://github.com/mrcordova/invoice-app)
 
 ## My process
 
@@ -59,57 +59,31 @@ Then crop/optimize/edit your image however you like, add it to your project, and
 - Flexbox
 - CSS Grid
 - Mobile-first workflow
-- [React](https://reactjs.org/) - JS library
-- [Next.js](https://nextjs.org/) - React framework
-- [Styled Components](https://styled-components.com/) - For styles
-
-**Note: These are just examples. Delete this note and replace the list above with your own choices**
 
 ### What I learned
 
-Use this section to recap over some of your major learnings while working through this project. Writing these out and providing code samples of areas you want to highlight is a great way to reinforce your own knowledge.
-
-To see how you can add code snippets, see below:
-
-```html
-<h1>Some HTML code I'm proud of</h1>
-```
-
-```css
-.proud-of-this-css {
-  color: papayawhip;
-}
-```
-
-```js
-const proudOfThisFunc = () => {
-  console.log("🎉");
-};
-```
-
-If you want more help with writing markdown, we'd recommend checking out [The Markdown Guide](https://www.markdownguide.org/) to learn more.
-
-**Note: Delete this note and the content within this section and replace with your own learnings.**
+I learned how to host frontend and backend on same domain. I also learned how to work with websockets. How to store images in the backend.
 
 ### Continued development
 
-Use this section to outline areas that you want to continue focusing on in future projects. These could be concepts you're still not completely comfortable with or techniques you found useful that you want to refine and perfect.
+I would like to add two new statuses: past due and owed. The plan is to show when an IOU has not been paid and the date it was due has past. Send reminder to Debtor(person who owes the money) to pay their IOU. The owed status should go to creditor(person owed money) after approving IOU and would show in Creditor's front page.
+I am also like to add the functionality of adding images of recipts to IOUs and extract information from recipts. Allow multiple creditors to one IOUs and split debt if necessary.
 
 ### Useful resources
 
-- [CSS Custom Checkboxes](https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [Show calendar programmatically](https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [Persisting color scheme](https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [How to invoke form errors](https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [How select elements based on partail token](https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [Test media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Testing_media_queries) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [How to fix date to your local time](https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [How to add days to date](https://stackoverflow.com/questions/563406/how-to-add-days-to-date) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [How to padd form data to backend](https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [How to open file upload dialog](https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [How to save images in node](https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [How to add foreign key to table](https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-- [Documentaion for tinyurl API](https://tinyurl.com/app/dev) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [CSS Custom Checkboxes](https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/) - Use this to create custom checkboxes like color border, checked color and shape.
+- [Show calendar programmatically](https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus) - The function to call calendar picker in code.
+- [Persisting color scheme](https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/) - How to save the color scheme chosen by the user throughout refreshes.
+- [How to invoke form errors](https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events) - How to show form errors when user clickes submit and you don't want default behavior.
+- [How select elements based on partail token](https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector) - How to choose specific token in id attribute.
+- [Test media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Testing_media_queries) - How to test media queries.
+- [How to fix date to your local time](https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off) - How to set date to your local time.
+- [How to add days to date](https://stackoverflow.com/questions/563406/how-to-add-days-to-date) - How to calculate new date based on the addition of days to original date.
+- [How to padd form data to backend](https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api) - How form data is handle when sent to backend.
+- [How to open file upload dialog](https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js) - How to open the file upload dialog directly.
+- [How to save images in node](https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express) - Steps to to manage and save images to the backend.
+- [How to add foreign key to table](https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table) - How to alter a table in mySql to include a foreign key.
+- [Documentaion for tinyurl API](https://tinyurl.com/app/dev) - The Documentaion for the tinyurl api and how to work with the api.
 
 ## Author
 
