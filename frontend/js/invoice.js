@@ -21,6 +21,7 @@ import {
   updateInvoice,
   updateStatus,
   URL_WEBSITE,
+  setUpEditDialog,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
 const loadingOverlay = document.getElementById("overlay");
@@ -124,126 +125,7 @@ body.addEventListener("click", async (e) => {
     const deleteId = deleteDialog.querySelector("[data-invoice-id]");
     deleteId.textContent = `#${invoiceId}`;
   } else if (editDialogTarget) {
-    editDialog.showModal();
-    const editId = editDialog.querySelector("[data-invoice-id]");
-    const addItemBtn = editDialog.querySelector("[ data-add-item]");
-    editId.textContent = `${invoiceId}`;
-    const {
-      senderAddress,
-      clientAddress,
-      clientName,
-      clientEmail,
-      createdAt,
-      description,
-      items,
-      paymentTerms,
-    } = invoice;
-    const { street, city, postCode, country } = JSON.parse(senderAddress);
-    const {
-      street: clientStreet,
-      city: clientCity,
-      postCode: clientPostCode,
-      country: clientCountry,
-    } = JSON.parse(clientAddress);
-
-    const itemsArry = JSON.parse(items).entries();
-    const netEle = editDialog.querySelector("form [data-payment-terms-value]");
-    netEle.setAttribute("data-payment-terms-value", paymentTerms);
-
-    netEle.querySelector(".net-span > span").textContent =
-      editDialog.querySelector(
-        `form [data-payment-terms-option="${paymentTerms}"] > span`
-      ).textContent;
-    editDialog.querySelector("form label > input#street").value = street ?? "";
-    editDialog.querySelector("form label > input#city").value = city ?? "";
-    editDialog.querySelector("form label > input#postal-code").value =
-      postCode ?? "";
-    editDialog.querySelector("form label > input#country").value =
-      country ?? "";
-
-    editDialog.querySelector("form label > input#client-name").value =
-      clientName ?? "";
-    editDialog.querySelector("form label > input#client-email").value =
-      clientEmail ?? "";
-
-    editDialog.querySelector("form label > input#client-street").value =
-      clientStreet ?? "";
-    editDialog.querySelector("form label > input#client-city").value =
-      clientCity ?? "";
-    editDialog.querySelector("form label > input#client-postal-code").value =
-      clientPostCode ?? "";
-    editDialog.querySelector("form label > input#client-country").value =
-      clientCountry ?? "";
-    editDialog.querySelector("form label > input#date").value =
-      formatDate(createdAt);
-    editDialog.querySelector("form label > input#description").value =
-      description ?? "";
-    for (const [index, item] of itemsArry) {
-      const { name, price, quantity, total } = item;
-      addItemBtn.insertAdjacentHTML(
-        "beforebegin",
-        `<div class="invoice-item">
-                  <label class="name">
-                    <span class="label-name">
-                      Item name
-                      <span class="error-text" aria-live="polite"></span>
-                    </span>
-
-                    <input
-                      type="text"
-                      name="items"
-                      
-                      value="${name}"
-                      required
-                      autocomplete="off" />
-                  </label>
-                  <label class="qty">
-                    <span class="label-name">Qty.</span>
-                    <input
-                      type="number"
-                      name="items"
-                      
-                      value="${quantity}"
-                      required
-                      inputmode="numeric" />
-                  </label>
-                  <label class="price">
-                    <span class="label-name">Price</span>
-                    <input
-                      type="number"
-                      value="${price.toFixed(2)}"
-                      name="items"
-                      step="any"
-                      required
-                      placeholder="0.00"
-                      inputmode="numeric" />
-                  </label>
-                  <label class="total">
-                    <span class="label-name">Total</span>
-                    <input
-                      type="number"
-                      name="items"
-
-                       step="any"
-                      value="${total.toFixed(2)}"
-                      required
-                      readonly
-                      placeholder="0.00" />
-                  </label>
-                  <button class="delete" data-delete-item data-item-index="${index}">
-                    <svg
-                      width="13"
-                      height="16"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.583 3.556v10.666c0 .982-.795 1.778-1.777 1.778H2.694a1.777 1.777 0 01-1.777-1.778V3.556h10.666zM8.473 0l.888.889h3.111v1.778H.028V.889h3.11L4.029 0h4.444z"
-                        fill="currentColor"
-                        fill-rule="nonzero" />
-                    </svg>
-                  </button>
-                </div>`
-      );
-    }
+    setUpEditDialog(editDialog, invoice);
   } else if (goBackBtn) {
     history.back();
   } else if (markAsPaidBtn) {
@@ -353,9 +235,9 @@ body.addEventListener("click", async (e) => {
         tempInvoice.senderAddress = JSON.stringify(tempInvoice.senderAddress);
         tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
         tempInvoice.items = JSON.stringify(tempInvoice.items);
-        updateStatus(tempInvoice);
+        updateStatus(tempInvoice, statusBarEle);
 
-        updateInvoice(tempInvoice);
+        updateInvoice(tempInvoice, invoiceEle, invoiceItemsTable, amountDue);
 
         invoice = tempInvoice;
       } catch (error) {
