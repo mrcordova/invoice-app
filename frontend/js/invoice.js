@@ -471,7 +471,6 @@ body.addEventListener("click", async (e) => {
     shareDialog.close();
   } else if (copyBtn) {
     const linkText = copyBtn.dataset.copy;
-    // console.log(linkText);
     await copyUrl(linkText);
     const feedback = document.getElementById("copyFeedback");
     feedback.style.visibility = "visible";
@@ -480,7 +479,5 @@ body.addEventListener("click", async (e) => {
     setTimeout(() => {
       feedback.style = "";
     }, 1000);
-
-    // alert('copied');
   }
 });
