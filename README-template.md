@@ -95,39 +95,23 @@ If you want more help with writing markdown, we'd recommend checking out [The Ma
 
 Use this section to outline areas that you want to continue focusing on in future projects. These could be concepts you're still not completely comfortable with or techniques you found useful that you want to refine and perfect.
 
-**Note: Delete this note and the content within this section and replace with your own plans for continued development.**
-
 ### Useful resources
 
-https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/
-https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus
-https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/
-https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events
-https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector
-https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Testing_media_queries
-https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off
-https://stackoverflow.com/questions/563406/how-to-add-days-to-date
-https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api
-https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js
-https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express
-https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table
-https://tinyurl.com/app/dev
-
-- [Example resource 1](https://www.example.com) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
-- [Example resource 2](https://www.example.com) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
-
-**Note: Delete this note and replace the list above with resources that helped you during the challenge. These could come in handy for anyone viewing your solution or for yourself when you look back on this project in the future.**
+- [CSS Custom Checkboxes](https://css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [Show calendar programmatically](https://stackoverflow.com/questions/51334960/how-to-show-calendar-popup-when-inputtype-date-is-on-focus) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [Persisting color scheme](https://www.smashingmagazine.com/2024/03/setting-persisting-color-scheme-preferences-css-javascript/) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [How to invoke form errors](https://stackoverflow.com/questions/71939429/programmatically-submit-form-with-submit-events) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [How select elements based on partail token](https://stackoverflow.com/questions/8714090/how-to-do-a-wildcard-element-name-match-with-queryselector-or-queryselector) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [Test media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Testing_media_queries) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [How to fix date to your local time](https://stackoverflow.com/questions/7556591/is-the-javascript-date-object-always-one-day-off) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [How to add days to date](https://stackoverflow.com/questions/563406/how-to-add-days-to-date) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [How to padd form data to backend](https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [How to open file upload dialog](https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [How to save images in node](https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
+- [How to add foreign key to table](https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table) - This is an amazing article which helped me finally understand XYZ. I'd recommend it to anyone still learning this concept.
+- [Documentaion for tinyurl API](https://tinyurl.com/app/dev) - This helped me for XYZ reason. I really liked this pattern and will use it going forward.
 
 ## Author
 
-- Website - [Add your name here](https://www.your-site.com)
-- Frontend Mentor - [@yourusername](https://www.frontendmentor.io/profile/yourusername)
-- Twitter - [@yourusername](https://www.twitter.com/yourusername)
-
-**Note: Delete this note and add/remove/edit lines above based on what links you'd like to share.**
-
-## Acknowledgments
-
-This is where you can give a hat tip to anyone who helped you out on this project. Perhaps you worked in a team or got some inspiration from someone else's solution. This is the perfect place to give them some credit.
-
-**Note: Delete this note and edit this section's content as necessary. If you completed this challenge by yourself, feel free to delete this section entirely.**
+- Website - [Noah's Website](https://noahs.software)
+- Frontend Mentor - [@mrcordova](https://www.frontendmentor.io/profile/mrcordova)
