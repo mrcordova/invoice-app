@@ -36,7 +36,7 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [iou.claims](iou.claims)
+- Solution URL: [iou.claims](https://iou.claims)
 - Live Site URL: [github repo](https://github.com/mrcordova/invoice-app)
 
 ## My process
