@@ -18,7 +18,7 @@ export const acceptedFileTypes = [
   "image/svg+xml",
 ];
 
-const currencyOptions = { style: "currency", currency: "USD" };
+export const currencyOptions = { style: "currency", currency: "USD" };
 function createdAt() {
   const currentDate = new Date(Date.now());
   return new Intl.DateTimeFormat("en-CA").format(currentDate);

@@ -16,27 +16,26 @@ import {
   hideProgressCircle,
   showOverlayLoading,
   hideOverlayLoading,
-
+  currencyOptions,
 } from "./functions.js";
-
 
 const themeInputs = document.querySelectorAll('label:has(input[name="theme"])');
 const invoices = document.querySelector(".invoices");
 const newInvoiceDialog = document.getElementById("new-invoice-dialog");
-const profileDialog = document.getElementById('profile-dialog');
+const profileDialog = document.getElementById("profile-dialog");
 const invoiceTotal = document.querySelector("[data-invoice-total]");
 
 const main = document.querySelector("main");
 const header = document.querySelector("header");
-const currencyOptions = { style: "currency", currency: "GBP" };
+// const currencyOptions = { style: "currency", currency: "USD" };
 const dateOptions = { day: "numeric", month: "short", year: "numeric" };
 const filterOptions = new Set();
-let username = localStorage.getItem('username');
-let img = localStorage.getItem('img');
-const loadingOverlay = document.getElementById('overlay');
+let username = localStorage.getItem("username");
+let img = localStorage.getItem("img");
+const loadingOverlay = document.getElementById("overlay");
 // const profileImg = document.getElementById('profile_img');
 // profileImg.src = img;
-const profileImgs = document.querySelectorAll('.profile_img');
+const profileImgs = document.querySelectorAll(".profile_img");
 for (const profileImg of profileImgs) {
   profileImg.src = img;
 }
@@ -44,14 +43,12 @@ const fileInput = document.getElementById("profile_pic");
 
 window.addEventListener("DOMContentLoaded", async (e) => {
   let response;
- 
+
   showOverlayLoading(loadingOverlay);
-  response = await fetchWithAuth('/getInvoices', 'GET');
+  response = await fetchWithAuth("/getInvoices", "GET");
   if (response.status === 403) {
-  
     await refreshAccessToken();
-    response = await fetchWithAuth('/getInvoices', 'GET');
-    
+    response = await fetchWithAuth("/getInvoices", "GET");
   }
   const { invoices } = await response.json();
   createInvoices(invoices);
@@ -118,13 +115,15 @@ function searchInvoices() {
 async function saveInvoiceToDB(invoice) {
   let response;
   try {
-
-    response = await fetchWithAuth('/saveInvoice', "POST", JSON.stringify(invoice));
+    response = await fetchWithAuth(
+      "/saveInvoice",
+      "POST",
+      JSON.stringify(invoice)
+    );
     if (response.status === 403) {
       await refreshAccessToken();
-    
+
       saveInvoiceToDB(invoice);
-    
     }
   } catch (error) {
     console.error(`saveInvoiceToDB: ${error}`);
@@ -173,61 +172,62 @@ function addInvoice(invoice) {
 }
 
 header.addEventListener("click", async (e) => {
-   e.stopImmediatePropagation();
+  e.stopImmediatePropagation();
   const themeBtn = e.target.closest("[data-theme]");
-  const profileDialogAttr = e.target.closest('[data-show-profile-dialog]');
-  const closeBtn = e.target.closest('[data-close]');
-  const submtiBtn = e.target.closest('[data-profile-submit]');
-  const logoutBtn = e.target.closest('[data-logout]');
+  const profileDialogAttr = e.target.closest("[data-show-profile-dialog]");
+  const closeBtn = e.target.closest("[data-close]");
+  const submtiBtn = e.target.closest("[data-profile-submit]");
+  const logoutBtn = e.target.closest("[data-logout]");
   // console.log(logoutBtn);
   if (themeBtn) {
     e.preventDefault();
     themeUpdate(e, themeInputs);
-  }
-  else if (profileDialogAttr) {
+  } else if (profileDialogAttr) {
     profileDialog.showModal();
     profileDialog.querySelector('input[name="username"]').value = username;
-    const imgPreview = profileDialog.querySelector('img[data-preview]');
-    imgPreview.src = localStorage.getItem('img');
-    
-  }  else if (closeBtn) {
-    const imgPreview = profileDialog.querySelector('img[data-preview]');
-    imgPreview.src = localStorage.getItem('img');
-    document.querySelector('#profile-form').reset();
+    const imgPreview = profileDialog.querySelector("img[data-preview]");
+    imgPreview.src = localStorage.getItem("img");
+  } else if (closeBtn) {
+    const imgPreview = profileDialog.querySelector("img[data-preview]");
+    imgPreview.src = localStorage.getItem("img");
+    document.querySelector("#profile-form").reset();
     profileDialog.close();
   } else if (submtiBtn) {
     e.preventDefault();
 
     const input = profileDialog.querySelector('input[name="username"]');
 
-    if (showFormErrors(submtiBtn) && (fileInput.files.length === 1 || input.value !== username) && input.value.length != 0) {
-      const formData = new FormData(document.querySelector('#profile-form'));
+    if (
+      showFormErrors(submtiBtn) &&
+      (fileInput.files.length === 1 || input.value !== username) &&
+      input.value.length != 0
+    ) {
+      const formData = new FormData(document.querySelector("#profile-form"));
       let response;
       const btnText = showProgressCircle(submtiBtn);
       try {
-        response = await fetchWithAuth('/upload', 'POST', formData, {});
+        response = await fetchWithAuth("/upload", "POST", formData, {});
         if (response.status === 403) {
           await refreshAccessToken();
-          response = await fetchWithAuth('/upload', 'POST', formData, {});
+          response = await fetchWithAuth("/upload", "POST", formData, {});
         }
         if (response.ok) {
           const result = await response.json();
-          if (result['success']) {
-            const { filename, alt, title } = result['file'];
+          if (result["success"]) {
+            const { filename, alt, title } = result["file"];
             const { username: newUsername } = result;
             for (const profileImg of profileImgs) {
               // profileImg.src = img;
               profileImg.src = `${filename}`;
-             
-              profileImg.setAttribute('title', title);
-              profileImg.setAttribute('alt', alt);
-            };
-          
-            fileInput.value = '';
-            localStorage.setItem('img', filename);
-            localStorage.setItem('username', newUsername);
+
+              profileImg.setAttribute("title", title);
+              profileImg.setAttribute("alt", alt);
+            }
+
+            fileInput.value = "";
+            localStorage.setItem("img", filename);
+            localStorage.setItem("username", newUsername);
             username = newUsername;
-          
           } else {
             console.error(result);
           }
@@ -237,49 +237,50 @@ header.addEventListener("click", async (e) => {
       }
       hideProgressCircle(submtiBtn, btnText);
     } else {
- 
-      if ((fileInput.files.length === 1 || input.value !== username)) {
-        const form = submtiBtn.closest('form');
+      if (fileInput.files.length === 1 || input.value !== username) {
+        const form = submtiBtn.closest("form");
         form.requestSubmit(submtiBtn);
       }
     }
   } else if (logoutBtn) {
     e.preventDefault();
-   
+
     const btnText = showProgressCircle(logoutBtn);
     const result = await logout();
     hideProgressCircle(logoutBtn, btnText);
     if (result.success) {
-      document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-      document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      document.cookie =
+        "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie =
+        "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }
-    
   }
-
 });
 
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length === 1 && acceptedFileTypes.includes(fileInput.files[0].type) && e.target.files[0].size < 2097152) {
+fileInput.addEventListener("change", (e) => {
+  if (
+    e.target.files.length === 1 &&
+    acceptedFileTypes.includes(fileInput.files[0].type) &&
+    e.target.files[0].size < 2097152
+  ) {
     const file = e.target.files[0];
     const thumbUrl = URL.createObjectURL(file);
-    const imgPreview = profileDialog.querySelector('img[data-preview]');
-    imgPreview.setAttribute('src', thumbUrl);
-    imgPreview.setAttribute('title', file.name);
-    imgPreview.setAttribute('alt', file.name);
+    const imgPreview = profileDialog.querySelector("img[data-preview]");
+    imgPreview.setAttribute("src", thumbUrl);
+    imgPreview.setAttribute("title", file.name);
+    imgPreview.setAttribute("alt", file.name);
   } else {
-    console.log('file does not meet requirements');
+    console.log("file does not meet requirements");
     console.error(e.target.files);
   }
-
 });
-
 
 main.addEventListener("click", (e) => {
   e.preventDefault();
   const statusFilterOption = e.target.closest("[data-filter-option]");
   const filterDropdown = e.target.closest("[data-filter-dropdown]");
   const dialog = e.target.closest("[data-show-dialog]");
-  
+
   const invoiceEle = e.target.closest("[data-invoice]");
 
   if (statusFilterOption) {
@@ -298,8 +299,7 @@ main.addEventListener("click", (e) => {
     newInvoiceDialog.showModal();
   } else if (invoiceEle) {
     location.href = invoiceEle.getAttribute("href");
-  } 
-  
+  }
 });
 
 newInvoiceDialog.addEventListener("click", async (e) => {
@@ -316,7 +316,6 @@ newInvoiceDialog.addEventListener("click", async (e) => {
 
   if (cancelBtn) {
     resetForm(newInvoiceDialog);
-   
   } else if (goBackBtn) {
     resetForm(newInvoiceDialog);
   } else if (saveBtn) {

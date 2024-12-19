@@ -56,7 +56,7 @@ I learned how to host frontend and backend on same domain. I also learned how to
 ### Continued development
 
 I would like to add two new statuses: past due and owed. The plan is to show when an IOU has not been paid and the date it was due has past. Send reminder to Debtor(person who owes the money) to pay their IOU. The owed status should go to creditor(person owed money) after approving IOU and would show in Creditor's front page.
-I am also like to add the functionality of adding images of recipts to IOUs and extract information from recipts. Allow multiple creditors to one IOUs and split debt if necessary.
+I am also like to add the functionality of adding images of recipts to IOUs and extract information from recipts. Allow multiple creditors to one IOUs and split debt if necessary. Finally, make website into a PWA(progressive web app);
 
 ### Useful resources
 

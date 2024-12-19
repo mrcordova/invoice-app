@@ -1,6 +1,5 @@
 import {
   addItemRow,
-  formatDate,
   resetForm,
   saveInvoice,
   showPaymentTermsMenu,
@@ -16,11 +15,9 @@ import {
   hideProgressCircle,
   showOverlayLoading,
   hideOverlayLoading,
-  getShortenUrl,
   copyUrl,
   updateInvoice,
   updateStatus,
-  URL_WEBSITE,
   setUpEditDialog,
 } from "./functions.js";
 let params = new URLSearchParams(document.location.search);
@@ -41,7 +38,7 @@ async function getInvoice(invoiceId) {
       return await response.json();
     }
   } catch (error) {
-    console.error(error);
+    console.error(`getInvoice: ${error}`);
   }
 }
 const deleteDialog = document.querySelector("#delete-dialog");
