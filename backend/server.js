@@ -1030,7 +1030,7 @@ io.on("connection", (socket) => {
       console.log(`Sockets in room:`, Array.from(roomSockets));
       // socket.emit("roomSockets", Array.from(roomSockets)); // Send list to the client
     } else {
-      console.log(`Room does not exist or is empty`);
+      console.error(`Room does not exist or is empty`);
     }
     socket.to(room_id).emit("checkStatus", { room_id });
     io.to(room_id).emit("rejoined-room", {
