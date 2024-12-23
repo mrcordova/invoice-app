@@ -1,4 +1,3 @@
-// export const URL_WEBSITE = "https://invoice-backend.noahprojects.work";
 export const URL_WEBSITE = "https://iou.claims";
 export const perferredColorScheme = "perferredColorScheme";
 
@@ -61,14 +60,9 @@ export function hideProgressCircle(btn, btnText) {
 
 export function showOverlayLoading(overlay) {
   overlay.style.visibility = "visible";
-  // overlay.style.opacity = '1';
 }
 export function hideOverlayLoading(overlay) {
   overlay.style.visibility = "hidden";
-  // overlay.style.opacity = '0';
-  // setTimeout(() => {
-  //   overlay.style.visibility = 'hidden';
-  // }, 500); // Match the transition duration
 }
 export function formatDate(date) {
   return new Intl.DateTimeFormat("en-CA").format(new Date(date));
@@ -207,7 +201,6 @@ export function updateInvoice(
   );
 
   for (const item of items) {
-    // console.log(JSON.parse(items));
     invoiceItemsTable.insertAdjacentHTML(
       "beforeend",
       ` <div class="invoice-item">
@@ -575,20 +568,15 @@ export function updatePaymentTerms(paymentTermsBtn) {
 export async function logout() {
   const response = await fetch(`${URL_WEBSITE}/logout`, {
     method: "POST",
-    headers: {
-      // "Access-Control-Allow-Origin": true,
-    },
+    headers: {},
     cache: "reload",
     credentials: "same-origin",
   });
-  // console.log(response);
   const result = await response.json();
-  // console.log(result);
-  // if (result['success']) {
+
   localStorage.removeItem("img");
   localStorage.removeItem("username");
   location.href = "/login.html";
-  // }
 }
 
 export async function getShortenUrl(link) {
@@ -619,16 +607,13 @@ export async function refreshAccessToken() {
 
     if (tokenResponse.ok) {
       const { accessToken } = await tokenResponse.json();
-      // console.log(accessToken);
     } else {
       console.error(await tokenResponse.json());
       await logout();
-      // location.href = "/login.html";
     }
   } catch (error) {
     console.error(error);
     await logout();
-    // location.href = "/login.html";
   }
 }
 

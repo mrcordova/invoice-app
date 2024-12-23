@@ -448,8 +448,6 @@ app.post("/loginUser", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
-  // const refreshToken = req.signedCookies['refresh_token'];
-  // if (!refreshToken) return res.status(204).json({'Refresh token invalid'{});
   try {
     const hashToken = hashPassword(refreshToken);
     const blackListed = await blacklistToken(refreshToken);
@@ -788,10 +786,8 @@ app.get(
       expiresIn: "7d",
     });
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    // const hashToken = hashPassword(token);
 
     const { num_of_guests } = req.query;
-    // console.log(num_of_guests);
     try {
       const selectInvoiceQuery =
         "SELECT * FROM invoices WHERE user_id = ? AND id = ?  AND link_expires_at > NOW()";
@@ -801,12 +797,9 @@ app.get(
       });
       let invoice = invoices[0] ?? undefined;
 
-      // console.log(`invoice: ${invoice}`);
       let urlLink = invoice != undefined ? invoice.link : "";
 
-      // console.log("url", !urlLink);
       if (!urlLink) {
-        // console.log("here", JSON);
         const selectInvoiceQuery =
           "SELECT * FROM invoices WHERE user_id = ? AND id = ? ";
         const [invoices] = await poolPromise.query({
@@ -820,7 +813,7 @@ app.get(
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              url: `https://invoice-backend.noahprojects.work/room.html?token=${token}`,
+              url: `https://iou.claims/room.html?token=${token}`,
               domain: "tinyurl.com",
               description: "string",
             }),
@@ -851,12 +844,6 @@ app.get(
         });
         urlLink = url;
       } else {
-        // const invoiceData = JSON.stringify(
-        //   invoice,
-        //   Object.keys(invoice).sort()
-        // );
-        // const invoiceData = invoices[0];
-        // console.log(invoiceData);
         const selectQuery =
           "SELECT room_id FROM rooms WHERE user_id = ? AND JSON_SEARCH(data, 'one', ?) IS NOT NULL";
         const [result] = await poolPromise.query({
@@ -866,7 +853,6 @@ app.get(
         token = result[0].room_id;
       }
 
-      // console.log(url);
       res.json({
         link: urlLink,
         path: `/room.html?token=${token}`,
@@ -885,7 +871,6 @@ app.get("/guest-token", async (req, res) => {
   }
   try {
     const guestId = uuidv4();
-    // jwt.sign({ id: user.id, username: user.username, img: user.img });
     const guestToken = jwt.sign(
       {
         id: guestId,
@@ -908,28 +893,6 @@ app.get("/guest-token", async (req, res) => {
     console.error(`guest-token: ${error}`);
   }
 });
-
-// app.get('/room/:token', async (req, res) => {
-//   const token = req.params.token;
-//   const { id , invoiceId } = jwt.verify(req.params.token, process.env.ROOM_SECRET);
-
-//   try {
-//     const selectQuery = 'SELECT room_id FROM rooms WHERE room_id = ?';
-//     const [result] = await poolPromise.query({ sql: selectQuery, values: [token] });
-//     const { 'num_of_guests': numOfGuests, used } = result[0];
-//     if (!result.length) {
-//       return res.status(404).send('Room not found');
-//     };
-
-//     if (!numOfGuests && used) {
-//       return res.status(403).send('This room is full');
-//     };
-
-//     res.sendFile(path.join(__dirname, "../frontend/room.html"));
-//   } catch (error) {
-
-//   }
-// });
 
 app.get("/health-check", async (req, res) => {
   try {
@@ -954,7 +917,6 @@ io.use((socket, next) => {
       process.env.COOKIE_SECRET
     );
 
-    // console.log(signedCookies);
     if (signedCookies.refresh_token) {
       socket.refresh_token = signedCookies.refresh_token; // Attach verified cookie to socket
 
@@ -965,22 +927,18 @@ io.use((socket, next) => {
       return next();
     }
 
-    // else {
     socket.refresh_token = undefined;
     socket.guest_token = undefined;
     return next();
-    // }
   }
   socket.refresh_token = undefined;
   next();
 });
 io.on("connection", (socket) => {
   console.log("New user connected", socket.id);
-  // console.log(socket.refresh_token);
-  // const refresh_token = cookies['refresh_token'];
+
   //When a user joins the room
   let userId;
-  // console.log(socket.refresh_token);
 
   try {
     if (socket.refresh_token) {
@@ -989,11 +947,9 @@ io.on("connection", (socket) => {
         process.env.REFRESH_SECRET
       );
       userId = id;
-      // console.log("userid", userId);
     } else {
       const { id } = jwt.verify(socket.guest_token, process.env.JWT_SECRET);
       userId = id;
-      // console.log(userId);
     }
   } catch (error) {
     console.error(`connection: ${error}`);
@@ -1002,23 +958,15 @@ io.on("connection", (socket) => {
   socket.on("reconnect", (token) => {
     console.log("hello");
   });
-  // socket.user_id = userId;
   socket.on("joinRoom", async ({ token }) => {
-    // const {invoiceId, id: user_id } = jwt.verify(token, process.env.ROOM_SECRET);
-
-    // check if expired link? in rejoin room event as well?
-
-    // console.log(token);
     try {
       const selectQuery =
         "SELECT room_id, user_id, used, guestIds, num_of_guests, data FROM rooms WHERE room_id = ?";
 
-      // console.log(token);
       const [room] = await poolPromise.query({
         sql: selectQuery,
         values: [token],
       });
-      // console.log(room);
       const {
         user_id,
         room_id,
@@ -1028,7 +976,6 @@ io.on("connection", (socket) => {
       } = room[0];
       const temp = JSON.parse(guestIds ?? "[]");
 
-      // console.log(user_id);
       if (user_id === userId) {
         const updateQuery = "UPDATE rooms SET used = ? WHERE room_id = ?";
         const [result] = await poolPromise.query({
@@ -1036,7 +983,6 @@ io.on("connection", (socket) => {
           values: [true, room_id],
         });
         socket.join(room_id);
-        // console.log(data);
         socket.emit("message", {
           message: "creator joined",
           invoice: data,
@@ -1044,21 +990,16 @@ io.on("connection", (socket) => {
         });
         socket.to(room_id).emit("checkStatus", { room_id });
       } else if (numOfGuests) {
-        // console.log('here');
         const updateQuery =
           "UPDATE rooms SET num_of_guests = ?, guestIds = ? WHERE room_id = ?";
         const newNumOfGuests = numOfGuests - 1;
-        // console.log(newNumOfGuests);
 
         temp.push(userId);
-        // console.log(test.push(1));
         const tempGuestIds = JSON.stringify(temp);
-        // console.log(tempGuestIds);
         const [result] = await poolPromise.query({
           sql: updateQuery,
           values: [newNumOfGuests, tempGuestIds, room_id],
         });
-        // console.log(result);
         socket.join(room_id);
         socket.emit("message", {
           message: "guest joined",
@@ -1083,7 +1024,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("rejoinRoom", (room_id) => {
-    // console.log("guest", socket.user_id);
     socket.join(room_id);
     const roomSockets = io.sockets.adapter.rooms.get(room_id); // Set of socket IDs
     if (roomSockets) {
@@ -1091,7 +1031,6 @@ io.on("connection", (socket) => {
       // socket.emit("roomSockets", Array.from(roomSockets)); // Send list to the client
     } else {
       console.log(`Room does not exist or is empty`);
-      // socket.emit("roomSockets", []);
     }
     socket.to(room_id).emit("checkStatus", { room_id });
     io.to(room_id).emit("rejoined-room", {
@@ -1110,8 +1049,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateInvoice", ({ room_id, invoice }) => {
-    // console.log(userId);
-    // socket.to(room_id).emit('invoice', { invoice });
     io.to(room_id).emit("invoice", { invoice, room_id });
   });
 
@@ -1133,9 +1070,7 @@ io.on("connection", (socket) => {
         items,
         total,
       } = tempInvoice;
-      // console.log(new Intl.DateTimeFormat("en-CA").format(new Date(createdAt)));
-      // console.log(invoice);
-      // console.log(clientAddress);
+
       const updateQuery =
         "UPDATE invoices SET createdAt = ?,  paymentDue = ?, description = ?, paymentTerms = ?, clientName = ?, clientEmail = ?, status = ?, clientAddress = ? , senderAddress = ?, items = ?, total = ? WHERE id = ? AND user_id = ?";
       const updateRoomDataQuery = "UPDATE rooms SET data = ? WHERE room_id = ?";
@@ -1161,13 +1096,10 @@ io.on("connection", (socket) => {
         sql: updateRoomDataQuery,
         values: [invoice, room_id],
       });
-      // console.log(results.affectedRows);
       tempInvoice.senderAddress = JSON.parse(senderAddress);
       tempInvoice.clientAddress = JSON.parse(clientAddress);
       tempInvoice.items = JSON.parse(items);
-      // console.log(tempInvoice);
-      // tempInvoice.clientAddress = JSON.stringify(tempInvoice.clientAddress);
-      // tempInvoice.items = JSON.stringify(tempInvoice.items);
+
       io.to(room_id).emit("invoice", { invoice: tempInvoice });
     } catch (error) {
       console.error(`saveInvoice event: ${error}`);
@@ -1176,16 +1108,13 @@ io.on("connection", (socket) => {
 
   socket.on("resetInvoice", async ({ room_id }) => {
     try {
-      // const { id, invoiceId } = jwt.verify(room_id, process.env.ROOM_SECRET);
       const selectQuery = "SELECT  data FROM rooms WHERE room_id = ?";
-      // const selectQuery = "SELECT * FROM invoices WHERE id = ? AND user_id = ?";
       const [invoices] = await poolPromise.query({
         sql: selectQuery,
         values: [room_id],
       });
 
       const invoice = JSON.parse(invoices[0].data);
-      // console.log(invoice);
       invoice.senderAddress = JSON.parse(invoice.senderAddress);
       invoice.clientAddress = JSON.parse(invoice.clientAddress);
       invoice.items = JSON.parse(invoice.items);
@@ -1200,10 +1129,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendInvoiceMessage", async ({ room_id, approve }) => {
-    // if (socket.refresh_token) {
-    // console.log("guest", socket.user_id);
-
-    // console.log(room_id);
     try {
       const selectQuery =
         "SELECT user_id, guestIds, num_of_guests FROM rooms WHERE room_id = ?";
@@ -1212,11 +1137,9 @@ io.on("connection", (socket) => {
         sql: selectQuery,
         values: [room_id],
       });
-      // console.log(room[0]);
-      // const guestIds = JSON.parse(room[0].guestIds);
+
       const { num_of_guests, guestIds } = room[0];
-      // console.log(room);
-      // console.log(user_id, userId);
+
       socket.to(room_id).emit("askForResponse", {
         userId,
         approve,
@@ -1231,28 +1154,14 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error(`sendInvoiceMessage: ${error}`);
     }
-
-    // } else {
-    // io.to(room_id).emit('responseReceived', { approve });
-    // };
   });
   socket.on("sendResponse", ({ room_id, approve: response }) => {
     socket.to(room_id).emit("responseReceived", { response });
   });
-  //   socket.on('waitForOthers', ({ room_id, approve }) => {
-  //     if (socket.refresh_token) {
-  //       socket.to(room_id).emit('response', { approve });
-  //       socket.emit('waitingResponse', { status: 'waiting' });
-  //     }
 
-  //   });
-  //   socket.on('othersRespnse', ({room_id}) => {
-  // io.to(room_id).emit('reponseReceived', {})
-  //   });
   socket.on("end", async ({ token }) => {
     try {
       const { id } = jwt.verify(token, process.env.ROOM_SECRET);
-      // console.log(token);
       if (userId == id) {
         const updateQuery = "UPDATE rooms SET used = false WHERE room_id = ?";
         const [results, error] = await poolPromise.query({
@@ -1270,14 +1179,12 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error(`end: ${error}`);
     }
-    // console.log("end", token);
     // get user id
     // reset used or num of guests and guestIds array
   });
 
   socket.on("disconnect", (reason) => {
     console.log("User disconnected", reason);
-    // socket.emit("disconnect", reason);
     if (reason === "ping timeout") {
       // Handle ping timeout (e.g., notify, log, or attempt reconnection)
       console.log(`Ping timeout detected for socket ${socket.id}`);

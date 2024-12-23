@@ -53,7 +53,6 @@ const shareDialog = document.getElementById("share-dialog");
 const shareOverlay = shareDialog.querySelector("#share-overlay");
 let username = localStorage.getItem("username");
 let img = localStorage.getItem("img");
-// const profileImg = document.getElementById('profile_img');
 const profileImgs = document.querySelectorAll(".profile_img");
 for (const profileImg of profileImgs) {
   profileImg.src = img;

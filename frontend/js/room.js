@@ -241,9 +241,7 @@ socket.on("disconnect", (reason) => {
 });
 
 window.addEventListener("beforeunload", () => {
-  // localStorage.removeItem("userId");
   localStorage.removeItem("invoice");
-  // localStorage.removeItem("status");
   socket.emit("end", { token });
   localStorage.removeItem("token");
 });

@@ -1,4 +1,3 @@
-// import { socket } from "./auth.js";
 import {
   addItemRow,
   resetForm,
@@ -33,8 +32,7 @@ const filterOptions = new Set();
 let username = localStorage.getItem("username");
 let img = localStorage.getItem("img");
 const loadingOverlay = document.getElementById("overlay");
-// const profileImg = document.getElementById('profile_img');
-// profileImg.src = img;
+
 const profileImgs = document.querySelectorAll(".profile_img");
 for (const profileImg of profileImgs) {
   profileImg.src = img;
@@ -54,7 +52,6 @@ window.addEventListener("DOMContentLoaded", async (e) => {
   createInvoices(invoices);
   invoiceTotal.textContent = invoices.length;
   hideOverlayLoading(loadingOverlay);
-  // loadingOverlay.style.visibility = 'hidden';
 });
 
 if (!(perferredColorScheme in localStorage)) {
@@ -178,7 +175,6 @@ header.addEventListener("click", async (e) => {
   const closeBtn = e.target.closest("[data-close]");
   const submtiBtn = e.target.closest("[data-profile-submit]");
   const logoutBtn = e.target.closest("[data-logout]");
-  // console.log(logoutBtn);
   if (themeBtn) {
     e.preventDefault();
     themeUpdate(e, themeInputs);
@@ -217,7 +213,6 @@ header.addEventListener("click", async (e) => {
             const { filename, alt, title } = result["file"];
             const { username: newUsername } = result;
             for (const profileImg of profileImgs) {
-              // profileImg.src = img;
               profileImg.src = `${filename}`;
 
               profileImg.setAttribute("title", title);
