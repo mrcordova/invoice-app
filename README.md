@@ -74,6 +74,8 @@ I am also like to add the functionality of adding images of recipts to IOUs and 
 - [How to add foreign key to table](https://stackoverflow.com/questions/10028214/add-foreign-key-to-existing-table) - How to alter a table in mySql to include a foreign key.
 - [Documentaion for tinyurl API](https://tinyurl.com/app/dev) - The Documentaion for the tinyurl api and how to work with the api.
 
+- [socket.io imports](https://cdnjs.com/libraries/socket.io) - Link to include socket.io latest packages to project.
+
 ## Author
 
 - Website - [Noah's Website](https://noahs.software)
