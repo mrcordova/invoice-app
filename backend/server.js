@@ -21,8 +21,8 @@ const acceptedFileTypes = {
 const defaultProfilePic = "uploads/image-avatar.jpg";
 const PORT = process.env.PORT || 3004;
 const allowedOrigins = [
-  "https://invoice-backend.noahprojects.work",
-  "https://iou.claims",
+  "https://invoice-backend.noahproject.site",
+  "https://iouclaims.noahproject.site",
   "http://127.0.0.1:5500",
   "chrome-extension://mpognobbkildjkofajifpdfhcoklimli",
 ];

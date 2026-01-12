@@ -1,4 +1,4 @@
-export const URL_WEBSITE = "https://iou.claims";
+export const URL_WEBSITE = "https://iouclaims.noahproject.site";
 export const perferredColorScheme = "perferredColorScheme";
 
 function generateCustomId() {
